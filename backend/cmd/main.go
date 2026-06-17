@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"weddinghub/handlers"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -10,12 +12,13 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
 	http.HandleFunc("/", home)
+	http.HandleFunc("/signup", handlers.Signup)
 
-	fmt.Println("Server running on http://localhost:8080")
+	fmt.Println("Server running on :8080")
 
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		fmt.Println(err)
-	}
+	http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/users", handlers.GetUsers)
 }
+

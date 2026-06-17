@@ -1,0 +1,32 @@
+package handlers
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"weddinghub/models"
+)
+
+var Events []models.Event
+
+func CreateEvent(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var event models.Event
+
+	err := json.NewDecoder(r.Body).Decode(&event)
+	if err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	event.ID = len(Events) + 1
+
+	Events = append(Events, event)
+
+	json.NewEncoder(w).Encode(event)
+}
