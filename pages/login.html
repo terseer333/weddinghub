@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>Login - WeddingHub</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -10,17 +10,86 @@
 
     <h1>Login</h1>
 
-    <form>
+    <form id="loginForm">
 
-        <input type="email" placeholder="Email"><br><br>
+        <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            required>
 
-        <input type="password" placeholder="Password"><br><br>
+        <br><br>
 
-        <button class="btn">Login</button>
+        <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required>
+
+        <br><br>
+
+        <button type="submit" class="btn">
+            Login
+        </button>
 
     </form>
 
+    <p id="message"></p>
+
 </section>
+
+<script>
+
+document.getElementById("loginForm")
+.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+   const user = {
+    email: document.getElementById("email").value.trim(),
+    password: document.getElementById("password").value.trim()
+};
+
+console.log("Sending:", user);
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(user)
+            }
+        );
+
+        if(response.ok){
+
+            document.getElementById("message")
+                .innerText = "✅ Login Successful";
+
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1000);
+
+        } else {
+
+            document.getElementById("message")
+                .innerText = "❌ Invalid Email or Password";
+
+        }
+
+    } catch(err){
+
+        document.getElementById("message")
+            .innerText = "❌ Server Error";
+
+    }
+
+});
+
+</script>
 
 </body>
 </html>
