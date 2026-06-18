@@ -9,6 +9,7 @@ import (
 
 var Users []models.User
 
+// POST /signup
 func Signup(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -35,6 +36,8 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		"user":    user,
 	})
 }
+
+// GET /users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodGet {
@@ -46,6 +49,8 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(Users)
 }
+
+// POST /login
 func Login(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
@@ -53,12 +58,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var loginData struct {
+	var login struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	err := json.NewDecoder(r.Body).Decode(&loginData)
+	err := json.NewDecoder(r.Body).Decode(&login)
 	if err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
@@ -66,8 +71,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	for _, user := range Users {
 
-		if user.Email == loginData.Email &&
-			user.Password == loginData.Password {
+		if user.Email == login.Email &&
+			user.Password == login.Password {
+
+			w.Header().Set("Content-Type", "application/json")
 
 			json.NewEncoder(w).Encode(map[string]string{
 				"message": "Login successful",

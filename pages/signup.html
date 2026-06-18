@@ -4,6 +4,44 @@
     <title>Sign Up</title>
     <link rel="stylesheet" href="../style.css">
 </head>
+<script>
+document.getElementById("signupForm")
+.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const user = {
+        full_name: document.getElementById("fullName").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+    };
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/signup",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(user)
+            }
+        );
+
+        const data = await response.json();
+
+        document.getElementById("message")
+            .innerText = data.message;
+
+    } catch(error) {
+
+        document.getElementById("message")
+            .innerText = "Registration failed";
+
+    }
+});
+</script>
 <body>
 
 <section class="hero">
@@ -11,18 +49,69 @@
     <h1>Create Account</h1>
 
     <form>
-        <input type="text" placeholder="Full Name"><br><br>
+        <form id="signupForm">
 
-        <input type="email" placeholder="Email"><br><br>
+    <input type="text"
+           id="fullName"
+           placeholder="Full Name"
+           required>
 
-        <input type="password" placeholder="Password"><br><br>
+    <br><br>
 
-        <input type="password" placeholder="Confirm Password"><br><br>
+    <input type="email"
+           id="email"
+           placeholder="Email"
+           required>
 
-        <button class="btn">Sign Up</button>
+    <br><br>
+
+    <input type="password"
+           id="password"
+           placeholder="Password"
+           required>
+
+    <br><br>
+
+    <button type="submit" class="btn">
+        Sign Up
+    </button>
+
+</form>
+
+<p id="message"></p>
+</form>
+
+<p id="message"></p>
+
     </form>
 
 </section>
+<script>
+document.getElementById("signupForm")
+.addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const user = {
+        full_name: document.getElementById("fullName").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+    };
+
+    const response = await fetch("http://localhost:8080/signup", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(user)
+    });
+
+    const data = await response.json();
+
+    document.getElementById("message").innerText =
+        data.message;
+});
+</script>
 
 </body>
 </html>

@@ -14,11 +14,18 @@ func home(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	http.HandleFunc("/", home)
+
 	http.HandleFunc("/signup", handlers.Signup)
-
-	fmt.Println("Server running on :8080")
-
-	http.ListenAndServe(":8080", nil)
 	http.HandleFunc("/users", handlers.GetUsers)
-}
+	http.HandleFunc("/login", handlers.Login)
 
+	http.HandleFunc("/events", handlers.CreateEvent)
+	http.HandleFunc("/events/all", handlers.GetEvents)
+
+	fmt.Println("Server running on http://localhost:8080")
+
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
