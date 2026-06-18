@@ -12,7 +12,6 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
 	http.HandleFunc("/", home)
 
 	http.HandleFunc("/signup", handlers.Signup)
@@ -21,11 +20,32 @@ func main() {
 
 	http.HandleFunc("/events", handlers.CreateEvent)
 	http.HandleFunc("/events/all", handlers.GetEvents)
+	http.HandleFunc("/event", handlers.GetEvent)
+
+	http.HandleFunc("/rsvp", handlers.SubmitRSVP)
+	http.HandleFunc("/rsvp/all", handlers.GetRSVPs)
 
 	fmt.Println("Server running on http://localhost:8080")
 
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(
+		":8080",
+		enableCORS(http.DefaultServeMux),
+	)
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+func enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

@@ -30,3 +30,4 @@ func SubmitRSVP(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(rsvp)
 }
+func GetRSVPs(w http.ResponseWriter, r *http.Request) {}

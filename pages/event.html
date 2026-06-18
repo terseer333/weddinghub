@@ -1,26 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Wedding Event</title>
+    <title>Wedding Invitation</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<section class="hero">
+<div class="container">
 
-    <h1>John ❤️ Mary</h1>
+    <h1 id="coupleNames">Loading...</h1>
 
-    <h3>25 July 2026</h3>
+    <h3 id="date"></h3>
 
-    <p>Makurdi, Benue State</p>
+    <h3 id="venue"></h3>
 
-    <p>30 Days Remaining</p>
+    <p id="description"></p>
 
-    <a href="dashboard.html" class="btn">
-        RSVP
+    <hr>
+
+    <h2>RSVP</h2>
+
+    <a href="rsvp.html">
+        <button>RSVP NOW</button>
     </a>
 
-</section>
+</div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+
+const id = params.get("id");
+
+fetch(`http://localhost:8080/event?id=${id}`)
+.then(response => response.json())
+.then(data => {
+
+    document.getElementById("coupleNames").innerText =
+        `💍 ${data.bride_name} & ${data.groom_name}`;
+
+    document.getElementById("date").innerText =
+        `📅 ${data.event_date}`;
+
+    document.getElementById("venue").innerText =
+        `📍 ${data.venue}`;
+
+    document.getElementById("description").innerText =
+        data.description;
+
+});
+
+</script>
 
 </body>
 </html>

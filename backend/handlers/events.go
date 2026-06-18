@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"weddinghub/models"
@@ -39,4 +40,20 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(Events)
+}
+func GetEvent(w http.ResponseWriter, r *http.Request) {
+
+	id := r.URL.Query().Get("id")
+
+	for _, event := range Events {
+
+		if fmt.Sprintf("%d", event.ID) == id {
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(event)
+			return
+		}
+	}
+
+	http.Error(w, "Event not found", http.StatusNotFound)
 }

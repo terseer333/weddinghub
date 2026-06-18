@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RSVP - WeddingHub</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>💌 RSVP</h1>
+
+    <form id="rsvpForm">
+
+        <input
+            type="text"
+            id="guestName"
+            placeholder="Your Full Name"
+            required>
+
+        <br><br>
+
+        <input
+            type="text"
+            id="phone"
+            placeholder="Phone Number"
+            required>
+
+        <br><br>
+
+        <select id="status" required>
+            <option value="">Will you attend?</option>
+            <option value="attending">Yes, I will attend</option>
+            <option value="not attending">Sorry, I can't attend</option>
+        </select>
+
+        <br><br>
+
+        <input
+            type="number"
+            id="guestCount"
+            placeholder="Number of Guests"
+            min="1"
+            value="1">
+
+        <br><br>
+
+        <textarea
+            id="message"
+            placeholder="Leave a message for the couple">
+        </textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Submit RSVP
+        </button>
+
+    </form>
+
+    <p id="result"></p>
+
+</div>
+
+<script>
+
+document.getElementById("rsvpForm")
+.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const rsvp = {
+        guest_name: document.getElementById("guestName").value,
+        phone: document.getElementById("phone").value,
+        status: document.getElementById("status").value,
+        guest_count: parseInt(document.getElementById("guestCount").value),
+        message: document.getElementById("message").value
+    };
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/rsvp",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(rsvp)
+            }
+        );
+
+        const data = await response.json();
+
+        document.getElementById("result").innerText =
+            "✅ RSVP Submitted Successfully!";
+
+        document.getElementById("rsvpForm").reset();
+
+    } catch(err) {
+
+        document.getElementById("result").innerText =
+            "❌ Failed to submit RSVP";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
