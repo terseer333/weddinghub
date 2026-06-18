@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+    <title>WeddingHub Dashboard</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
 <header>
-    <h1>WeddingHub Dashboard</h1>
+
+    <h1>💍 WeddingHub</h1>
+
+    <p>
+        Create beautiful wedding invitations,
+        track RSVPs and manage your guests.
+    </p>
+
 </header>
 
 <section class="dashboard">
@@ -29,6 +36,68 @@
     </div>
 
 </section>
+
+<hr>
+
+<h2 style="text-align:center;">My Wedding Events</h2>
+
+<div id="eventsContainer"></div>
+
+<script>
+
+async function loadEvents() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/events/all"
+        );
+
+        const events = await response.json();
+
+        const container =
+            document.getElementById("eventsContainer");
+
+        container.innerHTML = "";
+
+        events.forEach(event => {
+
+            container.innerHTML += `
+                <div class="card">
+                    <h3>
+                        💍 ${event.bride_name}
+                        &
+                        ${event.groom_name}
+                    </h3>
+
+                    <p>
+                        📅 ${event.event_date}
+                    </p>
+
+                    <p>
+                        📍 ${event.venue}
+                    </p>
+
+                    <a href="event.html?id=${event.id}">
+                        <button>
+                            View Invitation
+                        </button>
+                    </a>
+                </div>
+            `;
+        });
+
+    } catch(error) {
+
+        console.log(error);
+
+    }
+
+}
+
+loadEvents();
+
+</script>
 
 </body>
 </html>
