@@ -6,88 +6,183 @@
 </head>
 <body>
 
-<header>
+<header class="dashboard-header">
 
-    <h1>💍 WeddingHub</h1>
+    <h1>💍 WeddingHub Dashboard</h1>
 
     <p>
-        Create beautiful wedding invitations,
-        track RSVPs and manage your guests.
+        Plan, manage and celebrate your special day.
     </p>
 
 </header>
 
-<section class="dashboard">
+<section class="welcome-banner">
 
-    <div class="card">
-        <h2>Create Wedding Event</h2>
-        <p>Create and manage your wedding invitation.</p>
+    <h2>Welcome Back 👋</h2>
 
-        <a href="create-event.html">
-            <button>Create Event</button>
-        </a>
+    <p>
+        Everything you need to manage your wedding in one place.
+    </p>
+
+</section>
+
+<section class="stats">
+
+    <div class="stat-card">
+        <h3>Total Events</h3>
+        <h1 id="totalEvents">0</h1>
     </div>
 
-    <div class="card">
-        <h2>View RSVPs</h2>
-        <p>See who is attending.</p>
+    <div class="stat-card">
+        <h3>Total RSVPs</h3>
+        <h1 id="totalRSVPs">0</h1>
+    </div>
 
-        <button>Coming Soon</button>
+    <div class="stat-card">
+        <h3>Total Guests</h3>
+        <h1 id="totalGuests">0</h1>
     </div>
 
 </section>
 
-<hr>
+<section class="dashboard-actions">
 
-<h2 style="text-align:center;">My Wedding Events</h2>
+    <div class="action-card">
+
+        <h2>💍 Create Event</h2>
+
+        <p>
+            Create a beautiful wedding invitation.
+        </p>
+
+        <a href="create-event.html">
+            <button>Create Event</button>
+        </a>
+
+    </div>
+
+    <div class="action-card">
+
+        <h2>📋 View RSVPs</h2>
+
+        <p>
+            See all guest responses.
+        </p>
+
+        <a href="rsvps.html">
+            <button>View RSVPs</button>
+        </a>
+
+    </div>
+
+</section>
+
+<section class="recent-section">
+
+    <h2>Recent Activity</h2>
+
+    <div class="activity-card">
+
+        <p>🎉 Welcome to WeddingHub</p>
+
+        <p>Create your first wedding event to begin.</p>
+
+    </div>
+
+</section>
+
+<h2 class="section-title">
+    My Wedding Events
+</h2>
 
 <div id="eventsContainer"></div>
 
 <script>
 
-async function loadEvents() {
+async function loadEvents(){
 
     try {
 
-        const response = await fetch(
-            "http://localhost:8080/events/all"
-        );
+        const response =
+            await fetch(
+                "http://localhost:8080/events/all"
+            );
 
-        const events = await response.json();
+        const events =
+            await response.json();
+
+        document.getElementById("totalEvents")
+            .innerText = events.length;
 
         const container =
             document.getElementById("eventsContainer");
 
         container.innerHTML = "";
 
+        if(events.length === 0){
+
+            container.innerHTML = `
+                <div class="empty-state">
+
+                    <h2>
+                        No Wedding Events Yet
+                    </h2>
+
+                    <p>
+                        Create your first wedding event.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
         events.forEach(event => {
 
             container.innerHTML += `
-                <div class="card">
-                    <h3>
-                        💍 ${event.bride_name}
-                        &
-                        ${event.groom_name}
-                    </h3>
 
-                    <p>
-                        📅 ${event.event_date}
-                    </p>
+                <div class="event-card">
 
-                    <p>
-                        📍 ${event.venue}
-                    </p>
+                    <div class="event-image">
+                        💍
+                    </div>
 
-                    <a href="event.html?id=${event.id}">
-                        <button>
-                            View Invitation
-                        </button>
-                    </a>
+                    <div class="event-content">
+
+                        <h2>
+                            ${event.bride_name}
+                            &
+                            ${event.groom_name}
+                        </h2>
+
+                        <p>
+                            📅 ${event.event_date}
+                        </p>
+
+                        <p>
+                            📍 ${event.venue}
+                        </p>
+
+                        <p>
+                            ${event.description}
+                        </p>
+
+                        <a href="event.html?id=${event.id}">
+                            <button>
+                                View Invitation
+                            </button>
+                        </a>
+
+                    </div>
+
                 </div>
+
             `;
+
         });
 
-    } catch(error) {
+    } catch(error){
 
         console.log(error);
 

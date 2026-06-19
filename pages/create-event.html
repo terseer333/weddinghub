@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Wedding Event</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header class="dashboard-header">
+    <h1>💍 Create Your Wedding Event</h1>
+    <p>Set up your wedding invitation in minutes</p>
+</header>
+
+<div class="auth-right">
+
+    <div class="auth-card">
+
+        <h2>Wedding Details</h2>
+
+        <form id="eventForm">
+
+            <input
+                type="text"
+                id="bride"
+                placeholder="Bride Name"
+                required>
+
+            <input
+                type="text"
+                id="groom"
+                placeholder="Groom Name"
+                required>
+
+            <input
+                type="date"
+                id="date"
+                required>
+
+            <input
+                type="text"
+                id="venue"
+                placeholder="Wedding Venue"
+                required>
+
+            <textarea
+                id="description"
+                placeholder="Write a beautiful message for your guests..."
+                rows="5">
+            </textarea>
+
+            <button type="submit">
+                Create Wedding
+            </button>
+
+        </form>
+
+        <p id="message"></p>
+
+        <br>
+
+        <a href="dashboard.html">
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+<script>
+
+document.getElementById("eventForm")
+.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const event = {
+
+        bride_name:
+            document.getElementById("bride").value,
+
+        groom_name:
+            document.getElementById("groom").value,
+
+        event_date:
+            document.getElementById("date").value,
+
+        venue:
+            document.getElementById("venue").value,
+
+        description:
+            document.getElementById("description").value
+
+    };
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/events",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(event)
+            }
+        );
+
+        if(response.ok){
+
+            document.getElementById("message")
+                .innerHTML =
+                "✅ Wedding Created Successfully";
+
+            document.getElementById("eventForm")
+                .reset();
+
+        } else {
+
+            document.getElementById("message")
+                .innerHTML =
+                "❌ Failed To Create Wedding";
+
+        }
+
+    } catch(error){
+
+        document.getElementById("message")
+            .innerHTML =
+            "❌ Server Error";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

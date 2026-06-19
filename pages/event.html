@@ -6,29 +6,101 @@
 </head>
 <body>
 
-<div class="container">
+<section class="invitation-hero">
 
-    <h1 id="coupleNames">Loading...</h1>
+    <div class="overlay">
 
-    <h3 id="date"></h3>
+        <h1 id="coupleNames">
+            Loading...
+        </h1>
 
-    <h3 id="venue"></h3>
+        <p class="tagline">
+            Together Forever ❤️
+        </p>
 
-    <p id="description"></p>
+        <div id="countdown" class="countdown">
+            Loading countdown...
+        </div>
 
-    <hr>
+    </div>
 
-    <h2>RSVP</h2>
+</section>
+
+<section class="love-story">
+
+    <h2>Our Special Day</h2>
+
+    <p id="description">
+        Loading...
+    </p>
+
+</section>
+
+<section class="invitation-details">
+
+    <div class="detail-card">
+
+        <h2>📅 Date</h2>
+
+        <p id="date"></p>
+
+    </div>
+
+    <div class="detail-card">
+
+        <h2>📍 Venue</h2>
+
+        <p id="venue"></p>
+
+    </div>
+
+    <div class="detail-card">
+
+        <h2>💖 Celebration</h2>
+
+        <p>
+            Join us as we celebrate our union
+            and begin a new chapter together.
+        </p>
+
+    </div>
+
+</section>
+
+<section class="gallery">
+
+    <h2>Wedding Moments</h2>
+
+    <div class="gallery-grid">
+
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552">
+
+        <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf">
+
+        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc">
+
+    </div>
+
+</section>
+
+<section class="invitation-action">
+
+    <h2>We Would Love To Celebrate With You</h2>
+
+    <br>
 
     <a href="rsvp.html">
-        <button>RSVP NOW</button>
+        <button class="invite-btn">
+            Confirm Attendance
+        </button>
     </a>
 
-</div>
+</section>
 
 <script>
 
-const params = new URLSearchParams(window.location.search);
+const params =
+    new URLSearchParams(window.location.search);
 
 const id = params.get("id");
 
@@ -36,19 +108,77 @@ fetch(`http://localhost:8080/event?id=${id}`)
 .then(response => response.json())
 .then(data => {
 
-    document.getElementById("coupleNames").innerText =
-        `💍 ${data.bride_name} & ${data.groom_name}`;
+    document.getElementById("coupleNames")
+        .innerText =
+        `${data.bride_name} & ${data.groom_name}`;
 
-    document.getElementById("date").innerText =
-        `📅 ${data.event_date}`;
+    document.getElementById("date")
+        .innerText =
+        data.event_date;
 
-    document.getElementById("venue").innerText =
-        `📍 ${data.venue}`;
+    document.getElementById("venue")
+        .innerText =
+        data.venue;
 
-    document.getElementById("description").innerText =
+    document.getElementById("description")
+        .innerText =
         data.description;
 
+    startCountdown(data.event_date);
+
 });
+
+function startCountdown(eventDate){
+
+    const countdown =
+        document.getElementById("countdown");
+
+    const weddingDate =
+        new Date(eventDate);
+
+    setInterval(() => {
+
+        const now = new Date();
+
+        const difference =
+            weddingDate - now;
+
+        if(difference <= 0){
+
+            countdown.innerHTML =
+                "🎉 Wedding Day Has Arrived!";
+
+            return;
+        }
+
+        const days =
+            Math.floor(
+                difference /
+                (1000 * 60 * 60 * 24)
+            );
+
+        const hours =
+            Math.floor(
+                (difference %
+                (1000 * 60 * 60 * 24))
+                /
+                (1000 * 60 * 60)
+            );
+
+        const minutes =
+            Math.floor(
+                (difference %
+                (1000 * 60 * 60))
+                /
+                (1000 * 60)
+            );
+
+        countdown.innerHTML =
+            `${days} Days ${hours} Hours ${minutes} Minutes`;
+
+    }, 1000);
+
+}
 
 </script>
 

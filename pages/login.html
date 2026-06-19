@@ -6,37 +6,58 @@
 </head>
 <body>
 
-<section class="hero">
+<div class="auth-container">
 
-    <h1>Login</h1>
+    <div class="auth-left">
+        <h1>💍 WeddingHub</h1>
 
-    <form id="loginForm">
+        <h2>Create Beautiful Wedding Memories</h2>
 
-        <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            required>
+        <p>
+            Plan your wedding, manage guests,
+            track RSVPs and share beautiful
+            invitations with one simple link.
+        </p>
+    </div>
 
-        <br><br>
+    <div class="auth-right">
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            required>
+        <div class="auth-card">
 
-        <br><br>
+            <h2>Welcome Back</h2>
 
-        <button type="submit" class="btn">
-            Login
-        </button>
+            <form id="loginForm">
 
-    </form>
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Email Address"
+                    required>
 
-    <p id="message"></p>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Password"
+                    required>
 
-</section>
+                <button type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            <p id="message"></p>
+
+            <p class="auth-link">
+                Don't have an account?
+                <a href="signup.html">Create Account</a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
 
 <script>
 
@@ -45,45 +66,35 @@ document.getElementById("loginForm")
 
     e.preventDefault();
 
-   const user = {
-    email: document.getElementById("email").value.trim(),
-    password: document.getElementById("password").value.trim()
-};
+    const user = {
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value.trim()
+    };
 
-console.log("Sending:", user);
-    try {
-
-        const response = await fetch(
-            "http://localhost:8080/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":"application/json"
-                },
-                body: JSON.stringify(user)
-            }
-        );
-
-        if(response.ok){
-
-            document.getElementById("message")
-                .innerText = "✅ Login Successful";
-
-            setTimeout(() => {
-                window.location.href = "dashboard.html";
-            }, 1000);
-
-        } else {
-
-            document.getElementById("message")
-                .innerText = "❌ Invalid Email or Password";
-
+    const response = await fetch(
+        "http://localhost:8080/login",
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(user)
         }
+    );
 
-    } catch(err){
+    if(response.ok){
 
         document.getElementById("message")
-            .innerText = "❌ Server Error";
+        .innerHTML = "✅ Login Successful";
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1000);
+
+    } else {
+
+        document.getElementById("message")
+        .innerHTML = "❌ Invalid Email or Password";
 
     }
 

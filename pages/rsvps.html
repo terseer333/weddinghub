@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wedding RSVPs</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header>
+    <h1>Guest Responses</h1>
+</header>
+
+<div id="rsvpContainer"></div>
+
+<script>
+
+async function loadRSVPs() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/rsvp/all"
+        );
+
+        const rsvps = await response.json();
+
+        const container =
+            document.getElementById("rsvpContainer");
+
+        container.innerHTML = "";
+
+        rsvps.forEach(rsvp => {
+
+            container.innerHTML += `
+                <div class="card">
+
+                    <h2>${rsvp.guest_name}</h2>
+
+                    <p>
+                        📞 ${rsvp.phone}
+                    </p>
+
+                    <p>
+                        Status:
+                        <strong>${rsvp.status}</strong>
+                    </p>
+
+                    <p>
+                        Guests:
+                        ${rsvp.guest_count}
+                    </p>
+
+                    <p>
+                        ${rsvp.message}
+                    </p>
+
+                </div>
+            `;
+        });
+
+    } catch(error) {
+
+        console.log(error);
+
+    }
+
+}
+
+loadRSVPs();
+
+</script>
+
+</body>
+</html>
