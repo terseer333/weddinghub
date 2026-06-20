@@ -1,434 +1,127 @@
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ==================================
+   WEDDINGHUB GLOBAL STYLES
+================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #f8f5f2;
-    color: #333;
-}
-
-/* Header */
-header {
-    background: linear-gradient(135deg, #ff6b81, #ff9a8b);
-    color: white;
-    text-align: center;
-    padding: 40px 20px;
-}
-
-header h1 {
-    font-size: 2.5rem;
-}
-
-/* Dashboard Layout */
-.dashboard {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    padding: 40px;
-}
-
-/* Cards */
-.card {
-    background: white;
-    width: 320px;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.card h2,
-.card h3 {
-    margin-bottom: 10px;
-}
-
-.card p {
-    margin-bottom: 10px;
-    color: #666;
-}
-
-/* Buttons */
-button {
-    background: #ff6b81;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #ff4f6d;
-}
-
-/* Event List */
-#eventsContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 30px;
-}
-
-/* Forms */
-form {
-    background: white;
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-input,
-textarea,
-select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.hero {
-    text-align: center;
-    padding: 80px 20px;
-}
-
-.hero h1 {
-    font-size: 3rem;
-    margin-bottom: 20px;
-}
-.hero-header {
-    min-height: 100vh;
-    background:
-    linear-gradient(
-        rgba(0,0,0,.5),
-        rgba(0,0,0,.5)
-    ),
-    url("https://images.unsplash.com/photo-1511285560929-80b456fea0bc");
-    background-size: cover;
-    background-position: center;
-
-    color: white;
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px 50px;
-}
-
-nav a {
-    color: white;
-    text-decoration: none;
-    margin-left: 20px;
-}
-
-.hero-content {
-    text-align: center;
-    padding-top: 150px;
-}
-
-.hero-content h1 {
-    font-size: 4rem;
-    max-width: 900px;
-    margin: auto;
-}
-
-.hero-content p {
-    max-width: 700px;
-    margin: 20px auto;
-    font-size: 1.2rem;
-}
-
-.features {
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-    flex-wrap: wrap;
-    padding: 80px 20px;
-}
-
-.feature-card {
-    background: white;
-    width: 300px;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,.1);
-}
-
-.showcase {
-    text-align: center;
-    padding: 80px 20px;
-}
-
-.steps {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-    margin-top: 40px;
-}
-
-.step {
-    background: white;
-    width: 200px;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,.1);
-}
-
-.step h3 {
-    font-size: 3rem;
-    color: #ff6b81;
-}
-
-footer {
-    text-align: center;
-    padding: 40px;
-    background: #222;
-    color: white;
-}
-/* Invitation Hero */
-
-.invitation-hero {
-
-    height: 100vh;
-
-    background:
-    linear-gradient(
-        rgba(0,0,0,.5),
-        rgba(0,0,0,.5)
-    ),
-    url("https://images.unsplash.com/photo-1520854221256-17451cc331bf");
-
-    background-size: cover;
-    background-position: center;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    text-align: center;
-}
-
-.overlay {
-    color: white;
-}
-
-.overlay h1 {
-
-    font-size: 4rem;
-
-    margin-bottom: 15px;
-}
-
-.tagline {
-
-    font-size: 1.5rem;
-
-    margin-bottom: 40px;
-}
-
-.countdown {
-
-    font-size: 2rem;
-
-    background: rgba(255,255,255,.15);
-
-    padding: 20px;
-
-    border-radius: 15px;
-}
-
-/* Details */
-
-.invitation-details {
-
-    padding: 80px 20px;
-
-    display: flex;
-
-    justify-content: center;
-
-    flex-wrap: wrap;
-
-    gap: 25px;
-}
-
-.detail-card {
-
-    background: white;
-
-    width: 300px;
-
-    padding: 25px;
-
-    border-radius: 15px;
-
-    text-align: center;
-
-    box-shadow:
-    0 4px 15px rgba(0,0,0,.1);
-}
-
-/* RSVP Section */
-
-.invitation-action {
-
-    text-align: center;
-
-    padding-bottom: 80px;
-}
-
-.invite-btn {
-
-    font-size: 1.2rem;
-
-    padding: 15px 35px;
-
-    border-radius: 50px;
-}.auth-container{
-    display:flex;
-    min-height:100vh;
-}
-
-.auth-left{
-    flex:1;
-    background:
-    linear-gradient(
-        rgba(255,107,129,.85),
-        rgba(255,154,139,.85)
-    ),
-    url("https://images.unsplash.com/photo-1519741497674-611481863552");
-
-    background-size:cover;
-    background-position:center;
-
-    color:white;
-
-    display:flex;
-    justify-content:center;
-    flex-direction:column;
-
-    padding:60px;
-}
-
-.auth-left h1{
-    font-size:4rem;
-    margin-bottom:20px;
-}
-
-.auth-left h2{
-    font-size:2rem;
-    margin-bottom:20px;
-}
-
-.auth-left p{
-    max-width:500px;
-    font-size:1.1rem;
-}
-
-.auth-right{
-    flex:1;
+body{
+    font-family:Arial, Helvetica, sans-serif;
     background:#f8f5f2;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    color:#333;
+    line-height:1.6;
 }
 
-.auth-card{
-    width:420px;
-
-    background:white;
-
-    padding:40px;
-
-    border-radius:20px;
-
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.1);
+a{
+    text-decoration:none;
 }
 
-.auth-card h2{
-    text-align:center;
-    margin-bottom:20px;
+img{
+    max-width:100%;
+    display:block;
 }
 
-.auth-card input{
-    width:100%;
-    padding:15px;
-    margin-bottom:15px;
-    border:1px solid #ddd;
-    border-radius:10px;
-}
+/* ==================================
+   BUTTONS
+================================== */
 
-.auth-card button{
-    width:100%;
-}
-
-.auth-link{
-    text-align:center;
-    margin-top:20px;
-}
-
-.dashboard-header{
-    text-align:center;
-    padding:50px;
-    background:
-    linear-gradient(
+button{
+    background:linear-gradient(
         135deg,
         #ff6b81,
         #ff9a8b
     );
 
     color:white;
-}
-
-.stats{
-    display:flex;
-    justify-content:center;
-    margin:30px;
-}
-
-.stat-card{
-    background:white;
-    width:250px;
-    padding:25px;
-    border-radius:15px;
-    text-align:center;
-    box-shadow:
-    0 4px 15px rgba(0,0,0,.1);
-}
-
-.section-title{
-    text-align:center;
-    margin:30px;
-}
-textarea{
-    width:100%;
-    padding:15px;
-    border:1px solid #ddd;
+    border:none;
+    padding:12px 24px;
     border-radius:10px;
-    margin-bottom:15px;
-    resize:none;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.3s;
 }
 
-#message{
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(255,107,129,.3);
+}
+
+/* ==================================
+   HEADER
+================================== */
+
+header{
+    background:linear-gradient(
+        135deg,
+        #ff6b81,
+        #ff9a8b
+    );
+
+    color:white;
     text-align:center;
-    margin-top:15px;
+    padding:40px 20px;
+}
+
+header h1{
+    font-size:2.5rem;
+}
+
+/* ==================================
+   HERO HEADER
+================================== */
+
+.hero-header{
+    min-height:100vh;
+
+    background:
+    linear-gradient(
+        rgba(0,0,0,.55),
+        rgba(0,0,0,.55)
+    ),
+    url("https://images.unsplash.com/photo-1511285560929-80b456fea0bc");
+
+    background-size:cover;
+    background-position:center;
+
+    color:white;
+}
+
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:25px 50px;
+}
+
+nav a{
+    color:white;
+    margin-left:20px;
     font-weight:bold;
 }
-/* Hero Slider */
+
+.hero-content{
+    text-align:center;
+    padding-top:180px;
+}
+
+.hero-content h1{
+    font-size:4rem;
+    max-width:900px;
+    margin:auto;
+}
+
+.hero-content p{
+    max-width:700px;
+    margin:20px auto;
+    font-size:1.2rem;
+}
+
+/* ==================================
+   HERO SLIDER
+================================== */
 
 .hero-slider{
     position:relative;
@@ -441,7 +134,7 @@ textarea{
     width:100%;
     height:100%;
     opacity:0;
-    transition:opacity 1.5s ease-in-out;
+    transition:opacity 1.5s ease;
 }
 
 .slide.active{
@@ -461,7 +154,6 @@ textarea{
     transform:translate(-50%,-50%);
     text-align:center;
     color:white;
-    z-index:2;
     background:rgba(0,0,0,.35);
     padding:40px;
     border-radius:20px;
@@ -476,14 +168,175 @@ textarea{
     font-size:1.3rem;
     margin-bottom:25px;
 }
+
+/* ==================================
+   FEATURES
+================================== */
+
+.features{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    flex-wrap:wrap;
+    padding:80px 20px;
+}
+
+.feature-card{
+    background:white;
+    width:300px;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,.1);
+}
+
+.feature-card h3{
+    margin-bottom:10px;
+}
+
+/* ==================================
+   SHOWCASE
+================================== */
+
+.showcase{
+    text-align:center;
+    padding:80px 20px;
+}
+
+.steps{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    flex-wrap:wrap;
+    margin-top:40px;
+}
+
+.step{
+    background:white;
+    width:220px;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,.1);
+}
+
+.step h3{
+    font-size:3rem;
+    color:#ff6b81;
+}
+
+/* ==================================
+   AUTH PAGES
+================================== */
+
+.auth-container{
+    display:flex;
+    min-height:100vh;
+}
+
+.auth-left{
+    flex:1;
+
+    background:
+    linear-gradient(
+        rgba(255,107,129,.85),
+        rgba(255,154,139,.85)
+    ),
+    url("https://images.unsplash.com/photo-1519741497674-611481863552");
+
+    background-size:cover;
+    background-position:center;
+
+    color:white;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    padding:60px;
+}
+
+.auth-left h1{
+    font-size:4rem;
+    margin-bottom:20px;
+}
+
+.auth-left h2{
+    font-size:2rem;
+    margin-bottom:20px;
+}
+
+.auth-right{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.auth-card{
+    width:420px;
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);
+}
+
+.auth-card h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.auth-link{
+    text-align:center;
+    margin-top:20px;
+}
+
+/* ==================================
+   FORMS
+================================== */
+
+form{
+    background:white;
+    max-width:700px;
+    margin:30px auto;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    margin-bottom:15px;
+}
+
+textarea{
+    resize:none;
+    min-height:120px;
+}
+
+/* ==================================
+   DASHBOARD
+================================== */
+
+.dashboard-header{
+    text-align:center;
+    padding:60px;
+    background:
+    linear-gradient(
+        135deg,
+        #ff6b81,
+        #ff9a8b
+    );
+
+    color:white;
+}
+
 .welcome-banner{
     text-align:center;
     padding:40px;
-}
-
-.welcome-banner h2{
-    font-size:2rem;
-    margin-bottom:10px;
 }
 
 .stats{
@@ -497,47 +350,16 @@ textarea{
 .stat-card{
     width:220px;
     background:white;
-    border-radius:15px;
     padding:25px;
+    border-radius:15px;
     text-align:center;
     box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 
 .stat-card h1{
-    font-size:3rem;
     color:#ff6b81;
+    font-size:3rem;
 }
-.event-card{
-    display:flex;
-    background:white;
-    border-radius:20px;
-    overflow:hidden;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-    margin:20px auto;
-    max-width:800px;
-}
-
-.event-image{
-    width:200px;
-    background:linear-gradient(
-        135deg,
-        #ff6b81,
-        #ff9a8b
-    );
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:5rem;
-    color:white;
-}
-
-.event-content{
-    padding:25px;
-    flex:1;
-}
-/* =========================
-   MODERN DASHBOARD
-========================= */
 
 .dashboard-actions{
     display:flex;
@@ -545,7 +367,6 @@ textarea{
     gap:25px;
     flex-wrap:wrap;
     margin:40px auto;
-    max-width:1200px;
 }
 
 .action-card{
@@ -562,59 +383,27 @@ textarea{
     transform:translateY(-8px);
 }
 
-.action-card h2{
-    margin-bottom:15px;
-}
-
-.action-card p{
-    margin-bottom:20px;
-    color:#666;
-}
-
-.recent-section{
-    max-width:1000px;
-    margin:50px auto;
-    padding:0 20px;
-}
-
-.recent-section h2{
+.section-title{
     text-align:center;
-    margin-bottom:20px;
+    margin:40px 0;
 }
 
-.activity-card{
-    background:white;
-    padding:25px;
-    border-radius:15px;
-    box-shadow:0 6px 18px rgba(0,0,0,.08);
-}
-
-.activity-card p{
-    margin-bottom:10px;
-}
-
-/* =========================
+/* ==================================
    EVENT CARDS
-========================= */
+================================== */
 
 .event-card{
     display:flex;
+    max-width:900px;
+    margin:25px auto;
     background:white;
     border-radius:20px;
     overflow:hidden;
     box-shadow:0 10px 25px rgba(0,0,0,.08);
-    margin:25px auto;
-    max-width:900px;
-    transition:.3s;
-}
-
-.event-card:hover{
-    transform:translateY(-5px);
 }
 
 .event-image{
     width:220px;
-    min-height:220px;
 
     background:
     linear-gradient(
@@ -644,80 +433,56 @@ textarea{
     margin-bottom:10px;
 }
 
-/* =========================
-   EMPTY STATE
-========================= */
-
 .empty-state{
     text-align:center;
     padding:80px 20px;
 }
 
-.empty-state h2{
-    margin-bottom:10px;
+/* ==================================
+   INVITATION PAGE
+================================== */
+
+.invitation-hero{
+    height:100vh;
+
+    background:
+    linear-gradient(
+        rgba(0,0,0,.5),
+        rgba(0,0,0,.5)
+    ),
+    url("https://images.unsplash.com/photo-1520854221256-17451cc331bf");
+
+    background-size:cover;
+    background-position:center;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
 }
 
-/* =========================
-   PREMIUM BUTTONS
-========================= */
-
-button{
-    background:linear-gradient(
-        135deg,
-        #ff6b81,
-        #ff9a8b
-    );
-
+.overlay{
     color:white;
-    border:none;
-    padding:12px 24px;
-    border-radius:10px;
-    cursor:pointer;
+}
+
+.overlay h1{
+    font-size:4rem;
+    margin-bottom:15px;
+}
+
+.tagline{
+    font-size:1.5rem;
+    margin-bottom:30px;
+}
+
+.countdown{
+    font-size:2rem;
     font-weight:bold;
-    transition:.3s;
+    padding:20px;
+    border-radius:15px;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(10px);
 }
-
-button:hover{
-    transform:translateY(-2px);
-    box-shadow:0 8px 20px rgba(255,107,129,.3);
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:768px){
-
-    .auth-container{
-        flex-direction:column;
-    }
-
-    .auth-left{
-        min-height:300px;
-    }
-
-    .hero-content h1{
-        font-size:2.5rem;
-    }
-
-    .hero-overlay h1{
-        font-size:2.5rem;
-    }
-
-    .event-card{
-        flex-direction:column;
-    }
-
-    .event-image{
-        width:100%;
-        height:180px;
-    }
-
-    .dashboard-actions{
-        padding:0 20px;
-    }
-}
-/* Wedding Page Upgrade */
 
 .love-story{
     text-align:center;
@@ -727,14 +492,30 @@ button:hover{
 }
 
 .love-story h2{
-    margin-bottom:20px;
     color:#ff6b81;
+    margin-bottom:20px;
 }
 
-.love-story p{
-    font-size:1.2rem;
-    line-height:1.8;
+.invitation-details{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    flex-wrap:wrap;
+    padding:80px 20px;
 }
+
+.detail-card{
+    width:300px;
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,.1);
+}
+
+/* ==================================
+   GALLERY
+================================== */
 
 .gallery{
     padding:80px 20px;
@@ -748,12 +529,12 @@ button:hover{
 .gallery-grid{
     display:grid;
     grid-template-columns:
-        repeat(auto-fit,minmax(300px,1fr));
+    repeat(auto-fit,minmax(300px,1fr));
+
     gap:20px;
 }
 
 .gallery-grid img{
-    width:100%;
     height:300px;
     object-fit:cover;
     border-radius:15px;
@@ -764,18 +545,276 @@ button:hover{
     transform:scale(1.03);
 }
 
-.invitation-action{
+/* ==================================
+   RSVP
+================================== */
+
+.rsvp-hero{
+    height:50vh;
+
+    background:
+    linear-gradient(
+        rgba(0,0,0,.45),
+        rgba(0,0,0,.45)
+    ),
+    url("https://images.unsplash.com/photo-1519741497674-611481863552");
+
+    background-size:cover;
+    background-position:center;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.rsvp-overlay{
     text-align:center;
+    color:white;
+}
+
+.rsvp-overlay h1{
+    font-size:4rem;
+    margin-bottom:15px;
+}
+
+.rsvp-container{
+    padding:60px 20px;
+}
+
+.rsvp-card{
+    max-width:700px;
+    margin:auto;
+}
+
+#result,
+#message{
+    text-align:center;
+    margin-top:20px;
+    font-weight:bold;
+}
+
+/* ==================================
+   FOOTER
+================================== */
+
+footer{
+    background:#222;
+    color:white;
+    text-align:center;
+    padding:40px;
+}
+
+/* ==================================
+   MOBILE
+================================== */
+
+@media(max-width:768px){
+
+    nav{
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .auth-container{
+        flex-direction:column;
+    }
+
+    .auth-left{
+        min-height:300px;
+    }
+
+    .hero-content h1,
+    .hero-overlay h1,
+    .overlay h1{
+        font-size:2.5rem;
+    }
+
+    .event-card{
+        flex-direction:column;
+    }
+
+    .event-image{
+        width:100%;
+        height:180px;
+    }
+
+    .stats{
+        padding:0 20px;
+    }
+}
+/* ==================================
+   LOVE STORY
+================================== */
+
+.love-story{
+
+    max-width:900px;
+
+    margin:auto;
+
+    text-align:center;
+
+    padding:80px 30px;
+}
+
+.love-story h2{
+
+    color:#ff6b81;
+
+    font-size:2.5rem;
+
+    margin-bottom:20px;
+}
+
+.love-story p{
+
+    font-size:1.1rem;
+
+    color:#666;
+
+    line-height:1.8;
+}
+
+/* ==================================
+   PHOTO GALLERY
+================================== */
+
+.gallery{
+
+    padding:80px 20px;
+
+    text-align:center;
+}
+
+.gallery h2{
+
+    margin-bottom:40px;
+
+    color:#ff6b81;
+}
+
+.gallery-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(300px,1fr));
+
+    gap:20px;
+
+    max-width:1200px;
+
+    margin:auto;
+}
+
+.gallery-grid img{
+
+    width:100%;
+
+    height:350px;
+
+    object-fit:cover;
+
+    border-radius:20px;
+
+    transition:.4s;
+}
+
+.gallery-grid img:hover{
+
+    transform:scale(1.03);
+
+    box-shadow:
+    0 15px 30px rgba(0,0,0,.15);
+}
+
+/* ==================================
+   RSVP CTA
+================================== */
+
+.invitation-action{
+
+    text-align:center;
+
     padding:80px 20px;
 }
 
 .invitation-action h2{
+
+    margin-bottom:20px;
+
+    font-size:2rem;
+}
+
+.invite-btn{
+
+    font-size:1.2rem;
+
+    padding:15px 40px;
+
+    border-radius:50px;
+
+    transition:.3s;
+}
+
+.invite-btn:hover{
+
+    transform:translateY(-3px);
+}
+/* ==================================
+   INVITATION SLIDER
+================================== */
+
+.slider-container{
+    position:relative;
+    height:100vh;
+    overflow:hidden;
+}
+
+.slides{
+    position:absolute;
+    width:100%;
+    height:100%;
+    opacity:0;
+    transition:opacity 1.5s ease;
+}
+
+.slides.active{
+    opacity:1;
+}
+
+.slides img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.hero-overlay{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    color:white;
+    z-index:10;
+
+    background:rgba(0,0,0,.4);
+
+    padding:40px;
+
+    border-radius:20px;
+}
+
+.hero-overlay h1{
+    font-size:4rem;
     margin-bottom:20px;
 }
 
-.countdown{
-    font-size:2rem;
-    font-weight:bold;
-    background:rgba(255,255,255,.15);
-    backdrop-filter:blur(10px);
+.fade{
+    animation:fadeEffect 1.5s;
+}
+
+@keyframes fadeEffect{
+    from{opacity:.4}
+    to{opacity:1}
 }

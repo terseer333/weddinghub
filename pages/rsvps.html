@@ -1,14 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Wedding RSVPs</title>
+    <title>Wedding RSVP Dashboard</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<header>
-    <h1>Guest Responses</h1>
+<header class="dashboard-header">
+
+    <h1>💌 RSVP Dashboard</h1>
+
+    <p>
+        View guest attendance and responses
+    </p>
+
 </header>
+
+<section class="stats">
+
+    <div class="stat-card">
+        <h3>Total Responses</h3>
+        <h1 id="totalResponses">0</h1>
+    </div>
+
+    <div class="stat-card">
+        <h3>Attending</h3>
+        <h1 id="attendingCount">0</h1>
+    </div>
+
+    <div class="stat-card">
+        <h3>Not Attending</h3>
+        <h1 id="notAttendingCount">0</h1>
+    </div>
+
+</section>
+
+<h2 class="section-title">
+    Guest Responses
+</h2>
 
 <div id="rsvpContainer"></div>
 
@@ -18,45 +47,87 @@ async function loadRSVPs() {
 
     try {
 
-        const response = await fetch(
-            "http://localhost:8080/rsvp/all"
-        );
+        const response =
+            await fetch(
+                "http://localhost:8080/rsvp/all"
+            );
 
-        const rsvps = await response.json();
+        const rsvps =
+            await response.json();
 
         const container =
             document.getElementById("rsvpContainer");
 
         container.innerHTML = "";
 
+        let attending = 0;
+        let notAttending = 0;
+
+        document.getElementById("totalResponses")
+            .innerText = rsvps.length;
+
         rsvps.forEach(rsvp => {
 
+            if(rsvp.status === "attending"){
+                attending++;
+            } else {
+                notAttending++;
+            }
+
             container.innerHTML += `
-                <div class="card">
+                <div class="event-card">
 
-                    <h2>${rsvp.guest_name}</h2>
+                    <div class="event-image">
+                        💌
+                    </div>
 
-                    <p>
-                        📞 ${rsvp.phone}
-                    </p>
+                    <div class="event-content">
 
-                    <p>
-                        Status:
-                        <strong>${rsvp.status}</strong>
-                    </p>
+                        <h2>
+                            ${rsvp.guest_name}
+                        </h2>
 
-                    <p>
-                        Guests:
-                        ${rsvp.guest_count}
-                    </p>
+                        <p>
+                            📞 ${rsvp.phone}
+                        </p>
 
-                    <p>
-                        ${rsvp.message}
-                    </p>
+                        <p>
+                            ✅ Status:
+                            <strong>${rsvp.status}</strong>
+                        </p>
+
+                        <p>
+                            👥 Guests:
+                            ${rsvp.guest_count}
+                        </p>
+
+                        <p>
+                            💬 ${rsvp.message}
+                        </p>
+
+                    </div>
 
                 </div>
             `;
         });
+
+        document.getElementById("attendingCount")
+            .innerText = attending;
+
+        document.getElementById("notAttendingCount")
+            .innerText = notAttending;
+
+        if(rsvps.length === 0){
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h2>No RSVP Responses Yet</h2>
+                    <p>
+                        Guest responses will appear here.
+                    </p>
+                </div>
+            `;
+        }
 
     } catch(error) {
 

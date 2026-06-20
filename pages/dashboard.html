@@ -168,11 +168,21 @@ async function loadEvents(){
                             ${event.description}
                         </p>
 
-                        <a href="event.html?id=${event.id}">
-                            <button>
-                                View Invitation
-                            </button>
-                        </a>
+                       <div style="margin-top:15px;">
+
+    <a href="event.html?id=${event.id}">
+        <button>
+            View Invitation
+        </button>
+    </a>
+
+    <button
+        onclick="deleteEvent(${event.id})"
+        style="background:red;margin-left:10px;">
+        Delete
+    </button>
+
+</div>
 
                     </div>
 

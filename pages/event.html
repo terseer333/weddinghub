@@ -6,9 +6,23 @@
 </head>
 <body>
 
-<section class="invitation-hero">
+<!-- HERO SLIDER -->
 
-    <div class="overlay">
+<section class="slider-container">
+
+    <div class="slides fade active">
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552">
+    </div>
+
+    <div class="slides fade">
+        <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf">
+    </div>
+
+    <div class="slides fade">
+        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc">
+    </div>
+
+    <div class="hero-overlay">
 
         <h1 id="coupleNames">
             Loading...
@@ -26,9 +40,11 @@
 
 </section>
 
+<!-- LOVE STORY -->
+
 <section class="love-story">
 
-    <h2>Our Special Day</h2>
+    <h2>❤️ Our Love Story</h2>
 
     <p id="description">
         Loading...
@@ -36,11 +52,13 @@
 
 </section>
 
+<!-- EVENT DETAILS -->
+
 <section class="invitation-details">
 
     <div class="detail-card">
 
-        <h2>📅 Date</h2>
+        <h2>📅 Wedding Date</h2>
 
         <p id="date"></p>
 
@@ -56,89 +74,162 @@
 
     <div class="detail-card">
 
-        <h2>💖 Celebration</h2>
+        <h2>💖 Special Message</h2>
 
         <p>
-            Join us as we celebrate our union
-            and begin a new chapter together.
+            We are excited to celebrate this
+            unforgettable moment with our
+            family and friends.
         </p>
 
     </div>
 
 </section>
 
+<!-- GALLERY -->
+
 <section class="gallery">
 
-    <h2>Wedding Moments</h2>
+    <h2>📸 Pre-Wedding Gallery</h2>
 
     <div class="gallery-grid">
 
-        <img src="https://images.unsplash.com/photo-1519741497674-611481863552">
+        <img
+        src="https://images.unsplash.com/photo-1519741497674-611481863552"
+        alt="Wedding Photo">
 
-        <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf">
+        <img
+        src="https://images.unsplash.com/photo-1520854221256-17451cc331bf"
+        alt="Wedding Photo">
 
-        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc">
+        <img
+        src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc"
+        alt="Wedding Photo">
 
     </div>
 
 </section>
 
+<!-- RSVP CTA -->
+
 <section class="invitation-action">
 
-    <h2>We Would Love To Celebrate With You</h2>
+    <h2>
+        We Would Love To Celebrate With You ❤️
+    </h2>
+
+    <p>
+        Kindly confirm your attendance
+        by clicking the button below.
+    </p>
 
     <br>
 
-    <a href="rsvp.html">
+    <a id="rsvpButton" href="rsvp.html">
+
         <button class="invite-btn">
             Confirm Attendance
         </button>
+
     </a>
 
 </section>
 
+<!-- FOOTER -->
+
+<footer>
+
+    <h3 id="footerNames">
+        WeddingHub
+    </h3>
+
+    <p>
+        Creating unforgettable wedding memories 💍
+    </p>
+
+</footer>
+
 <script>
 
+/* =========================
+   LOAD EVENT
+========================= */
+
 const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+        window.location.search
+    );
 
 const id = params.get("id");
 
-fetch(`http://localhost:8080/event?id=${id}`)
+fetch(
+    `http://localhost:8080/event?id=${id}`
+)
 .then(response => response.json())
 .then(data => {
 
-    document.getElementById("coupleNames")
-        .innerText =
-        `${data.bride_name} & ${data.groom_name}`;
+    document.getElementById(
+        "coupleNames"
+    ).innerText =
+    `${data.bride_name} & ${data.groom_name}`;
 
-    document.getElementById("date")
-        .innerText =
-        data.event_date;
+    document.getElementById(
+        "footerNames"
+    ).innerText =
+    `${data.bride_name} ❤️ ${data.groom_name}`;
 
-    document.getElementById("venue")
-        .innerText =
-        data.venue;
+    document.getElementById(
+        "date"
+    ).innerText =
+    data.event_date;
 
-    document.getElementById("description")
-        .innerText =
-        data.description;
+    document.getElementById(
+        "venue"
+    ).innerText =
+    data.venue;
 
-    startCountdown(data.event_date);
+    document.getElementById(
+        "description"
+    ).innerText =
+    data.description;
+
+    document.getElementById(
+        "rsvpButton"
+    ).href =
+    `rsvp.html?id=${data.id}`;
+
+    startCountdown(
+        data.event_date
+    );
+
+})
+.catch(() => {
+
+    document.getElementById(
+        "coupleNames"
+    ).innerText =
+    "Unable to load invitation";
 
 });
+
+/* =========================
+   COUNTDOWN
+========================= */
 
 function startCountdown(eventDate){
 
     const countdown =
-        document.getElementById("countdown");
+        document.getElementById(
+            "countdown"
+        );
 
     const weddingDate =
         new Date(eventDate);
 
     setInterval(() => {
 
-        const now = new Date();
+        const now =
+            new Date();
 
         const difference =
             weddingDate - now;
@@ -173,12 +264,67 @@ function startCountdown(eventDate){
                 (1000 * 60)
             );
 
+        const seconds =
+            Math.floor(
+                (difference %
+                (1000 * 60))
+                /
+                1000
+            );
+
         countdown.innerHTML =
-            `${days} Days ${hours} Hours ${minutes} Minutes`;
+            `${days} Days
+             ${hours} Hours
+             ${minutes} Minutes
+             ${seconds} Seconds`;
 
     }, 1000);
 
 }
+
+/* =========================
+   SLIDER
+========================= */
+
+let slideIndex = 0;
+
+function showSlides(){
+
+    const slides =
+        document.querySelectorAll(
+            ".slides"
+        );
+
+    slides.forEach(slide => {
+
+        slide.classList.remove(
+            "active"
+        );
+
+    });
+
+    slideIndex++;
+
+    if(slideIndex > slides.length){
+
+        slideIndex = 1;
+
+    }
+
+    slides[
+        slideIndex - 1
+    ].classList.add(
+        "active"
+    );
+
+    setTimeout(
+        showSlides,
+        4000
+    );
+
+}
+
+showSlides();
 
 </script>
 

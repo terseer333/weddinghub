@@ -21,9 +21,22 @@ func main() {
 	http.HandleFunc("/events", handlers.CreateEvent)
 	http.HandleFunc("/events/all", handlers.GetEvents)
 	http.HandleFunc("/event", handlers.GetEvent)
+	http.HandleFunc("/events/delete", handlers.DeleteEvent)
 
 	http.HandleFunc("/rsvp", handlers.SubmitRSVP)
 	http.HandleFunc("/rsvp/all", handlers.GetRSVPs)
+
+	fs := http.FileServer(
+		http.Dir("./uploads"),
+	)
+
+	http.Handle(
+		"/uploads/",
+		http.StripPrefix(
+			"/uploads/",
+			fs,
+		),
+	)
 
 	fmt.Println("Server running on http://localhost:8080")
 

@@ -57,3 +57,50 @@ func GetEvent(w http.ResponseWriter, r *http.Request) {
 
 	http.Error(w, "Event not found", http.StatusNotFound)
 }
+func DeleteEvent(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodDelete {
+		http.Error(
+			w,
+			"Method not allowed",
+			http.StatusMethodNotAllowed,
+		)
+		return
+	}
+
+	id := r.URL.Query().Get("id")
+
+	if id == "" {
+		http.Error(
+			w,
+			"Missing event id",
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	for i, event := range Events {
+
+		if fmt.Sprintf("%d", event.ID) == id {
+
+			Events = append(
+				Events[:i],
+				Events[i+1:]...,
+			)
+
+			json.NewEncoder(w).Encode(
+				map[string]string{
+					"message": "Event deleted",
+				},
+			)
+
+			return
+		}
+	}
+
+	http.Error(
+		w,
+		"Event not found",
+		http.StatusNotFound,
+	)
+}
