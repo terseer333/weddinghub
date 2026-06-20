@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Dashboard | WeddingHub</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header class="app-header guest-header">
+    <nav class="site-nav app-nav">
+        <a class="brand" href="../index.html">
+            <span class="brand-mark">W</span>
+            <span>WeddingHub</span>
+        </a>
+
+        <div class="nav-links">
+            <a id="invitationLink" href="event.html">Invitation</a>
+        </div>
+    </nav>
+
+    <section class="dashboard-hero">
+        <div>
+            <p class="eyebrow">Guest dashboard</p>
+            <h1 id="guestDashboardTitle">Welcome, honored guest.</h1>
+            <p id="guestDashboardIntro">
+                Your RSVP is confirmed. Enjoy the couple's photos and share ideas with other attending guests.
+            </p>
+        </div>
+    </section>
+</header>
+
+<main class="app-shell guest-dashboard-shell">
+    <section class="guest-dashboard-grid">
+        <article class="guest-slideshow-panel">
+            <div class="section-heading compact-heading">
+                <p class="eyebrow">Couple moments</p>
+                <h2 id="coupleNames">Loading...</h2>
+            </div>
+
+            <div id="guestSlides" class="guest-slideshow"></div>
+        </article>
+
+        <article class="guest-chat-panel">
+            <div class="chat-heading">
+                <div>
+                    <p class="eyebrow">Attending guests only</p>
+                    <h2>Wedding Chat Room</h2>
+                </div>
+                <span id="chatStatus">Connecting</span>
+            </div>
+
+            <div id="chatMessages" class="chat-messages"></div>
+
+            <form id="chatForm" class="chat-form">
+                <label for="chatMessage">Share an idea or message</label>
+                <textarea
+                    id="chatMessage"
+                    placeholder="Write a note, travel idea, song suggestion, or celebration plan..."
+                    required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </article>
+    </section>
+</main>
+
+<script>
+
+const defaultImages = [
+    "https://images.unsplash.com/photo-1519741497674-611481863552",
+    "https://images.unsplash.com/photo-1520854221256-17451cc331bf",
+    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc"
+];
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const eventId =
+    parseInt(params.get("event_id"), 10);
+
+const rsvpId =
+    parseInt(params.get("rsvp_id"), 10);
+
+let slideIndex = 0;
+let slideTimer;
+let dashboardLocked = false;
+
+document.getElementById("invitationLink").href =
+    `event.html?id=${eventId}`;
+
+if(!eventId || !rsvpId){
+    showLockedDashboard();
+} else {
+    loadGuestDashboard();
+}
+
+async function loadGuestDashboard(){
+
+    try {
+
+        const eventResponse =
+            await fetch(
+                `http://localhost:8080/event?id=${eventId}`
+            );
+
+        if(!eventResponse.ok){
+            throw new Error("Event unavailable");
+        }
+
+        const event =
+            await eventResponse.json();
+
+        document.getElementById("coupleNames").innerText =
+            `${event.bride_name} & ${event.groom_name}`;
+
+        document.getElementById("guestDashboardTitle").innerText =
+            `${event.bride_name} & ${event.groom_name}`;
+
+        renderGuestSlides(event);
+        await loadMessages();
+
+    } catch(error){
+        showLockedDashboard();
+    }
+
+}
+
+function renderGuestSlides(event){
+
+    const images =
+        event.gallery_images &&
+        event.gallery_images.length > 0
+            ? event.gallery_images
+            : event.hero_image
+                ? [event.hero_image]
+                : defaultImages;
+
+    const guestSlides =
+        document.getElementById("guestSlides");
+
+    guestSlides.innerHTML = "";
+
+    images.forEach((imageUrl, index) => {
+
+        guestSlides.innerHTML += `
+            <img
+                class="guest-slide ${index === 0 ? "active" : ""}"
+                src="${imageUrl}"
+                alt="${event.bride_name} and ${event.groom_name} wedding photo">
+        `;
+
+    });
+
+    showGuestSlides();
+
+}
+
+function showGuestSlides(){
+
+    const slides =
+        document.querySelectorAll(".guest-slide");
+
+    if(slides.length === 0){
+        return;
+    }
+
+    slides.forEach(slide => {
+        slide.classList.remove("active");
+    });
+
+    slideIndex++;
+
+    if(slideIndex > slides.length){
+        slideIndex = 1;
+    }
+
+    slides[slideIndex - 1].classList.add("active");
+
+    clearTimeout(slideTimer);
+
+    slideTimer = setTimeout(
+        showGuestSlides,
+        4000
+    );
+
+}
+
+async function loadMessages(){
+
+    const response =
+        await fetch(
+            `http://localhost:8080/chat?event_id=${eventId}&rsvp_id=${rsvpId}`
+        );
+
+    if(!response.ok){
+        showLockedDashboard();
+        return;
+    }
+
+    const messages =
+        await response.json();
+
+    document.getElementById("chatStatus").innerText =
+        "Open";
+
+    renderMessages(messages);
+
+}
+
+function renderMessages(messages){
+
+    const chatMessages =
+        document.getElementById("chatMessages");
+
+    if(messages.length === 0){
+        chatMessages.innerHTML = `
+            <div class="empty-chat">
+                <h3>No messages yet</h3>
+                <p>Start the conversation with a kind note or a celebration idea.</p>
+            </div>
+        `;
+        return;
+    }
+
+    chatMessages.innerHTML = "";
+
+    messages.forEach(message => {
+
+        const sentAt =
+            new Date(message.created_at).toLocaleString();
+
+        chatMessages.innerHTML += `
+            <div class="chat-message">
+                <div>
+                    <strong>${escapeHTML(message.guest_name)}</strong>
+                    <span>${sentAt}</span>
+                </div>
+                <p>${escapeHTML(message.message)}</p>
+            </div>
+        `;
+
+    });
+
+    chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
+}
+
+document.getElementById("chatForm")
+.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const chatMessage =
+        document.getElementById("chatMessage");
+
+    const response =
+        await fetch(
+            "http://localhost:8080/chat",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    event_id: eventId,
+                    rsvp_id: rsvpId,
+                    message: chatMessage.value
+                })
+            }
+        );
+
+    if(response.ok){
+        chatMessage.value = "";
+        await loadMessages();
+    } else {
+        showLockedDashboard();
+    }
+
+});
+
+function showLockedDashboard(){
+
+    dashboardLocked = true;
+
+    document.getElementById("guestDashboardTitle").innerText =
+        "Guest access required.";
+
+    document.getElementById("guestDashboardIntro").innerText =
+        "This dashboard and chat room are only available after an attending RSVP is confirmed.";
+
+    document.getElementById("coupleNames").innerText =
+        "RSVP required";
+
+    document.getElementById("guestSlides").innerHTML = `
+        <div class="locked-panel">
+            <h3>Attending guests only</h3>
+            <p>Please RSVP as attending from the invitation page to open the guest chat room.</p>
+            <a href="event.html?id=${eventId || ""}">
+                <button>Return to Invitation</button>
+            </a>
+        </div>
+    `;
+
+    document.getElementById("chatStatus").innerText =
+        "Locked";
+
+    document.getElementById("chatMessages").innerHTML = "";
+
+    document.getElementById("chatForm").style.display =
+        "none";
+
+}
+
+setInterval(() => {
+    if(eventId && rsvpId && !dashboardLocked){
+        loadMessages();
+    }
+}, 7000);
+
+function escapeHTML(value){
+
+    return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+</script>
+
+</body>
+</html>

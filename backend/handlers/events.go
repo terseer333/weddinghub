@@ -39,6 +39,11 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if Events == nil {
+		json.NewEncoder(w).Encode([]models.Event{})
+		return
+	}
+
 	json.NewEncoder(w).Encode(Events)
 }
 func GetEvent(w http.ResponseWriter, r *http.Request) {

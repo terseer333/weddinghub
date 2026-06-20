@@ -1,81 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>RSVP - WeddingHub</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP | WeddingHub</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
 <section class="rsvp-hero">
+    <nav class="invitation-nav">
+        <a class="brand" href="../index.html">
+            <span class="brand-mark">W</span>
+            <span>WeddingHub</span>
+        </a>
+    </nav>
 
     <div class="rsvp-overlay">
-
-        <h1>💌 RSVP</h1>
-
-        <p>
-            We can't wait to celebrate with you.
-            Please let us know if you'll be attending.
-        </p>
-
+        <p class="eyebrow">Guest response</p>
+        <h1>Kindly RSVP</h1>
+        <p>We cannot wait to celebrate together. Please let the couple know if you will attend.</p>
     </div>
-
 </section>
 
-<div class="rsvp-container">
+<main class="form-shell">
+    <section class="form-panel rsvp-card">
+        <div class="section-heading compact-heading">
+            <p class="eyebrow">Attendance</p>
+            <h2>Confirm Your Details</h2>
+        </div>
 
-    <form id="rsvpForm" class="rsvp-card">
+        <form id="rsvpForm">
+            <label for="guestName">Full Name</label>
+            <input type="text" id="guestName" placeholder="Your full name" required>
 
-        <input
-            type="text"
-            id="guestName"
-            placeholder="Your Full Name"
-            required>
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" placeholder="Phone number" required>
 
-        <input
-            type="text"
-            id="phone"
-            placeholder="Phone Number"
-            required>
+            <label for="status">Attendance Status</label>
+            <select id="status" required>
+                <option value="">Will you be joining us?</option>
+                <option value="attending">Yes, I will attend</option>
+                <option value="not attending">Sorry, I can't attend</option>
+            </select>
 
-        <select id="status" required>
+            <label for="guestCount">Number of Guests</label>
+            <input type="number" id="guestCount" placeholder="Number of Guests" min="1" value="1">
 
-            <option value="">
-                Will you be joining us?
-            </option>
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Leave a message for the couple"></textarea>
 
-            <option value="attending">
-                Yes, I will attend
-            </option>
-
-            <option value="not attending">
-                Sorry, I can't attend
-            </option>
-
-        </select>
-
-        <input
-            type="number"
-            id="guestCount"
-            placeholder="Number of Guests"
-            min="1"
-            value="1">
-
-        <textarea
-            id="message"
-            placeholder="Leave a message for the couple">
-        </textarea>
-
-        <button type="submit">
-            Submit RSVP
-        </button>
+            <button type="submit">Submit RSVP</button>
+        </form>
 
         <p id="result"></p>
-
-    </form>
-
-</div>
+    </section>
+</main>
 
 <script>
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const eventId =
+    parseInt(params.get("id"), 10) || 0;
 
 document.getElementById("rsvpForm")
 .addEventListener("submit", async function(e){
@@ -83,6 +73,7 @@ document.getElementById("rsvpForm")
     e.preventDefault();
 
     const rsvp = {
+        event_id: eventId,
         guest_name: document.getElementById("guestName").value,
         phone: document.getElementById("phone").value,
         status: document.getElementById("status").value,
@@ -105,12 +96,29 @@ document.getElementById("rsvpForm")
 
         if(response.ok){
 
-            document.getElementById("result")
-                .innerText =
-                "✅ RSVP Submitted Successfully";
+            const savedRSVP =
+                await response.json();
 
             document.getElementById("rsvpForm")
                 .reset();
+
+            if(savedRSVP.status === "attending" && savedRSVP.event_id){
+
+                document.getElementById("result")
+                    .innerText =
+                    "RSVP accepted. Opening your guest dashboard...";
+
+                setTimeout(() => {
+                    window.location.href =
+                        `guest-dashboard.html?event_id=${savedRSVP.event_id}&rsvp_id=${savedRSVP.id}`;
+                }, 900);
+
+                return;
+            }
+
+            document.getElementById("result")
+                .innerText =
+                "Thank you for letting the couple know.";
 
         }
 
@@ -118,7 +126,7 @@ document.getElementById("rsvpForm")
 
         document.getElementById("result")
             .innerText =
-            "❌ Failed To Submit RSVP";
+            "Failed to submit RSVP.";
 
     }
 

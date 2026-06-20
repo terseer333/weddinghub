@@ -1,45 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Wedding RSVP Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP Dashboard | WeddingHub</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<header class="dashboard-header">
+<header class="app-header compact-app-header">
+    <nav class="site-nav app-nav">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">W</span>
+            <span>WeddingHub</span>
+        </a>
 
-    <h1>💌 RSVP Dashboard</h1>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a class="nav-button" href="create-event.html">New Wedding</a>
+        </div>
+    </nav>
 
-    <p>
-        View guest attendance and responses
-    </p>
-
+    <section class="dashboard-hero">
+        <div>
+            <p class="eyebrow">Guest intelligence</p>
+            <h1>RSVP Dashboard</h1>
+            <p>Review responses, attendance counts, guest totals, and personal notes from invitees.</p>
+        </div>
+    </section>
 </header>
 
-<section class="stats">
+<main class="app-shell">
+    <section class="stats">
+        <div class="stat-card">
+            <span>Total Responses</span>
+            <strong id="totalResponses">0</strong>
+        </div>
 
-    <div class="stat-card">
-        <h3>Total Responses</h3>
-        <h1 id="totalResponses">0</h1>
-    </div>
+        <div class="stat-card">
+            <span>Attending</span>
+            <strong id="attendingCount">0</strong>
+        </div>
 
-    <div class="stat-card">
-        <h3>Attending</h3>
-        <h1 id="attendingCount">0</h1>
-    </div>
+        <div class="stat-card">
+            <span>Not Attending</span>
+            <strong id="notAttendingCount">0</strong>
+        </div>
+    </section>
 
-    <div class="stat-card">
-        <h3>Not Attending</h3>
-        <h1 id="notAttendingCount">0</h1>
-    </div>
+    <section class="section-heading compact-heading">
+        <p class="eyebrow">Responses</p>
+        <h2>Guest Responses</h2>
+    </section>
 
-</section>
-
-<h2 class="section-title">
-    Guest Responses
-</h2>
-
-<div id="rsvpContainer"></div>
+    <section id="rsvpContainer" class="event-list"></section>
+</main>
 
 <script>
 
@@ -75,39 +90,20 @@ async function loadRSVPs() {
             }
 
             container.innerHTML += `
-                <div class="event-card">
-
-                    <div class="event-image">
-                        💌
+                <article class="event-card response-card">
+                    <div class="response-icon">
+                        <span>${rsvp.status === "attending" ? "Yes" : "No"}</span>
                     </div>
 
                     <div class="event-content">
-
-                        <h2>
-                            ${rsvp.guest_name}
-                        </h2>
-
-                        <p>
-                            📞 ${rsvp.phone}
-                        </p>
-
-                        <p>
-                            ✅ Status:
-                            <strong>${rsvp.status}</strong>
-                        </p>
-
-                        <p>
-                            👥 Guests:
-                            ${rsvp.guest_count}
-                        </p>
-
-                        <p>
-                            💬 ${rsvp.message}
-                        </p>
-
+                        <p class="eyebrow">Guest response</p>
+                        <h2>${rsvp.guest_name}</h2>
+                        <p><strong>Phone</strong> ${rsvp.phone}</p>
+                        <p><strong>Status</strong> ${rsvp.status}</p>
+                        <p><strong>Guests</strong> ${rsvp.guest_count}</p>
+                        <p>${rsvp.message || "No message provided."}</p>
                     </div>
-
-                </div>
+                </article>
             `;
         });
 
@@ -121,10 +117,8 @@ async function loadRSVPs() {
 
             container.innerHTML = `
                 <div class="empty-state">
-                    <h2>No RSVP Responses Yet</h2>
-                    <p>
-                        Guest responses will appear here.
-                    </p>
+                    <h2>No RSVP responses yet</h2>
+                    <p>Guest responses will appear here as soon as invitees submit the form.</p>
                 </div>
             `;
         }

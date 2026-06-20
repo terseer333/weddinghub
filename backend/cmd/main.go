@@ -18,6 +18,7 @@ func main() {
 	http.HandleFunc("/users", handlers.GetUsers)
 	http.HandleFunc("/login", handlers.Login)
 
+	http.HandleFunc("/upload", handlers.UploadPhoto)
 	http.HandleFunc("/events", handlers.CreateEvent)
 	http.HandleFunc("/events/all", handlers.GetEvents)
 	http.HandleFunc("/event", handlers.GetEvent)
@@ -25,6 +26,7 @@ func main() {
 
 	http.HandleFunc("/rsvp", handlers.SubmitRSVP)
 	http.HandleFunc("/rsvp/all", handlers.GetRSVPs)
+	http.HandleFunc("/chat", handlers.GuestChat)
 
 	fs := http.FileServer(
 		http.Dir("./uploads"),
@@ -53,7 +55,7 @@ func enableCORS(next http.Handler) http.Handler {
 
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
 
 		if r.Method == "OPTIONS" {
 			return

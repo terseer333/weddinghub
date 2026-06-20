@@ -1,115 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WeddingHub Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | WeddingHub</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<header class="dashboard-header">
+<header class="app-header">
+    <nav class="site-nav app-nav">
+        <a class="brand" href="../index.html">
+            <span class="brand-mark">W</span>
+            <span>WeddingHub</span>
+        </a>
 
-    <h1>💍 WeddingHub Dashboard</h1>
+        <div class="nav-links">
+            <a href="rsvps.html">RSVPs</a>
+            <a class="nav-button" href="create-event.html">New Wedding</a>
+        </div>
+    </nav>
 
-    <p>
-        Plan, manage and celebrate your special day.
-    </p>
-
-</header>
-
-<section class="welcome-banner">
-
-    <h2>Welcome Back 👋</h2>
-
-    <p>
-        Everything you need to manage your wedding in one place.
-    </p>
-
-</section>
-
-<section class="stats">
-
-    <div class="stat-card">
-        <h3>Total Events</h3>
-        <h1 id="totalEvents">0</h1>
-    </div>
-
-    <div class="stat-card">
-        <h3>Total RSVPs</h3>
-        <h1 id="totalRSVPs">0</h1>
-    </div>
-
-    <div class="stat-card">
-        <h3>Total Guests</h3>
-        <h1 id="totalGuests">0</h1>
-    </div>
-
-</section>
-
-<section class="dashboard-actions">
-
-    <div class="action-card">
-
-        <h2>💍 Create Event</h2>
-
-        <p>
-            Create a beautiful wedding invitation.
-        </p>
+    <section class="dashboard-hero">
+        <div>
+            <p class="eyebrow">Planning dashboard</p>
+            <h1>Your wedding workspace.</h1>
+            <p>Monitor events, invitation pages, photos, and guest responses from one refined command center.</p>
+        </div>
 
         <a href="create-event.html">
-            <button>Create Event</button>
+            <button>Create New Wedding</button>
         </a>
+    </section>
+</header>
 
-    </div>
+<main class="app-shell">
+    <section class="stats">
+        <div class="stat-card">
+            <span>Total Events</span>
+            <strong id="totalEvents">0</strong>
+        </div>
 
-    <div class="action-card">
+        <div class="stat-card">
+            <span>Total RSVPs</span>
+            <strong id="totalRSVPs">0</strong>
+        </div>
 
-        <h2>📋 View RSVPs</h2>
+        <div class="stat-card">
+            <span>Total Guests</span>
+            <strong id="totalGuests">0</strong>
+        </div>
+    </section>
 
-        <p>
-            See all guest responses.
-        </p>
+    <section class="dashboard-actions">
+        <article class="action-card">
+            <span class="feature-icon">01</span>
+            <h2>Create Event</h2>
+            <p>Launch a polished invitation page with wedding details and pre-wedding images.</p>
+            <a href="create-event.html"><button>Create Event</button></a>
+        </article>
 
-        <a href="rsvps.html">
-            <button>View RSVPs</button>
-        </a>
+        <article class="action-card">
+            <span class="feature-icon">02</span>
+            <h2>Review RSVPs</h2>
+            <p>See guest responses, attendance status, guest totals, and personal messages.</p>
+            <a href="rsvps.html"><button>View RSVPs</button></a>
+        </article>
+    </section>
 
-    </div>
+    <section class="section-heading compact-heading">
+        <p class="eyebrow">Invitation portfolio</p>
+        <h2>My Wedding Events</h2>
+    </section>
 
-</section>
-
-<section class="recent-section">
-
-    <h2>Recent Activity</h2>
-
-    <div class="activity-card">
-
-        <p>🎉 Welcome to WeddingHub</p>
-
-        <p>Create your first wedding event to begin.</p>
-
-    </div>
-
-</section>
-
-<h2 class="section-title">
-    My Wedding Events
-</h2>
-
-<div id="eventsContainer"></div>
+    <section id="eventsContainer" class="event-list"></section>
+</main>
 
 <script>
 
-async function loadEvents(){
+async function loadEvents() {
 
     try {
 
-        const response =
-            await fetch(
-                "http://localhost:8080/events/all"
-            );
+        const response = await fetch(
+            "http://localhost:8080/events/all"
+        );
 
-        const events =
-            await response.json();
+        const events = await response.json();
 
         document.getElementById("totalEvents")
             .innerText = events.length;
@@ -123,15 +100,9 @@ async function loadEvents(){
 
             container.innerHTML = `
                 <div class="empty-state">
-
-                    <h2>
-                        No Wedding Events Yet
-                    </h2>
-
-                    <p>
-                        Create your first wedding event.
-                    </p>
-
+                    <h2>No weddings yet</h2>
+                    <p>Create your first wedding event and your invitation will appear here.</p>
+                    <a href="create-event.html"><button>Create Wedding</button></a>
                 </div>
             `;
 
@@ -140,54 +111,30 @@ async function loadEvents(){
 
         events.forEach(event => {
 
+            const imageUrl =
+                event.hero_image ||
+                "https://images.unsplash.com/photo-1519741497674-611481863552";
+
             container.innerHTML += `
-
-                <div class="event-card">
-
+                <article class="event-card">
                     <div class="event-image">
-                        💍
+                        <img
+                            src="${imageUrl}"
+                            alt="${event.bride_name} and ${event.groom_name} wedding">
                     </div>
 
                     <div class="event-content">
+                        <p class="eyebrow">Wedding invitation</p>
+                        <h2>${event.bride_name} & ${event.groom_name}</h2>
+                        <p><strong>Date</strong> ${event.event_date}</p>
+                        <p><strong>Venue</strong> ${event.venue}</p>
+                        <p>${event.description || "A beautiful celebration is being prepared."}</p>
 
-                        <h2>
-                            ${event.bride_name}
-                            &
-                            ${event.groom_name}
-                        </h2>
-
-                        <p>
-                            📅 ${event.event_date}
-                        </p>
-
-                        <p>
-                            📍 ${event.venue}
-                        </p>
-
-                        <p>
-                            ${event.description}
-                        </p>
-
-                       <div style="margin-top:15px;">
-
-    <a href="event.html?id=${event.id}">
-        <button>
-            View Invitation
-        </button>
-    </a>
-
-    <button
-        onclick="deleteEvent(${event.id})"
-        style="background:red;margin-left:10px;">
-        Delete
-    </button>
-
-</div>
-
+                        <a href="event.html?id=${event.id}">
+                            <button>View Invitation</button>
+                        </a>
                     </div>
-
-                </div>
-
+                </article>
             `;
 
         });
@@ -200,7 +147,36 @@ async function loadEvents(){
 
 }
 
+async function loadRSVPStats() {
+
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/rsvp/all"
+        );
+
+        const rsvps = await response.json();
+
+        const totalGuests = rsvps.reduce((sum, rsvp) => {
+            return sum + (rsvp.guest_count || 0);
+        }, 0);
+
+        document.getElementById("totalRSVPs")
+            .innerText = rsvps.length;
+
+        document.getElementById("totalGuests")
+            .innerText = totalGuests;
+
+    } catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
 loadEvents();
+loadRSVPStats();
 
 </script>
 

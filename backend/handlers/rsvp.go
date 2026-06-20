@@ -39,5 +39,10 @@ func GetRSVPs(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
+	if RSVPs == nil {
+		json.NewEncoder(w).Encode([]models.RSVP{})
+		return
+	}
+
 	json.NewEncoder(w).Encode(RSVPs)
 }

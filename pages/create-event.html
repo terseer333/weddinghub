@@ -1,111 +1,236 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Create Wedding Event</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Wedding | WeddingHub</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<header class="dashboard-header">
-    <h1>💍 Create Your Wedding Event</h1>
-    <p>Set up your wedding invitation in minutes</p>
-</header>
-
-<div class="auth-right">
-
-    <div class="auth-card">
-
-        <h2>Wedding Details</h2>
-
-        <form id="eventForm">
-
-            <input
-                type="text"
-                id="bride"
-                placeholder="Bride Name"
-                required>
-
-            <input
-                type="text"
-                id="groom"
-                placeholder="Groom Name"
-                required>
-
-            <input
-                type="date"
-                id="date"
-                required>
-
-            <input
-                type="text"
-                id="venue"
-                placeholder="Wedding Venue"
-                required>
-                <input
-    type="file"
-    id="photos"
-    multiple
-    accept="image/*">
-    <input
-    type="file"
-    id="photos"
-    multiple
-    accept="image/*">
-                
-                
-   
-
-            <textarea
-                id="description"
-                placeholder="Write a beautiful message for your guests..."
-                rows="5">
-            </textarea>
-
-            <button type="submit">
-                Create Wedding
-            </button>
-
-        </form>
-
-        <p id="message"></p>
-
-        <br>
-
-        <a href="dashboard.html">
-            ← Back to Dashboard
+<header class="app-header compact-app-header">
+    <nav class="site-nav app-nav">
+        <a class="brand" href="dashboard.html">
+            <span class="brand-mark">W</span>
+            <span>WeddingHub</span>
         </a>
 
-    </div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="rsvps.html">RSVPs</a>
+        </div>
+    </nav>
 
-</div>
+    <section class="dashboard-hero">
+        <div>
+            <p class="eyebrow">Create invitation</p>
+            <h1>Design the first impression.</h1>
+            <p>Add your wedding details and photos. WeddingHub will turn them into a shareable invitation page.</p>
+        </div>
+    </section>
+</header>
+
+<main class="form-shell create-event-shell">
+    <section class="create-event-layout">
+        <article class="form-panel create-event-panel">
+            <div class="section-heading compact-heading">
+                <p class="eyebrow">Wedding details</p>
+                <h2>Create Wedding Event</h2>
+            </div>
+
+            <form id="eventForm">
+                <div class="form-grid">
+                    <div>
+                        <label for="bride">Bride Name</label>
+                        <input type="text" id="bride" placeholder="Bride name" required>
+                    </div>
+
+                    <div>
+                        <label for="groom">Groom Name</label>
+                        <input type="text" id="groom" placeholder="Groom name" required>
+                    </div>
+                </div>
+
+                <label for="date">Wedding Date</label>
+                <input type="date" id="date" required>
+
+                <label for="venue">Wedding Venue</label>
+                <input type="text" id="venue" placeholder="Venue name and city" required>
+
+                <label for="description">Love Story</label>
+                <textarea
+                    id="description"
+                    placeholder="Write a warm message for your guests..."
+                    rows="5"></textarea>
+
+                <label for="photos">Pre-Wedding Photos</label>
+                <div class="upload-dropzone" id="dropzone">
+                    <p>Choose images or drag them here</p>
+                    <span>The first image becomes your invitation hero photo.</span>
+                    <input type="file" id="photos" accept="image/*" multiple>
+                </div>
+
+                <div id="imagePreview" class="image-preview-grid"></div>
+
+                <button type="submit">Create Wedding</button>
+            </form>
+
+            <p id="message"></p>
+
+            <a class="text-link" href="dashboard.html">Back to Dashboard</a>
+        </article>
+
+        <aside class="creation-preview">
+            <img
+                src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc"
+                alt="Elegant wedding table with flowers">
+            <div>
+                <p class="eyebrow">Guest view</p>
+                <h2>Your invitation should feel personal before guests read a word.</h2>
+                <p>
+                    Add a strong hero photo, a warm story, and clear details so the page feels ready to share.
+                </p>
+            </div>
+        </aside>
+    </section>
+</main>
 
 <script>
+
+const photosInput =
+    document.getElementById("photos");
+
+const preview =
+    document.getElementById("imagePreview");
+
+const dropzone =
+    document.getElementById("dropzone");
+
+photosInput.addEventListener("change", () => {
+
+    renderImagePreviews(
+        photosInput.files
+    );
+
+});
+
+dropzone.addEventListener("dragover", function(e){
+
+    e.preventDefault();
+    dropzone.classList.add("dragging");
+
+});
+
+dropzone.addEventListener("dragleave", function(){
+
+    dropzone.classList.remove("dragging");
+
+});
+
+dropzone.addEventListener("drop", function(e){
+
+    e.preventDefault();
+    dropzone.classList.remove("dragging");
+    photosInput.files = e.dataTransfer.files;
+
+    renderImagePreviews(
+        photosInput.files
+    );
+
+});
+
+function renderImagePreviews(files){
+
+    preview.innerHTML = "";
+
+    Array.from(files).forEach(file => {
+
+        const image =
+            document.createElement("img");
+
+        image.src =
+            URL.createObjectURL(file);
+
+        image.alt =
+            file.name;
+
+        image.onload = () => {
+            URL.revokeObjectURL(image.src);
+        };
+
+        preview.appendChild(image);
+
+    });
+
+}
 
 document.getElementById("eventForm")
 .addEventListener("submit", async function(e){
 
     e.preventDefault();
 
-    const event = {
-
-        bride_name:
-            document.getElementById("bride").value,
-
-        groom_name:
-            document.getElementById("groom").value,
-
-        event_date:
-            document.getElementById("date").value,
-
-        venue:
-            document.getElementById("venue").value,
-
-        description:
-            document.getElementById("description").value
-
-    };
-
     try {
+
+        const uploadedImages = [];
+        const photos = Array.from(
+            photosInput.files
+        );
+
+        for (const photo of photos) {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "photo",
+                photo
+            );
+
+            const uploadResponse = await fetch(
+                "http://localhost:8080/upload",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+            if(!uploadResponse.ok){
+                throw new Error("Image upload failed");
+            }
+
+            const uploadData =
+                await uploadResponse.json();
+
+            uploadedImages.push(
+                uploadData.file_url
+            );
+
+        }
+
+        const event = {
+
+            bride_name:
+                document.getElementById("bride").value,
+
+            groom_name:
+                document.getElementById("groom").value,
+
+            event_date:
+                document.getElementById("date").value,
+
+            venue:
+                document.getElementById("venue").value,
+
+            description:
+                document.getElementById("description").value,
+
+            hero_image:
+                uploadedImages[0] || "",
+
+            gallery_images:
+                uploadedImages
+
+        };
 
         const response = await fetch(
             "http://localhost:8080/events",
@@ -122,16 +247,18 @@ document.getElementById("eventForm")
 
             document.getElementById("message")
                 .innerHTML =
-                "✅ Wedding Created Successfully";
+                "Wedding created successfully.";
 
             document.getElementById("eventForm")
                 .reset();
+
+            preview.innerHTML = "";
 
         } else {
 
             document.getElementById("message")
                 .innerHTML =
-                "❌ Failed To Create Wedding";
+                "Failed to create wedding.";
 
         }
 
@@ -139,7 +266,9 @@ document.getElementById("eventForm")
 
         document.getElementById("message")
             .innerHTML =
-            "❌ Server Error";
+            "Server error. Please try again.";
+
+        console.log(error);
 
     }
 

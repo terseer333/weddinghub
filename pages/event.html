@@ -1,159 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Wedding Invitation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation | WeddingHub</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
 
-<!-- HERO SLIDER -->
-
 <section class="slider-container">
+    <div id="heroSlides"></div>
 
-    <div class="slides fade active">
-        <img src="https://images.unsplash.com/photo-1519741497674-611481863552">
-    </div>
-
-    <div class="slides fade">
-        <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf">
-    </div>
-
-    <div class="slides fade">
-        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc">
-    </div>
+    <nav class="invitation-nav">
+        <a class="brand" href="../index.html">
+            <span class="brand-mark">W</span>
+            <span>WeddingHub</span>
+        </a>
+        <a id="rsvpNavButton" class="nav-button" href="rsvp.html">RSVP</a>
+    </nav>
 
     <div class="hero-overlay">
+        <p class="eyebrow">The wedding of</p>
+        <h1 id="coupleNames">Loading...</h1>
+        <p class="tagline">Together forever</p>
+        <div id="countdown" class="countdown">Loading countdown...</div>
+    </div>
+</section>
 
-        <h1 id="coupleNames">
-            Loading...
-        </h1>
+<main>
+    <section class="love-story">
+        <p class="eyebrow">Our story</p>
+        <h2>A celebration of love, family, and forever.</h2>
+        <p id="description">Loading...</p>
+    </section>
 
-        <p class="tagline">
-            Together Forever ❤️
-        </p>
+    <section class="invitation-details">
+        <article class="detail-card">
+            <span>Date</span>
+            <h2 id="date"></h2>
+        </article>
 
-        <div id="countdown" class="countdown">
-            Loading countdown...
+        <article class="detail-card">
+            <span>Venue</span>
+            <h2 id="venue"></h2>
+        </article>
+
+        <article class="detail-card">
+            <span>Note</span>
+            <p>We are excited to celebrate this unforgettable moment with our family and friends.</p>
+        </article>
+    </section>
+
+    <section class="gallery">
+        <div class="section-heading compact-heading">
+            <p class="eyebrow">Gallery</p>
+            <h2>Pre-Wedding Moments</h2>
         </div>
 
-    </div>
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
 
-</section>
+    <section class="invitation-action">
+        <p class="eyebrow">Kindly respond</p>
+        <h2>We would love to celebrate with you.</h2>
+        <p>Please confirm your attendance so the couple can prepare every detail beautifully.</p>
 
-<!-- LOVE STORY -->
-
-<section class="love-story">
-
-    <h2>❤️ Our Love Story</h2>
-
-    <p id="description">
-        Loading...
-    </p>
-
-</section>
-
-<!-- EVENT DETAILS -->
-
-<section class="invitation-details">
-
-    <div class="detail-card">
-
-        <h2>📅 Wedding Date</h2>
-
-        <p id="date"></p>
-
-    </div>
-
-    <div class="detail-card">
-
-        <h2>📍 Venue</h2>
-
-        <p id="venue"></p>
-
-    </div>
-
-    <div class="detail-card">
-
-        <h2>💖 Special Message</h2>
-
-        <p>
-            We are excited to celebrate this
-            unforgettable moment with our
-            family and friends.
-        </p>
-
-    </div>
-
-</section>
-
-<!-- GALLERY -->
-
-<section class="gallery">
-
-    <h2>📸 Pre-Wedding Gallery</h2>
-
-    <div class="gallery-grid">
-
-        <img
-        src="https://images.unsplash.com/photo-1519741497674-611481863552"
-        alt="Wedding Photo">
-
-        <img
-        src="https://images.unsplash.com/photo-1520854221256-17451cc331bf"
-        alt="Wedding Photo">
-
-        <img
-        src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc"
-        alt="Wedding Photo">
-
-    </div>
-
-</section>
-
-<!-- RSVP CTA -->
-
-<section class="invitation-action">
-
-    <h2>
-        We Would Love To Celebrate With You ❤️
-    </h2>
-
-    <p>
-        Kindly confirm your attendance
-        by clicking the button below.
-    </p>
-
-    <br>
-
-    <a id="rsvpButton" href="rsvp.html">
-
-        <button class="invite-btn">
-            Confirm Attendance
-        </button>
-
-    </a>
-
-</section>
-
-<!-- FOOTER -->
+        <a id="rsvpButton" href="rsvp.html">
+            <button class="invite-btn">Confirm Attendance</button>
+        </a>
+    </section>
+</main>
 
 <footer>
-
-    <h3 id="footerNames">
-        WeddingHub
-    </h3>
-
-    <p>
-        Creating unforgettable wedding memories 💍
-    </p>
-
+    <h3 id="footerNames">WeddingHub</h3>
+    <p>Creating unforgettable wedding memories.</p>
 </footer>
 
 <script>
 
-/* =========================
-   LOAD EVENT
-========================= */
+const defaultImages = [
+    "https://images.unsplash.com/photo-1519741497674-611481863552",
+    "https://images.unsplash.com/photo-1520854221256-17451cc331bf",
+    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc"
+];
+
+let slideTimer;
 
 const params =
     new URLSearchParams(
@@ -176,7 +107,7 @@ fetch(
     document.getElementById(
         "footerNames"
     ).innerText =
-    `${data.bride_name} ❤️ ${data.groom_name}`;
+    `${data.bride_name} & ${data.groom_name}`;
 
     document.getElementById(
         "date"
@@ -198,6 +129,13 @@ fetch(
     ).href =
     `rsvp.html?id=${data.id}`;
 
+    document.getElementById(
+        "rsvpNavButton"
+    ).href =
+    `rsvp.html?id=${data.id}`;
+
+    renderEventImages(data);
+
     startCountdown(
         data.event_date
     );
@@ -212,9 +150,46 @@ fetch(
 
 });
 
-/* =========================
-   COUNTDOWN
-========================= */
+function renderEventImages(event){
+
+    const images =
+        event.gallery_images &&
+        event.gallery_images.length > 0
+            ? event.gallery_images
+            : event.hero_image
+                ? [event.hero_image]
+                : defaultImages;
+
+    const heroSlides =
+        document.getElementById("heroSlides");
+
+    const galleryGrid =
+        document.getElementById("galleryGrid");
+
+    heroSlides.innerHTML = "";
+    galleryGrid.innerHTML = "";
+
+    images.forEach((imageUrl, index) => {
+
+        heroSlides.innerHTML += `
+            <div class="slides fade ${index === 0 ? "active" : ""}">
+                <img
+                    src="${imageUrl}"
+                    alt="${event.bride_name} and ${event.groom_name} wedding photo">
+            </div>
+        `;
+
+        galleryGrid.innerHTML += `
+            <img
+                src="${imageUrl}"
+                alt="${event.bride_name} and ${event.groom_name} wedding photo">
+        `;
+
+    });
+
+    showSlides();
+
+}
 
 function startCountdown(eventDate){
 
@@ -237,7 +212,7 @@ function startCountdown(eventDate){
         if(difference <= 0){
 
             countdown.innerHTML =
-                "🎉 Wedding Day Has Arrived!";
+                "Wedding day has arrived";
 
             return;
         }
@@ -282,10 +257,6 @@ function startCountdown(eventDate){
 
 }
 
-/* =========================
-   SLIDER
-========================= */
-
 let slideIndex = 0;
 
 function showSlides(){
@@ -294,6 +265,10 @@ function showSlides(){
         document.querySelectorAll(
             ".slides"
         );
+
+    if(slides.length === 0){
+        return;
+    }
 
     slides.forEach(slide => {
 
@@ -317,14 +292,14 @@ function showSlides(){
         "active"
     );
 
-    setTimeout(
+    clearTimeout(slideTimer);
+
+    slideTimer = setTimeout(
         showSlides,
         4000
     );
 
 }
-
-showSlides();
 
 </script>
 
