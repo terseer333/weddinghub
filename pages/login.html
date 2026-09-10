@@ -1,63 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | WeddingHub</title>
-    <link rel="stylesheet" href="../style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Continue to your browser-local WeddingHub workspace.">
+    <title>Log in · WeddingHub</title>
+    <link rel="stylesheet" href="../weddinghub.css">
+    <link rel="stylesheet" href="../landing.css">
 </head>
-<body>
-
-<main class="auth-container">
-    <section class="auth-left">
-        <a class="brand auth-brand" href="../index.html">
-            <span class="brand-mark">W</span>
+<body class="auth-page" data-auth-page="login">
+<a class="skip-link" href="#auth-form">Skip to login form</a>
+<main class="auth-layout">
+    <section class="auth-intro" aria-labelledby="auth-intro-title">
+        <a class="public-brand" href="../index.html" aria-label="WeddingHub home">
+            <span class="brand-mark" aria-hidden="true">W</span>
             <span>WeddingHub</span>
         </a>
-
-        <div>
-            <p class="eyebrow">Welcome back</p>
-            <h1>Return to your wedding command center.</h1>
-            <p>
-                Manage invitations, photos, RSVP responses, and guest details
-                from one elegant planning dashboard.
-            </p>
+        <div class="auth-intro-copy">
+            <p class="landing-eyebrow">Your wedding workspace</p>
+            <h1 id="auth-intro-title">Everything you’re planning, together.</h1>
+            <p>Return to the central workspace for wedding details, invitations, guest responses, published content, and announcements.</p>
+            <div class="auth-points" aria-label="WeddingHub workspace features">
+                <span><i aria-hidden="true">✓</i> One admin view for the celebration</span>
+                <span><i aria-hidden="true">✓</i> Connected invitation and guest information</span>
+                <span><i aria-hidden="true">✓</i> Responsive across phone, tablet, and desktop</span>
+            </div>
         </div>
+        <p class="auth-legal">Welcome back to your wedding</p>
     </section>
 
-    <section class="auth-right">
+    <section class="auth-main" aria-labelledby="login-title">
         <div class="auth-card">
-            <p class="eyebrow">Secure access</p>
-            <h2>Login</h2>
+            <a class="auth-back" href="../index.html"><span aria-hidden="true">←</span> Back to WeddingHub</a>
+            <p class="landing-eyebrow">Welcome back</p>
+            <h1 id="login-title">Log in</h1>
+            <p class="auth-subtitle">Enter your details to continue to your WeddingHub workspace.</p>
 
-            <form id="loginForm">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" required>
+            <aside class="local-notice" aria-label="Preview environment information">
+                <span aria-hidden="true">i</span>
+                <div>This hosted preview continues with the wedding saved in this browser. Production authentication is provided by the connected deployment.</div>
+            </aside>
 
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
-
-                <button type="submit">Login</button>
+            <form class="auth-form" id="auth-form" data-auth-form="login">
+                <div class="field">
+                    <label for="email">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required>
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="6" required aria-describedby="password-hint">
+                    <p class="field-hint" id="password-hint">Used only to complete this local entry form.</p>
+                </div>
+                <button class="auth-submit" type="submit">Continue to workspace</button>
             </form>
-
-            <p id="message"></p>
-
-            <p class="auth-link">
-                Don't have an account?
-                <a href="signup.html">Create Account</a>
-            </p>
+            <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+            <p class="auth-switch">Planning a new wedding? <a href="signup.html">Create a workspace</a></p>
         </div>
     </section>
 </main>
-
 <script src="../app.js"></script>
-<script>
-document.getElementById("loginForm").addEventListener("submit", function(e){
-    e.preventDefault();
-    document.getElementById("message").textContent = "Welcome back. Opening your wedding workspace...";
-    setTimeout(() => { window.location.href = "dashboard.html"; }, 600);
-});
-</script>
-
+<script src="../auth.js"></script>
 </body>
 </html>

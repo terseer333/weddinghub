@@ -4,6 +4,8 @@ let data = WH.getData();
 let guest = WH.guestByToken(data);
 let wedding = data.wedding;
 const token = WH.query("token");
+const adminPreview = WH.query("preview") === "admin";
+if (adminPreview && !guest) guest = { id:"preview", name:"Guest preview", token:"", rsvp:"pending", invitationStatus:"pending", partySize:1 };
 const modal = document.getElementById("rsvpModal");
 const content = document.getElementById("rsvpContent");
 
@@ -26,13 +28,22 @@ async function loadInvitation() {
           partySize: 1
         };
         data.guests.push(guest);
-      } else {
+      } else if (view.invitation.status !== "pending") {
         guest.invitationStatus = view.invitation.status;
+      }
+      if (guest.invitationStatus === "sent") {
+        guest.invitationStatus = "opened";
+        guest.openedAt = new Date().toISOString();
       }
       WH.saveData(data);
     } catch (error) {
       console.warn("Using local invitation fallback:", error);
     }
+  }
+  if (guest && guest.invitationStatus === "sent") {
+    guest.invitationStatus = "opened";
+    guest.openedAt = new Date().toISOString();
+    WH.saveData(data);
   }
   renderInvitation();
 }
@@ -52,6 +63,10 @@ function renderInvitation() {
   if (!guest) {
     document.getElementById("personalGreeting").textContent = "This invitation link is invalid or has expired.";
     document.getElementById("inviteActions").innerHTML = '<a class="button ivory" href="../index.html">Return to WeddingHub</a>';
+  } else if (adminPreview) {
+    document.getElementById("personalGreeting").textContent = "Guest preview · this is how your invitation currently appears.";
+    document.getElementById("inviteActions").innerHTML = '<a class="button ivory" href="dashboard.html">Return to editor</a>';
+    document.getElementById("bottomAccept").hidden = true;
   } else {
     document.getElementById("personalGreeting").textContent = `Dear ${guest.name.split(" ")[0]}, this celebration would not be complete without you.`;
     updateResponseState();
@@ -64,11 +79,12 @@ function renderInvitation() {
           .map(([label, number]) => `<div><strong>${String(number).padStart(2, "0")}</strong><span>${label}</span></div>`).join("");
   });
 
-  document.getElementById("eventCards").innerHTML = WH.published(data.events).map((event, index) => `
+  const publishedEvents = WH.published(data.events);
+  document.getElementById("eventCards").innerHTML = publishedEvents.length ? publishedEvents.map((event, index) => `
     <article><p class="eyebrow">${index === 0 ? "Ceremony" : "Celebration"}</p><span class="event-number">0${index + 1}</span>
     <h2>${WH.escape(event.name)}</h2><p><strong>${WH.formatDate(event.date)} · ${event.time}</strong></p>
     <p>${WH.escape(event.venue)}<br>${WH.escape(event.address)}</p><small>${WH.escape(event.description)}</small>
-    <a href="https://maps.google.com/?q=${encodeURIComponent(event.address)}" target="_blank">View location ↗</a></article>`).join("");
+    <a href="https://maps.google.com/?q=${encodeURIComponent(event.address)}" target="_blank">View location ↗</a></article>`).join("") : '<div class="invitation-empty"><span>✦</span><h2>Celebration details are coming soon</h2><p>The couple will publish the event schedule here.</p></div>';
 }
 
 function updateResponseState() {
@@ -121,8 +137,8 @@ async function submitResponse(event, mode) {
   if (mode === "attending") setTimeout(() => location.href = `guest-dashboard.html?token=${guest.token}`, 600);
 }
 
-document.getElementById("acceptButton").addEventListener("click", () => openRSVP("attending"));
-document.getElementById("declineButton").addEventListener("click", () => openRSVP("declined"));
+document.getElementById("acceptButton").addEventListener("click", () => { if(!adminPreview) openRSVP("attending"); });
+document.getElementById("declineButton").addEventListener("click", () => { if(!adminPreview) openRSVP("declined"); });
 document.getElementById("bottomAccept").addEventListener("click", () => openRSVP("attending"));
 document.getElementById("closeModal").addEventListener("click", () => modal.classList.remove("open"));
 modal.addEventListener("click", event => { if (event.target === modal) modal.classList.remove("open"); });

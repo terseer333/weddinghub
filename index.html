@@ -1,101 +1,207 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeddingHub | Premium Wedding Websites</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="WeddingHub connects wedding administration, personal invitations, and private guest dashboards in one coordinated experience.">
+    <title>WeddingHub · One connected wedding experience</title>
+    <link rel="stylesheet" href="weddinghub.css">
+    <link rel="stylesheet" href="landing.css">
 </head>
-<body>
+<body class="landing-page">
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-<header class="site-hero">
-    <nav class="site-nav">
-        <a class="brand" href="index.html">
-            <span class="brand-mark">W</span>
+<header>
+    <nav class="public-nav public-shell" aria-label="Primary navigation">
+        <a class="public-brand" href="index.html" aria-label="WeddingHub home">
+            <span class="brand-mark" aria-hidden="true">W</span>
             <span>WeddingHub</span>
         </a>
-
-        <div class="nav-links">
-            <a href="pages/login.html">Login</a>
-            <a class="nav-button" href="pages/signup.html">Start Free</a>
+        <div class="public-nav-links">
+            <a href="#platform">Platform</a>
+            <a href="#experience">Experience</a>
+            <a href="pages/login.html">Log in</a>
+            <a class="landing-button primary compact" href="pages/signup.html">Create your workspace</a>
         </div>
     </nav>
 
-    <div class="hero-content">
-        <p class="eyebrow">Wedding websites, RSVPs, galleries</p>
-        <h1>Build a wedding experience guests will remember.</h1>
-        <p>
-            Create a polished invitation site, collect RSVPs, showcase your
-            story, and manage every celebration detail from one calm dashboard.
-        </p>
+    <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-grid public-shell">
+            <div class="hero-copy">
+                <p class="landing-eyebrow">One beautifully connected celebration</p>
+                <h1 id="hero-title">Plan once. Welcome every guest <em>personally.</em></h1>
+                <p class="hero-lead">WeddingHub brings your admin workspace, personal invitations, and private guest dashboards together—so the details you manage become the experience your guests receive.</p>
+                <div class="hero-actions">
+                    <a class="landing-button primary" href="pages/signup.html">Create your workspace <span aria-hidden="true">→</span></a>
+                    <a class="landing-button outline" href="pages/dashboard.html">Explore the product <span aria-hidden="true">↗</span></a>
+                </div>
+                <p class="hero-note"><span aria-hidden="true">✓</span> Start with your wedding details and personalize as you go</p>
+            </div>
 
-        <div class="hero-actions">
-            <a href="pages/signup.html">
-                <button>Start Your Wedding Site</button>
-            </a>
-            <a class="text-link" href="pages/login.html">Open Dashboard</a>
+            <div class="product-stage" aria-label="WeddingHub admin dashboard and mobile invitation previews">
+                <div class="dashboard-mockup" aria-hidden="true">
+                    <div class="window-bar"><i></i><i></i><i></i></div>
+                    <div class="mock-app">
+                        <aside class="mock-sidebar">
+                            <div class="mock-logo">WeddingHub</div>
+                            <span>Overview</span>
+                            <span>Wedding details</span>
+                            <span>Invitations</span>
+                            <span>Guest list</span>
+                            <span>Announcements</span>
+                        </aside>
+                        <div class="mock-content">
+                            <div class="mock-topline">
+                                <div><p class="mock-kicker">Wedding overview</p><h3>Your celebration</h3></div>
+                                <span class="mock-avatar">A&amp;J</span>
+                            </div>
+                            <div class="mock-metrics">
+                                <div><span>Invited</span><strong>86</strong></div>
+                                <div><span>Attending</span><strong>64</strong></div>
+                                <div><span>Awaiting reply</span><strong>22</strong></div>
+                            </div>
+                            <div class="mock-panels">
+                                <div class="mock-panel">
+                                    <h4>Wedding countdown</h4>
+                                    <div class="mock-countdown"><span><b>42</b><small>Days</small></span><span><b>08</b><small>Hours</small></span><span><b>21</b><small>Minutes</small></span></div>
+                                    <div class="mock-event"><span class="mock-calendar">19</span><span>Wedding ceremony · 10:00</span></div>
+                                </div>
+                                <div class="mock-panel">
+                                    <h4>Recent responses</h4>
+                                    <div class="mock-activity"><span></span><span></span><span></span><span></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="phone-mockup" aria-hidden="true">
+                    <div class="phone-screen">
+                        <div class="phone-notch"></div>
+                        <small>Together with their families</small>
+                        <h3>Amara <em>&amp;</em> Joshua</h3>
+                        <div class="phone-rule"></div>
+                        <p>Saturday, the nineteenth of December<br>Garden House · Lagos</p>
+                        <span class="phone-pill">View invitation</span>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 </header>
 
-<main>
-    <section class="feature-band">
-        <div class="section-heading">
-            <p class="eyebrow">Everything in one place</p>
-            <h2>Premium tools for modern wedding planning</h2>
+<main id="main-content">
+    <section class="trust-strip" aria-label="Core platform capabilities">
+        <div class="trust-grid public-shell">
+            <p>One shared source of truth</p>
+            <div><span aria-hidden="true">◇</span> Admin workspace</div>
+            <div><span aria-hidden="true">✦</span> Personal invitations</div>
+            <div><span aria-hidden="true">⌂</span> Private guest space</div>
         </div>
+    </section>
 
+    <section class="landing-section public-shell" id="platform" aria-labelledby="platform-title">
+        <div class="section-heading center">
+            <p class="landing-eyebrow">Designed around the whole journey</p>
+            <h2 id="platform-title">Every part of your wedding, moving together.</h2>
+            <p>Manage the celebration from one calm workspace, then present each guest with the relevant published details through their invitation and guest dashboard.</p>
+        </div>
         <div class="feature-grid">
             <article class="feature-card">
-                <span class="feature-icon">01</span>
-                <h3>Personal invitations</h3>
-                <p>Send secure, named invitation links and track every open, acceptance and RSVP.</p>
+                <span class="feature-number" aria-hidden="true">01</span>
+                <h3>A clear admin workspace</h3>
+                <p>Organize wedding information, events, guests, responses, photos, stories, and announcements in one central view.</p>
+                <a href="pages/dashboard.html">View the workspace <span aria-hidden="true">&nbsp;→</span></a>
             </article>
-
             <article class="feature-card">
-                <span class="feature-icon">02</span>
-                <h3>Private guest dashboard</h3>
-                <p>Accepted guests enter a beautiful mobile-first space designed specifically for your wedding.</p>
+                <span class="feature-number" aria-hidden="true">02</span>
+                <h3>Invitations made personal</h3>
+                <p>Give named guests a direct invitation experience with the date, place, celebration details, and their response path.</p>
+                <a href="#experience">See how it connects <span aria-hidden="true">&nbsp;↓</span></a>
             </article>
-
             <article class="feature-card">
-                <span class="feature-icon">03</span>
-                <h3>Always in sync</h3>
-                <p>Update a venue, photo or announcement once and every guest sees the latest published version.</p>
+                <span class="feature-number" aria-hidden="true">03</span>
+                <h3>A private place for guests</h3>
+                <p>Accepted guests can enter a mobile-first dashboard for published events, details, stories, galleries, announcements, and RSVP information.</p>
+                <a href="#guest-preview">Preview the experience <span aria-hidden="true">&nbsp;↓</span></a>
             </article>
         </div>
     </section>
 
-    <section class="editorial-section">
-        <div>
-            <p class="eyebrow">From setup to celebration</p>
-            <h2>From “you’re invited” to “welcome to our wedding.”</h2>
-            <p>
-                WeddingHub connects a powerful planning workspace to a deeply personal guest experience. Choose from 108 invitation designs without ever re-entering your details.
-            </p>
+    <section class="landing-section connected-section" id="experience" aria-labelledby="connected-title">
+        <div class="flow-grid public-shell">
+            <div class="flow-copy">
+                <p class="landing-eyebrow">A continuous guest journey</p>
+                <h2 id="connected-title">From your first update to their final details.</h2>
+                <p>WeddingHub is structured around a single wedding record. Admin-managed information flows into the appropriate guest-facing surfaces, keeping the planning view and published experience aligned.</p>
+                <div class="flow-list">
+                    <div class="flow-item"><b>1</b><div><strong>Build the celebration</strong><span>Add the couple, schedule, venue, story, imagery, and guest list.</span></div></div>
+                    <div class="flow-item"><b>2</b><div><strong>Invite each guest</strong><span>Share a personal invitation connected to that guest’s response.</span></div></div>
+                    <div class="flow-item"><b>3</b><div><strong>Keep everyone informed</strong><span>Published details and updates appear in the accepted guest experience.</span></div></div>
+                </div>
+            </div>
+            <div class="connection-visual" aria-label="Diagram showing the admin workspace connected to invitations and guest dashboards">
+                <div class="connection-line" aria-hidden="true"></div>
+                <div class="connection-core"><strong>One wedding<br>record</strong></div>
+                <article class="connection-card admin"><small>Manage</small><h3>Admin workspace</h3><p>Your central view of details, content, guests, and responses.</p><i aria-hidden="true"></i></article>
+                <article class="connection-card invite"><small>Invite</small><h3>Personal invitation</h3><p>A named route into the celebration and RSVP flow.</p><i aria-hidden="true"></i></article>
+                <article class="connection-card guest"><small>Welcome</small><h3>Guest dashboard</h3><p>Published information for each accepted guest.</p><i aria-hidden="true"></i></article>
+            </div>
         </div>
+    </section>
 
-        <div class="process-list">
+    <section class="landing-section preview-section" id="guest-preview" aria-labelledby="preview-title">
+        <div class="section-heading center">
+            <p class="landing-eyebrow">Two sides of one experience</p>
+            <h2 id="preview-title">Purposeful for you. Personal for them.</h2>
+        </div>
+        <div class="preview-layout public-shell">
+            <article class="preview-card admin-preview">
+                <div class="preview-copy">
+                    <small>For wedding admins</small>
+                    <h3>See the whole celebration clearly.</h3>
+                    <p>Move between guest management, event information, content, announcements, and design without leaving the workspace.</p>
+                    <a class="landing-button light" href="pages/dashboard.html">Open product preview <span aria-hidden="true">↗</span></a>
+                </div>
+                <div class="preview-sheet" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+            </article>
+            <article class="preview-card guest-preview">
+                <span class="guest-monogram" aria-hidden="true">A&amp;J</span>
+                <div class="preview-copy">
+                    <small>For invited guests</small>
+                    <h3>A private space that feels like your wedding.</h3>
+                    <p>Guests enter through their personal invitation, respond, and access the published celebration experience when accepted.</p>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="cta-wrap">
+        <div class="cta-panel public-shell">
             <div>
-                <strong>1</strong>
-                <span>Create your wedding and choose a design</span>
+                <h2>Bring every wedding detail into one thoughtful experience.</h2>
+                <p>Create your wedding workspace now, or explore the connected admin experience before you begin.</p>
             </div>
-            <div>
-                <strong>2</strong>
-                <span>Invite and track every guest</span>
-            </div>
-            <div>
-                <strong>3</strong>
-                <span>Unlock a private guest experience</span>
+            <div class="cta-actions">
+                <a class="landing-button light" href="pages/signup.html">Create workspace</a>
+                <a class="landing-button outline" href="pages/login.html">Continue to login</a>
             </div>
         </div>
     </section>
 </main>
 
-<footer>
-    <h3>WeddingHub</h3>
-    <p>One admin. Many guests. One beautifully connected wedding.</p>
+<footer class="public-footer">
+    <div class="footer-inner public-shell">
+        <div>
+            <a class="public-brand" href="index.html"><span class="brand-mark" aria-hidden="true">W</span><span>WeddingHub</span></a>
+            <p>Connected planning, invitations, and private guest experiences.</p>
+        </div>
+        <nav class="footer-links" aria-label="Footer navigation">
+            <a href="#platform">Platform</a>
+            <a href="pages/dashboard.html">Product preview</a>
+            <a href="pages/login.html">Log in</a>
+            <a href="pages/signup.html">Sign up</a>
+        </nav>
+    </div>
 </footer>
-
 </body>
 </html>

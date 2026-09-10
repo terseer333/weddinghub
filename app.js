@@ -82,8 +82,8 @@
   }
   function templates() {
     const categories = ["Luxury", "Classic", "Modern", "Minimalist", "Floral", "Romantic", "Royal", "Traditional", "African-inspired", "Nigerian wedding", "Church wedding", "Traditional marriage", "Photo invitation", "Black & Gold", "White & Gold", "Pastel", "Dark Elegant", "Simple", "Premium"];
-    const styles = ["Serif Editorial", "Botanical Arch", "Modern Monogram", "Gilded Frame", "Soft Romance", "Heritage Pattern"];
-    return Array.from({ length: 108 }, (_, i) => ({ id: i === 2 ? "black-gold-03" : `template-${i + 1}`, name: `${styles[i % styles.length]} ${String(i + 1).padStart(2, "0")}`, category: categories[i % categories.length], premium: i % 4 === 0, tone: i % 6 }));
+    const styles = ["Editorial Vows", "Botanical Arch", "Modern Monogram", "Gilded Noir", "Soft Romance", "Heritage Weave", "Ivory Letterpress", "Sage Garden", "Midnight Gala", "Terracotta Bloom", "Pearl Minimal", "Royal Emblem"];
+    return Array.from({ length: 108 }, (_, i) => ({ id: i === 3 ? "black-gold-03" : `template-${i + 1}`, name: `${styles[i % styles.length]} ${String(Math.floor(i / styles.length) + 1).padStart(2, "0")}`, category: categories[i % categories.length], premium: i % 4 === 0, tone: i % 12 }));
   }
   function countdown(target, callback) {
     const tick = () => {

@@ -1,71 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up | WeddingHub</title>
-    <link rel="stylesheet" href="../style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Create a browser-local WeddingHub profile and enter the connected wedding workspace.">
+    <title>Create a workspace · WeddingHub</title>
+    <link rel="stylesheet" href="../weddinghub.css">
+    <link rel="stylesheet" href="../landing.css">
 </head>
-<body>
-
-<main class="auth-container">
-    <section class="auth-left signup-visual">
-        <a class="brand auth-brand" href="../index.html">
-            <span class="brand-mark">W</span>
+<body class="auth-page" data-auth-page="signup">
+<a class="skip-link" href="#auth-form">Skip to signup form</a>
+<main class="auth-layout">
+    <section class="auth-intro" aria-labelledby="auth-intro-title">
+        <a class="public-brand" href="../index.html" aria-label="WeddingHub home">
+            <span class="brand-mark" aria-hidden="true">W</span>
             <span>WeddingHub</span>
         </a>
-
-        <div>
-            <p class="eyebrow">Start beautifully</p>
-            <h1>Create your wedding website in minutes.</h1>
-            <p>
-                Build a refined invitation page, collect RSVPs, and keep every
-                guest response close at hand.
-            </p>
+        <div class="auth-intro-copy">
+            <p class="landing-eyebrow">Start with one shared record</p>
+            <h1 id="auth-intro-title">Shape the experience your guests will enter.</h1>
+            <p>Set up the admin side of your wedding, organize the guest journey, and keep published details connected from invitation to private dashboard.</p>
+            <div class="auth-points" aria-label="WeddingHub product features">
+                <span><i aria-hidden="true">✓</i> Central wedding and event information</span>
+                <span><i aria-hidden="true">✓</i> Personal invitations and RSVP records</span>
+                <span><i aria-hidden="true">✓</i> Published content for accepted guests</span>
+            </div>
         </div>
+        <p class="auth-legal">Your wedding starts here</p>
     </section>
 
-    <section class="auth-right">
+    <section class="auth-main" aria-labelledby="signup-title">
         <div class="auth-card">
-            <p class="eyebrow">New account</p>
-            <h2>Create Account</h2>
+            <a class="auth-back" href="../index.html"><span aria-hidden="true">←</span> Back to WeddingHub</a>
+            <p class="landing-eyebrow">Create your workspace</p>
+            <h1 id="signup-title">Let’s begin</h1>
+            <p class="auth-subtitle">Tell us who is celebrating. You can refine every detail from your workspace.</p>
 
-            <form id="signupForm">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" placeholder="Your name" required>
+            <aside class="local-notice" aria-label="Preview environment information">
+                <span aria-hidden="true">i</span>
+                <div>This preview saves your setup in this browser. Connect the deployed API for persistent multi-device access.</div>
+            </aside>
 
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" required>
-
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Create a password" required>
-
-                <button type="submit">Create Account</button>
+            <form class="auth-form" id="auth-form" data-auth-form="signup">
+                <div class="field">
+                    <label for="full-name">Full name</label>
+                    <input id="full-name" name="fullName" type="text" autocomplete="name" placeholder="Your full name" minlength="2" required>
+                </div>
+                <div class="field">
+                    <label for="email">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required>
+                </div>
+                <div class="auth-form-row">
+                    <div class="field"><label for="partner-one">Partner one</label><input id="partner-one" name="partnerOne" type="text" placeholder="First name" required></div>
+                    <div class="field"><label for="partner-two">Partner two</label><input id="partner-two" name="partnerTwo" type="text" placeholder="First name" required></div>
+                </div>
+                <div class="field"><label for="wedding-date">Wedding date</label><input id="wedding-date" name="weddingDate" type="date" required></div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 6 characters" minlength="6" required aria-describedby="password-hint">
+                    <p class="field-hint" id="password-hint">Used only to complete this local entry form.</p>
+                </div>
+                <button class="auth-submit" type="submit">Create wedding workspace</button>
             </form>
-
-            <p id="message"></p>
-
-            <p class="auth-link">
-                Already have an account?
-                <a href="login.html">Login</a>
-            </p>
+            <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+            <p class="auth-switch">Already started? <a href="login.html">Log in</a></p>
         </div>
     </section>
 </main>
-
 <script src="../app.js"></script>
-<script>
-document.getElementById("signupForm").addEventListener("submit", function(e){
-    e.preventDefault();
-    localStorage.setItem("weddinghub_demo_user", JSON.stringify({
-        fullName: document.getElementById("fullName").value,
-        email: document.getElementById("email").value
-    }));
-    WeddingHub.getData();
-    document.getElementById("message").textContent = "Your demo workspace is ready. Opening WeddingHub...";
-    setTimeout(() => { window.location.href = "dashboard.html"; }, 600);
-});
-</script>
-
+<script src="../auth.js"></script>
 </body>
 </html>

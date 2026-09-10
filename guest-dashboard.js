@@ -31,6 +31,8 @@ function showAccessGate() {
 }
 
 function renderGuestDashboard() {
+  const visibility = { story: WH.published(data.stories).length > 0, gallery: WH.published(data.photos).length > 0, events: WH.published(data.events).length > 0, announcements: WH.published(data.announcements).length > 0 };
+  Object.entries(visibility).forEach(([id, visible]) => { const section=document.getElementById(id); if(section)section.hidden=!visible; const link=document.querySelector(`.guest-links a[href="#${id}"]`); if(link)link.hidden=!visible; });
   document.getElementById("guestHero").style.backgroundImage = `url('${wedding.heroImage}')`;
   document.getElementById("detailImage").style.backgroundImage = `url('${data.photos[2]?.url || wedding.heroImage}')`;
   document.getElementById("welcomeName").textContent = `Welcome, ${guest.name.split(" ")[0]}`;
@@ -69,6 +71,7 @@ function renderGuestDashboard() {
 
 function renderGallery() {
   const photos = WH.published(data.photos);
+  if (!photos.length) return;
   let index = 0;
   const show = () => {
     document.getElementById("galleryStage").innerHTML = photos.map((photo, photoIndex) => `<figure class="${photoIndex === index ? "active" : ""}">
@@ -76,8 +79,34 @@ function renderGallery() {
     document.getElementById("photoPosition").textContent = `${String(index + 1).padStart(2, "0")} / ${String(photos.length).padStart(2, "0")}`;
   };
   show();
-  document.getElementById("nextPhoto").onclick = () => { index = (index + 1) % photos.length; show(); };
-  document.getElementById("prevPhoto").onclick = () => { index = (index - 1 + photos.length) % photos.length; show(); };
+  const stage = document.getElementById("galleryStage");
+  const next = () => { index = (index + 1) % photos.length; show(); };
+  const previous = () => { index = (index - 1 + photos.length) % photos.length; show(); };
+  document.getElementById("nextPhoto").onclick = next;
+  document.getElementById("prevPhoto").onclick = previous;
+  let touchStart = 0;
+  stage.ontouchstart = event => { touchStart = event.changedTouches[0].screenX; };
+  stage.ontouchend = event => { const distance = event.changedTouches[0].screenX - touchStart; if (Math.abs(distance) > 45) distance < 0 ? next() : previous(); };
+  stage.onclick = () => openLightbox(photos[index]);
+  window.clearInterval(window.weddingGalleryTimer);
+  window.weddingGalleryTimer = window.setInterval(next, 5500);
+}
+
+function openLightbox(photo) {
+  let dialog = document.getElementById("photoLightbox");
+  if (!dialog) {
+    dialog = document.createElement("dialog");
+    dialog.id = "photoLightbox";
+    dialog.className = "photo-lightbox";
+    dialog.innerHTML = '<button type="button" aria-label="Close full-screen photo">×</button><img><p></p>';
+    document.body.appendChild(dialog);
+    dialog.querySelector("button").onclick = () => dialog.close();
+    dialog.onclick = event => { if (event.target === dialog) dialog.close(); };
+  }
+  dialog.querySelector("img").src = photo.url;
+  dialog.querySelector("img").alt = photo.caption || "Wedding photo";
+  dialog.querySelector("p").textContent = photo.caption || "";
+  dialog.showModal();
 }
 
 document.getElementById("guestMenu").onclick = () => document.querySelector(".guest-links").classList.toggle("open");

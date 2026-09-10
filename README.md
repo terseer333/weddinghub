@@ -17,9 +17,9 @@ Serve the frontend from a loopback origin in another terminal:
 python3 -m http.server 5500
 ```
 
-Then open `http://localhost:5500`. The Admin Dashboard shows **API connected** when the Go service is available. On its first connection it bootstraps the demo wedding and creates real cryptographically secure API invitation tokens. If the API is unavailable, the UI explicitly falls back to **Local demo** mode and continues using `localStorage`.
+Then open `http://localhost:5500`. The Admin Dashboard shows **API connected** when the Go service is available. On its first connection it creates the wedding aggregate and cryptographically secure invitation tokens. If the API is unavailable, the UI explicitly falls back to **Offline mode** and continues using the browser workspace.
 
-Recommended demo journey:
+Recommended product journey:
 
 1. Open `pages/dashboard.html` to use the Wedding Admin workspace.
 2. Edit **Wedding information** (for example, change the venue) and save.
@@ -29,7 +29,11 @@ Recommended demo journey:
 6. Confirm that wedding details and published announcements use the same updated API record.
 7. To test invitation acceptance, open **Guests & RSVP**, copy a pending guest's generated invitation link, accept it, and enter the newly unlocked guest dashboard.
 
-`api-client.js` maps the browser view model to the Go API and keeps a local cache for resilient demo behavior. Browser storage is not treated as a production database or security boundary; the API remains authoritative whenever it is connected.
+`api-client.js` maps the browser view model to the Go API and keeps a local cache for resilient offline behavior. Browser storage is not treated as a production database or security boundary; the API remains authoritative whenever it is connected.
+
+### Hosted frontend
+
+A static host runs in Offline mode until an API URL is configured. Open **Dashboard → Settings → API connection** and enter the deployed HTTPS API URL, or define `window.WEDDINGHUB_API_URL` before loading `api-client.js`. Do not point an HTTPS website at an HTTP API; browsers block that as mixed content.
 
 ## Backend API
 

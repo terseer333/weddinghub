@@ -1,11 +1,17 @@
 (() => {
   const API_URL_KEY = "weddinghub_api_url";
   const API_ID_KEY = "weddinghub_api_wedding_id";
-  const baseURL = () => (localStorage.getItem(API_URL_KEY) || "http://localhost:8080").replace(/\/$/, "");
+  const baseURL = () => {
+      const configured = window.WEDDINGHUB_API_URL || localStorage.getItem(API_URL_KEY);
+      if (configured) return configured.replace(/\/$/, "");
+      return ["localhost", "127.0.0.1"].includes(location.hostname) ? "http://localhost:8080" : "";
+    };
   let online = false;
 
   async function request(path, options = {}) {
-    const response = await fetch(baseURL() + path, {
+    const endpoint = baseURL();
+    if (!endpoint) throw new Error("API URL is not configured");
+    const response = await fetch(endpoint + path, {
       ...options,
       headers: { "Content-Type": "application/json", ...(options.headers || {}) }
     });
@@ -61,6 +67,26 @@
       title: s.title, content: s.body, order: s.sort_order, status: s.status }));
     if (w.announcements) data.announcements = w.announcements.map(a => ({ id: a.id, title: a.title,
       message: a.body, date: String(a.published_at || new Date().toISOString()).slice(0, 10), status: a.status }));
+    if (w.invitations) {
+      w.invitations.forEach(invitation => {
+        const guest = data.guests.find(item => item.apiInvitationId === invitation.id || item.email === invitation.guest_email);
+        if (!guest) return;
+        guest.apiInvitationId = invitation.id;
+        if (invitation.status === "accepted") { guest.invitationStatus = "accepted"; guest.rsvp = "attending"; }
+        if (invitation.status === "declined") { guest.invitationStatus = "declined"; guest.rsvp = "declined"; }
+        const response = (w.rsvps || []).find(item => item.invitation_id === invitation.id);
+        if (response) { guest.rsvp = response.status === "not_attending" ? "declined" : response.status; guest.partySize = response.party_size; }
+      });
+    }
+    if (w.guest_messages) {
+      const invitations = w.invitations || [];
+      const existingStatus = new Map(data.messages.map(item => [item.id, item.status]));
+      data.messages = w.guest_messages.map(message => {
+        const invitation = invitations.find(item => item.id === message.invitation_id);
+        return { id: message.id, guestId: message.invitation_id, name: invitation?.guest_name || "Invited guest",
+          message: message.body, status: existingStatus.get(message.id) || "pending", date: String(message.created_at).slice(0, 10) };
+      });
+    }
     WeddingHub.saveData(data);
     return data;
   }
