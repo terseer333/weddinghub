@@ -1,0 +1,370 @@
+/* WeddingHub invitation themes: local artwork, no external assets. */
+:where(.invitation-card, .template-preview)[class*="design-"] {
+  --theme-bg: #f8f4ed;
+  --theme-ink: #3d3934;
+  --theme-accent: #a67c62;
+  --theme-line: color-mix(in srgb, var(--theme-accent) 48%, transparent);
+  --theme-display: Georgia, "Times New Roman", serif;
+  --theme-copy: Arial, Helvetica, sans-serif;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  overflow: hidden;
+  color: var(--theme-ink);
+  background-color: var(--theme-bg);
+  font-family: var(--theme-copy);
+  text-align: center;
+}
+
+.invitation-card[class*="design-"] {
+  width: min(100%, 920px);
+  min-height: 820px;
+  margin-inline: auto;
+}
+
+.template-preview[class*="design-"] {
+  width: 100%;
+  min-height: 320px;
+}
+
+:where(.invitation-card, .template-preview)[class*="design-"]::before,
+:where(.invitation-card, .template-preview)[class*="design-"]::after {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+:where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner {
+  z-index: 2;
+  display: flex;
+  width: min(76%, 650px);
+  min-height: 56%;
+  margin: auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2rem, 7vw, 5rem) clamp(1.1rem, 5vw, 3.5rem);
+}
+
+:where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner :where(h1, h2, h3) {
+  margin: .2em 0;
+  color: inherit;
+  font-family: var(--theme-display);
+  font-weight: 400;
+  line-height: .98;
+}
+
+.invitation-card[class*="design-"] .template-card-inner :where(h1, h2) {
+  font-size: clamp(2.9rem, 9vw, 6.8rem);
+}
+
+.template-preview[class*="design-"] .template-card-inner :where(h1, h2, h3) {
+  font-size: clamp(1.7rem, 7vw, 3rem);
+}
+
+:where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner p {
+  max-width: 36rem;
+  margin: .65em auto;
+  line-height: 1.7;
+}
+
+:where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner small,
+:where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner time {
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+:where(.invitation-card, .template-preview)[class*="design-"] .template-ornament {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 36%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  pointer-events: none;
+}
+
+:where(.invitation-card, .template-preview)[class*="design-"] .template-ornament.top { top: 0; }
+:where(.invitation-card, .template-preview)[class*="design-"] .template-ornament.bottom { bottom: 0; transform: rotate(180deg); }
+
+/* 01 — layered blush rose corners */
+:where(.invitation-card, .template-preview).design-romantic-floral {
+  --theme-bg: #fff7f4;
+  --theme-ink: #563f43;
+  --theme-accent: #b56e7b;
+  --theme-display: "Palatino Linotype", Palatino, Georgia, serif;
+  background-image: radial-gradient(circle at 50% 38%, #fff 0 25%, transparent 58%), linear-gradient(135deg, #f8dedf66, transparent 42%);
+}
+:where(.invitation-card, .template-preview).design-romantic-floral::before { inset: 18px; border: 1px solid #b56e7b55; }
+:where(.invitation-card, .template-preview).design-romantic-floral .template-ornament { background-image: url("assets/templates/rose-corners.svg"); }
+:where(.invitation-card, .template-preview).design-romantic-floral .template-card-inner { width: min(68%, 590px); }
+:where(.invitation-card, .template-preview).design-romantic-floral .template-card-inner :where(h1,h2,h3) { font-style: italic; }
+
+/* 02 — formal rose stationery with a double rule */
+:where(.invitation-card, .template-preview).design-rose-elegance {
+  --theme-bg: #f8efec;
+  --theme-ink: #482f35;
+  --theme-accent: #8f4f5c;
+  --theme-display: Didot, "Bodoni MT", Georgia, serif;
+  background-image: repeating-linear-gradient(0deg, #ffffff24 0 1px, transparent 1px 5px);
+}
+:where(.invitation-card, .template-preview).design-rose-elegance::before { inset: 3.2%; border: 3px double #8f4f5c80; }
+:where(.invitation-card, .template-preview).design-rose-elegance .template-ornament { width: 58%; height: 29%; background-image: url("assets/templates/rose-corners.svg"); background-size: cover; }
+:where(.invitation-card, .template-preview).design-rose-elegance .template-ornament.top { right: 0; background-position: right top; }
+:where(.invitation-card, .template-preview).design-rose-elegance .template-ornament.bottom { left: 0; }
+:where(.invitation-card, .template-preview).design-rose-elegance .template-card-inner { border-block: 1px solid #8f4f5c55; }
+:where(.invitation-card, .template-preview).design-rose-elegance .template-card-inner :where(h1,h2,h3) { letter-spacing: .025em; }
+
+/* 03 — airy wildflower meadow */
+:where(.invitation-card, .template-preview).design-garden-wedding {
+  --theme-bg: #fbfaf1;
+  --theme-ink: #4e5d48;
+  --theme-accent: #9c7194;
+  --theme-display: "Book Antiqua", Palatino, serif;
+  background-image: linear-gradient(#fff9, #fff0), radial-gradient(circle at 50% 10%, #e8efda 0, transparent 48%);
+}
+:where(.invitation-card, .template-preview).design-garden-wedding .template-ornament { height: 42%; background-image: url("assets/templates/wildflower-garden.svg"); background-position: center bottom; }
+:where(.invitation-card, .template-preview).design-garden-wedding .template-ornament.top { top: auto; bottom: 0; }
+:where(.invitation-card, .template-preview).design-garden-wedding .template-ornament.bottom { display: none; }
+:where(.invitation-card, .template-preview).design-garden-wedding .template-card-inner { align-self: start; min-height: 70%; padding-top: 12%; }
+:where(.invitation-card, .template-preview).design-garden-wedding .template-card-inner :where(h1,h2,h3) { color: #755d78; }
+
+/* 04 — centered botanical arch */
+:where(.invitation-card, .template-preview).design-botanical {
+  --theme-bg: #f2f4ea;
+  --theme-ink: #304b39;
+  --theme-accent: #6e866c;
+  --theme-display: Georgia, serif;
+  background-image: linear-gradient(90deg, #dbe3d355 1px, transparent 1px), linear-gradient(#dbe3d355 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+:where(.invitation-card, .template-preview).design-botanical .template-ornament.top { inset: 2% 5% auto; width: 90%; height: 94%; background-image: url("assets/templates/botanical-arch.svg"); background-position: center top; background-size: 88% 88%; }
+:where(.invitation-card, .template-preview).design-botanical .template-ornament.bottom { display: none; }
+:where(.invitation-card, .template-preview).design-botanical .template-card-inner { width: min(58%, 510px); }
+:where(.invitation-card, .template-preview).design-botanical .template-card-inner :where(h1,h2,h3) { letter-spacing: .035em; }
+
+/* 05 — ivory luxury, full gold frame */
+:where(.invitation-card, .template-preview).design-luxury-gold {
+  --theme-bg: #f8f1df;
+  --theme-ink: #46371f;
+  --theme-accent: #b28a3e;
+  --theme-display: Didot, "Bodoni MT", Georgia, serif;
+  background-image: radial-gradient(ellipse at center, #fffdf6 0, #f7edd6 70%, #e9d5aa 100%);
+}
+:where(.invitation-card, .template-preview).design-luxury-gold::before { inset: 2%; background: url("assets/templates/luxury-frame.svg") center/100% 100% no-repeat; }
+:where(.invitation-card, .template-preview).design-luxury-gold .template-ornament { height: 16%; background-image: url("assets/templates/traditional-flourish.svg"); }
+:where(.invitation-card, .template-preview).design-luxury-gold .template-card-inner :where(h1,h2,h3) { letter-spacing: .06em; }
+
+/* 06 — dramatic black tie */
+:where(.invitation-card, .template-preview).design-black-gold {
+  --theme-bg: #11110f;
+  --theme-ink: #f2e7cd;
+  --theme-accent: #c5a45d;
+  --theme-display: "Bodoni MT", Didot, Georgia, serif;
+  background-image: radial-gradient(circle at center, #2c2921 0, #10100e 68%), repeating-linear-gradient(135deg, #fff 0 1px, transparent 1px 9px);
+}
+:where(.invitation-card, .template-preview).design-black-gold::before { inset: 4%; border: 1px solid #c5a45d; box-shadow: inset 0 0 0 7px #111, inset 0 0 0 8px #c5a45d66; }
+:where(.invitation-card, .template-preview).design-black-gold .template-ornament { height: 18%; background-image: url("assets/templates/traditional-flourish.svg"); filter: saturate(.75) brightness(1.15); }
+:where(.invitation-card, .template-preview).design-black-gold .template-card-inner { width: min(70%, 620px); }
+:where(.invitation-card, .template-preview).design-black-gold .template-card-inner p { color: #d7c8a8; }
+
+/* 07 — cloud-soft pastel blocks */
+:where(.invitation-card, .template-preview).design-soft-pastel {
+  --theme-bg: #fdf8f3;
+  --theme-ink: #5d5965;
+  --theme-accent: #a693b2;
+  --theme-display: "Trebuchet MS", Arial, sans-serif;
+  background-image: radial-gradient(circle at 12% 15%, #f2dce4 0 14%, transparent 36%), radial-gradient(circle at 88% 82%, #dce9e4 0 16%, transparent 38%), radial-gradient(circle at 85% 12%, #e6e0f2 0 10%, transparent 29%);
+}
+:where(.invitation-card, .template-preview).design-soft-pastel::before { inset: 5%; border: 1px solid #b7a8c355; border-radius: 42% 42% 3rem 3rem / 9rem 9rem 3rem 3rem; }
+:where(.invitation-card, .template-preview).design-soft-pastel .template-ornament { width: 55%; height: 25%; opacity: .42; background-image: url("assets/templates/wildflower-garden.svg"); }
+:where(.invitation-card, .template-preview).design-soft-pastel .template-ornament.top { left: -5%; }
+:where(.invitation-card, .template-preview).design-soft-pastel .template-ornament.bottom { right: -5%; }
+:where(.invitation-card, .template-preview).design-soft-pastel .template-card-inner { width: min(72%, 620px); }
+:where(.invitation-card, .template-preview).design-soft-pastel .template-card-inner :where(h1,h2,h3) { letter-spacing: -.035em; }
+
+/* 08 — saturated pink romance */
+:where(.invitation-card, .template-preview).design-pink-romantic {
+  --theme-bg: #f5d6dc;
+  --theme-ink: #6d2941;
+  --theme-accent: #a8365d;
+  --theme-display: "Palatino Linotype", Palatino, serif;
+  background-image: linear-gradient(145deg, #fff6, transparent 35%), repeating-radial-gradient(circle at 20% 20%, transparent 0 9px, #fff2 10px 11px);
+}
+:where(.invitation-card, .template-preview).design-pink-romantic::before { inset: 20px; border: 1px solid #fff9; }
+:where(.invitation-card, .template-preview).design-pink-romantic .template-ornament { height: 34%; background-image: url("assets/templates/rose-corners.svg"); filter: saturate(1.18); }
+:where(.invitation-card, .template-preview).design-pink-romantic .template-card-inner { padding-inline: 8%; background: #fff5; backdrop-filter: blur(2px); }
+:where(.invitation-card, .template-preview).design-pink-romantic .template-card-inner :where(h1,h2,h3) { font-style: italic; }
+
+/* 09 — wine florals and candlelight */
+:where(.invitation-card, .template-preview).design-burgundy-floral {
+  --theme-bg: #4b1724;
+  --theme-ink: #fff0e8;
+  --theme-accent: #d1a16b;
+  --theme-display: Georgia, serif;
+  background-image: radial-gradient(circle at center, #772e3f 0, #46131f 70%);
+}
+:where(.invitation-card, .template-preview).design-burgundy-floral::before { inset: 3%; border: 1px solid #d1a16b88; }
+:where(.invitation-card, .template-preview).design-burgundy-floral .template-ornament { height: 31%; background-image: url("assets/templates/burgundy-flowers.svg"); }
+:where(.invitation-card, .template-preview).design-burgundy-floral .template-card-inner { width: min(65%, 570px); }
+:where(.invitation-card, .template-preview).design-burgundy-floral .template-card-inner p { color: #f0cfd0; }
+:where(.invitation-card, .template-preview).design-burgundy-floral .template-card-inner :where(h1,h2,h3) { text-shadow: 0 2px 20px #210810; }
+
+/* 10 — lush tropical celebration */
+:where(.invitation-card, .template-preview).design-tropical {
+  --theme-bg: #f5f1d8;
+  --theme-ink: #154938;
+  --theme-accent: #dd7d5b;
+  --theme-display: "Trebuchet MS", Arial, sans-serif;
+  background-image: linear-gradient(120deg, #fff8, transparent 45%), radial-gradient(circle at center, #fffce7, #e4e8c5);
+}
+:where(.invitation-card, .template-preview).design-tropical .template-ornament { height: 47%; background-image: url("assets/templates/tropical-leaves.svg"); background-position: center bottom; background-size: cover; }
+:where(.invitation-card, .template-preview).design-tropical .template-ornament.top { transform: rotate(180deg); }
+:where(.invitation-card, .template-preview).design-tropical .template-ornament.bottom { transform: none; }
+:where(.invitation-card, .template-preview).design-tropical .template-card-inner { width: min(60%, 540px); background: #fffbe9cf; box-shadow: 0 18px 60px #214b3424; }
+:where(.invitation-card, .template-preview).design-tropical .template-card-inner :where(h1,h2,h3) { font-weight: 700; letter-spacing: -.045em; }
+
+/* 11 — white-on-white embossed elegance */
+:where(.invitation-card, .template-preview).design-white-elegant {
+  --theme-bg: #fff;
+  --theme-ink: #3f403d;
+  --theme-accent: #c4b9a5;
+  --theme-display: Didot, "Bodoni MT", Georgia, serif;
+  background-image: linear-gradient(115deg, #f4f1ea 0, #fff 45%, #ece8df 100%);
+}
+:where(.invitation-card, .template-preview).design-white-elegant::before { inset: 3%; border: 1px solid #b9af9d; box-shadow: 0 0 0 8px #fff8, 0 0 30px #87775d20; }
+:where(.invitation-card, .template-preview).design-white-elegant::after { inset: 5%; opacity: .25; background: url("assets/templates/luxury-frame.svg") center/100% 100% no-repeat; filter: grayscale(1); }
+:where(.invitation-card, .template-preview).design-white-elegant .template-ornament { display: none; }
+:where(.invitation-card, .template-preview).design-white-elegant .template-card-inner { width: min(72%, 650px); }
+:where(.invitation-card, .template-preview).design-white-elegant .template-card-inner :where(h1,h2,h3) { letter-spacing: .08em; }
+
+/* 12 — deep green botanical night */
+:where(.invitation-card, .template-preview).design-green-botanical {
+  --theme-bg: #183c30;
+  --theme-ink: #f3edda;
+  --theme-accent: #c5ad70;
+  --theme-display: "Palatino Linotype", Palatino, serif;
+  background-image: radial-gradient(circle at center, #315c48, #15352b 72%);
+}
+:where(.invitation-card, .template-preview).design-green-botanical .template-ornament.top { inset: 1% 4% auto; width: 92%; height: 98%; opacity: .66; background-image: url("assets/templates/botanical-arch.svg"); background-size: 90% 92%; filter: brightness(1.25) saturate(.75); }
+:where(.invitation-card, .template-preview).design-green-botanical .template-ornament.bottom { display: none; }
+:where(.invitation-card, .template-preview).design-green-botanical .template-card-inner { width: min(57%, 510px); }
+:where(.invitation-card, .template-preview).design-green-botanical .template-card-inner p { color: #d6decf; }
+
+/* 13 — blue porcelain stationery */
+:where(.invitation-card, .template-preview).design-blue-elegant {
+  --theme-bg: #f6f8f8;
+  --theme-ink: #244c72;
+  --theme-accent: #5279a3;
+  --theme-display: "Book Antiqua", Palatino, serif;
+  background-image: radial-gradient(circle at 50% 50%, #fff 0, #eef3f5 68%);
+}
+:where(.invitation-card, .template-preview).design-blue-elegant::before { inset: 2.8%; border: 4px double #5279a388; }
+:where(.invitation-card, .template-preview).design-blue-elegant .template-ornament { height: 35%; background-image: url("assets/templates/blue-porcelain.svg"); }
+:where(.invitation-card, .template-preview).design-blue-elegant .template-card-inner { width: min(67%, 590px); }
+:where(.invitation-card, .template-preview).design-blue-elegant .template-card-inner :where(h1,h2,h3) { letter-spacing: .025em; }
+
+/* 14 — kraft paper and pressed wildflowers */
+:where(.invitation-card, .template-preview).design-rustic {
+  --theme-bg: #e6d2b2;
+  --theme-ink: #4c412f;
+  --theme-accent: #7b6744;
+  --theme-display: Georgia, serif;
+  background-image: repeating-linear-gradient(4deg, #755f3810 0 1px, transparent 1px 6px), radial-gradient(circle at 30% 15%, #f0dfc4, transparent 35%);
+}
+:where(.invitation-card, .template-preview).design-rustic::before { inset: 22px; border: 1px dashed #75613e; }
+:where(.invitation-card, .template-preview).design-rustic .template-ornament { height: 38%; opacity: .72; background-image: url("assets/templates/wildflower-garden.svg"); filter: sepia(.35) saturate(.72); }
+:where(.invitation-card, .template-preview).design-rustic .template-card-inner { width: min(70%, 620px); transform: rotate(-.4deg); }
+:where(.invitation-card, .template-preview).design-rustic .template-card-inner :where(h1,h2,h3) { font-style: italic; }
+
+/* 15 — classic ceremonial flourish */
+:where(.invitation-card, .template-preview).design-traditional {
+  --theme-bg: #fff8e9;
+  --theme-ink: #5a352b;
+  --theme-accent: #9a743e;
+  --theme-display: "Times New Roman", Times, serif;
+  background-image: repeating-linear-gradient(90deg, transparent 0 31px, #9a743e0c 32px 33px);
+}
+:where(.invitation-card, .template-preview).design-traditional::before { inset: 3%; border: 6px double #9a743e99; }
+:where(.invitation-card, .template-preview).design-traditional .template-ornament { height: 20%; background-image: url("assets/templates/traditional-flourish.svg"); }
+:where(.invitation-card, .template-preview).design-traditional .template-card-inner { width: min(68%, 610px); }
+:where(.invitation-card, .template-preview).design-traditional .template-card-inner :where(h1,h2,h3) { font-variant: small-caps; letter-spacing: .055em; }
+
+/* 16 — African geometric black and gold */
+:where(.invitation-card, .template-preview).design-african-luxury {
+  --theme-bg: #201913;
+  --theme-ink: #fbefd3;
+  --theme-accent: #c9a44f;
+  --theme-display: "Trebuchet MS", Arial, sans-serif;
+  background-image: radial-gradient(circle at 50% 45%, #49351e 0, #1c1712 65%);
+}
+:where(.invitation-card, .template-preview).design-african-luxury::before { inset: 3%; border-inline: 8px double #c9a44f; }
+:where(.invitation-card, .template-preview).design-african-luxury .template-ornament { height: 22%; background-image: url("assets/templates/african-gold.svg"); background-size: cover; }
+:where(.invitation-card, .template-preview).design-african-luxury .template-card-inner { width: min(70%, 640px); }
+:where(.invitation-card, .template-preview).design-african-luxury .template-card-inner :where(h1,h2,h3) { font-weight: 700; letter-spacing: .01em; text-transform: uppercase; }
+:where(.invitation-card, .template-preview).design-african-luxury .template-card-inner small { color: #d9b861; }
+
+/* 17 — architectural modern minimal */
+:where(.invitation-card, .template-preview).design-modern-minimal {
+  --theme-bg: #f1f0eb;
+  --theme-ink: #1f2422;
+  --theme-accent: #64746c;
+  --theme-display: Arial, Helvetica, sans-serif;
+  justify-items: stretch;
+  background-image: linear-gradient(90deg, transparent 49.9%, #64746c22 50%, transparent 50.1%);
+}
+:where(.invitation-card, .template-preview).design-modern-minimal::before { top: 0; left: 7%; width: 1px; height: 100%; background: #64746c; }
+:where(.invitation-card, .template-preview).design-modern-minimal::after { right: 7%; bottom: 8%; width: 18%; height: 8px; background: var(--theme-accent); }
+:where(.invitation-card, .template-preview).design-modern-minimal .template-ornament { display: none; }
+:where(.invitation-card, .template-preview).design-modern-minimal .template-card-inner { width: 72%; margin-left: 12%; align-items: flex-start; border-top: 1px solid #64746c; border-bottom: 1px solid #64746c; text-align: left; }
+:where(.invitation-card, .template-preview).design-modern-minimal .template-card-inner :where(h1,h2,h3) { font-weight: 300; letter-spacing: -.065em; }
+:where(.invitation-card, .template-preview).design-modern-minimal .template-card-inner p { margin-inline: 0; }
+
+/* 18 — asymmetric fashion editorial */
+:where(.invitation-card, .template-preview).design-editorial {
+  --theme-bg: #e8e2d8;
+  --theme-ink: #211f1d;
+  --theme-accent: #9e4037;
+  --theme-display: Didot, "Bodoni MT", Georgia, serif;
+  justify-items: stretch;
+  background-image: linear-gradient(90deg, #d7cec1 0 34%, transparent 34%), linear-gradient(165deg, transparent 0 72%, #9e4037 72% 73%, transparent 73%);
+}
+:where(.invitation-card, .template-preview).design-editorial::before { top: 8%; left: 8%; width: 18%; height: 2px; background: #9e4037; }
+:where(.invitation-card, .template-preview).design-editorial::after { right: 5%; bottom: 5%; width: 1px; height: 38%; background: #211f1d; }
+:where(.invitation-card, .template-preview).design-editorial .template-ornament { display: none; }
+:where(.invitation-card, .template-preview).design-editorial .template-card-inner { width: 61%; margin-left: 30%; align-items: flex-start; text-align: left; }
+:where(.invitation-card, .template-preview).design-editorial .template-card-inner :where(h1,h2,h3) { font-size: clamp(3.3rem, 10vw, 7.4rem); letter-spacing: -.07em; line-height: .78; }
+.template-preview.design-editorial .template-card-inner :where(h1,h2,h3) { font-size: clamp(2rem, 8vw, 3.4rem); }
+:where(.invitation-card, .template-preview).design-editorial .template-card-inner p { margin-inline: 0; }
+
+@media (max-width: 700px) {
+  .invitation-card[class*="design-"] { min-height: 680px; }
+  .template-preview[class*="design-"] { min-height: 290px; }
+  :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner { width: min(76%, 560px); min-height: 52%; padding: 2.2rem 1rem; }
+  :where(.invitation-card, .template-preview)[class*="design-"] .template-ornament { height: 31%; }
+  :where(.invitation-card, .template-preview).design-botanical .template-ornament.top,
+  :where(.invitation-card, .template-preview).design-green-botanical .template-ornament.top { width: 110%; height: 96%; margin-left: -5%; background-size: 105% 88%; }
+  :where(.invitation-card, .template-preview).design-tropical .template-ornament { height: 39%; }
+  :where(.invitation-card, .template-preview).design-modern-minimal .template-card-inner { width: 72%; margin-left: 14%; }
+  :where(.invitation-card, .template-preview).design-editorial .template-card-inner { width: 64%; margin-left: 27%; }
+}
+
+@media (max-width: 420px) {
+  .invitation-card[class*="design-"] { min-height: 610px; }
+  :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner p { font-size: .88rem; line-height: 1.55; }
+  :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner small,
+  :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner time { font-size: .62rem; }
+  :where(.invitation-card, .template-preview).design-garden-wedding .template-card-inner { min-height: 64%; }
+  :where(.invitation-card, .template-preview).design-botanical .template-card-inner,
+  :where(.invitation-card, .template-preview).design-green-botanical .template-card-inner { width: 62%; }
+  :where(.invitation-card, .template-preview).design-editorial .template-card-inner :where(h1,h2,h3) { line-height: .84; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.invitation-card, .template-preview)[class*="design-"] * { scroll-behavior: auto; }
+}

@@ -81,9 +81,22 @@
     el.textContent = message; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2600);
   }
   function templates() {
-    const categories = ["Luxury", "Classic", "Modern", "Minimalist", "Floral", "Romantic", "Royal", "Traditional", "African-inspired", "Nigerian wedding", "Church wedding", "Traditional marriage", "Photo invitation", "Black & Gold", "White & Gold", "Pastel", "Dark Elegant", "Simple", "Premium"];
-    const styles = ["Editorial Vows", "Botanical Arch", "Modern Monogram", "Gilded Noir", "Soft Romance", "Heritage Weave", "Ivory Letterpress", "Sage Garden", "Midnight Gala", "Terracotta Bloom", "Pearl Minimal", "Royal Emblem"];
-    return Array.from({ length: 108 }, (_, i) => ({ id: i === 3 ? "black-gold-03" : `template-${i + 1}`, name: `${styles[i % styles.length]} ${String(Math.floor(i / styles.length) + 1).padStart(2, "0")}`, category: categories[i % categories.length], premium: i % 4 === 0, tone: i % 12 }));
+    const designs = [
+      ["romantic-floral","Romantic Floral","Floral"],["rose-elegance","Rose Elegance","Romantic"],
+      ["garden-wedding","Secret Garden","Garden wedding"],["botanical","Botanical Arch","Botanical"],
+      ["luxury-gold","Gilded Vows","Luxury"],["black-gold","Black & Gold Gala","Black & Gold"],
+      ["soft-pastel","Pastel Daydream","Pastel"],["pink-romantic","Blush Romance","Pink romantic"],
+      ["burgundy-floral","Burgundy Bloom","Dark Elegant"],["tropical","Tropical Promise","Tropical flowers"],
+      ["white-elegant","White Elegance","White & Gold"],["green-botanical","Verdant Vows","Green botanical"],
+      ["blue-elegant","Blue Porcelain","Blue elegant"],["rustic","Rustic Wildflower","Rustic wedding"],
+      ["traditional","Timeless Tradition","Traditional"],["african-luxury","African Royal","African-inspired"],
+      ["modern-minimal","Modern Minimal","Minimalist"],["editorial","The Wedding Edit","Premium editorial"]
+    ];
+    const editions = ["Signature","Atelier","Grande","Luxe","Classic","Contemporary"];
+    return designs.flatMap(([design,name,category],designIndex) => editions.map((edition,variant) => ({
+      id: `${design}-${String(variant + 1).padStart(2,"0")}`, design, variant: variant + 1,
+      name: `${name} · ${edition}`, category, premium: variant > 2 || [4,5,15,17].includes(designIndex), tone: designIndex % 12
+    })));
   }
   function countdown(target, callback) {
     const tick = () => {

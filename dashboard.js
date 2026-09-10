@@ -12,11 +12,22 @@ function currentAdmin() {
   try { return JSON.parse(localStorage.getItem("weddinghub_user") || localStorage.getItem("weddinghub_local_profile") || localStorage.getItem("weddinghub_demo_user")) || {}; }
   catch (_) { return {}; }
 }
+function openSidebar() {
+  $('#sidebar').classList.add('open');
+  $('#sidebarBackdrop').classList.add('open');
+  document.body.classList.add('menu-open');
+  $('#sidebarClose').focus();
+}
+function closeSidebar() {
+  $('#sidebar').classList.remove('open');
+  $('#sidebarBackdrop').classList.remove('open');
+  document.body.classList.remove('menu-open');
+}
 function openView(name) {
   const target = document.getElementById(`view-${name}`) ? name : "overview";
   $$('.admin-view').forEach(view => view.classList.toggle('active', view.id === `view-${target}`));
   $$('.side-link[data-view]').forEach(link => link.classList.toggle('active', link.dataset.view === target));
-  $('#sidebar').classList.remove('open');
+  closeSidebar();
   history.replaceState(null, '', `#${target}`);
   scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -68,14 +79,14 @@ function renderTemplates() {
   const query = $('#templateSearch').value.toLowerCase();
   const category = $('#templateCategory').value;
   const templates = WH.templates().filter(item => (!category || item.category === category) && `${item.name} ${item.category}`.toLowerCase().includes(query));
-  $('#templateGrid').innerHTML = templates.map(item => `<article class="template-card tone-${item.tone} ${data.wedding.templateId === item.id ? 'selected' : ''}"><div class="template-preview"><span>${item.premium ? 'PREMIUM' : item.category.toUpperCase()}</span><small>Together with their families</small><h3>${WH.escape(data.wedding.brideName)} <i>&</i><br>${WH.escape(data.wedding.groomName)}</h3><p>${WH.formatDate(data.wedding.date)}</p></div><div class="template-meta"><span><strong>${item.name}</strong><small>${item.category}</small></span><button data-template="${item.id}">${data.wedding.templateId === item.id ? 'Selected' : 'Use design'}</button></div></article>`).join('');
+  $('#templateGrid').innerHTML = templates.map(item => `<article class="template-card ${data.wedding.templateId === item.id ? 'selected' : ''}"><div class="template-preview design-${item.design} variant-${item.variant}"><span class="template-ornament top" aria-hidden="true"></span><div class="template-card-inner"><span class="template-label">${item.premium ? 'PREMIUM COLLECTION' : item.category.toUpperCase()}</span><small>Together with their families</small><h3>${WH.escape(data.wedding.brideName)} <i>&</i><br>${WH.escape(data.wedding.groomName)}</h3><p>${WH.formatDate(data.wedding.date)}</p><em>${WH.escape(data.wedding.venue || 'Wedding venue')}</em></div><span class="template-ornament bottom" aria-hidden="true"></span></div><div class="template-meta"><span><strong>${item.name}</strong><small>${item.category}</small></span><div class="template-actions"><button class="preview-template" data-preview-template="${item.id}">Preview</button><button data-template="${item.id}">${data.wedding.templateId === item.id ? 'Selected' : 'Apply'}</button></div></div></article>`).join('');
 }
 function renderEvents() {
   $('#eventAdminList').innerHTML = data.events.length ? data.events.map(event => `<article class="manage-card"><span class="calendar-tile"><b>${new Date(`${event.date}T12:00`).getDate()}</b>${new Date(`${event.date}T12:00`).toLocaleString('en',{month:'short'}).toUpperCase()}</span><div class="manage-copy"><h3>${WH.escape(event.name)} <i class="status ${event.status}">${event.status}</i></h3><p>${event.time} · ${WH.escape(event.venue)}</p><small>${WH.escape(event.description)}</small></div><div class="row-menu"><button data-action="edit-event" data-id="${event.id}">Edit</button><button data-action="delete-event" data-id="${event.id}">Delete</button></div></article>`).join('') : emptyState('No events yet', 'Add your ceremony, reception or another celebration.');
 }
 function renderGuests(filter = '') {
   const guests = data.guests.filter(guest => `${guest.name} ${guest.email}`.toLowerCase().includes(filter.toLowerCase()));
-  $('#guestTable').innerHTML = '<div class="table-row table-head"><span>Guest</span><span>Category</span><span>Invitation</span><span>RSVP</span><span>Party</span><span>Actions</span></div>' + guests.map(guest => `<div class="table-row"><span class="guest-cell"><i>${initials(guest.name)}</i><span><strong>${WH.escape(guest.name)}</strong><small>${WH.escape(guest.email)}</small></span></span><span>${WH.escape(guest.category)}</span><span><b class="status ${guest.invitationStatus}">${guest.invitationStatus}</b></span><span>${guest.rsvp}</span><span>${guest.partySize}</span><span class="row-menu"><button data-copy="${guest.token}">Copy</button><button data-action="delete-guest" data-id="${guest.id}">Delete</button></span></div>`).join('');
+  $('#guestTable').innerHTML = '<div class="table-row table-head"><span>Guest</span><span>Category</span><span>Invitation</span><span>RSVP</span><span>Party</span><span>Actions</span></div>' + guests.map(guest => `<div class="table-row"><span class="guest-cell"><i>${initials(guest.name)}</i><span><strong>${WH.escape(guest.name)}</strong><small>${WH.escape(guest.email)}</small></span></span><span>${WH.escape(guest.category)}</span><span><b class="status ${guest.invitationStatus}">${guest.invitationStatus}</b></span><span>${guest.rsvp}</span><span>${guest.partySize}</span><span class="row-menu"><button data-share-guest="${guest.id}">Share</button><button data-copy="${guest.token}">Copy</button><button data-action="delete-guest" data-id="${guest.id}">Delete</button></span></div>`).join('');
 }
 function renderContent() {
   $('#photoAdminGrid').innerHTML = data.photos.length ? data.photos.map(photo => `<figure><img src="${photo.url}" alt="${WH.escape(photo.caption)}"><figcaption>${WH.escape(photo.caption)} <button data-action="delete-photo" data-id="${photo.id}" aria-label="Delete photo">×</button></figcaption></figure>`).join('') : emptyState('No photos yet','Add a photo URL to begin your gallery.');
@@ -98,7 +109,10 @@ async function persist(message = 'Changes saved') {
 window.AdminApp = { get data(){return data}, set data(value){data=value}, openView, renderAll, renderTemplates, renderGuests, persist, initials };
 $$('.side-link[data-view]').forEach(link => link.onclick = () => openView(link.dataset.view));
 $$('[data-jump]').forEach(button => button.onclick = () => openView(button.dataset.jump));
-$('#menuButton').onclick = () => $('#sidebar').classList.toggle('open');
+$('#menuButton').onclick = openSidebar;
+$('#sidebarClose').onclick = closeSidebar;
+$('#sidebarBackdrop').onclick = closeSidebar;
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeSidebar(); });
 $('#templateSearch').oninput = renderTemplates;
 $('#templateCategory').onchange = renderTemplates;
 $('#guestSearch').oninput = event => renderGuests(event.target.value);
