@@ -53,48 +53,18 @@
     </section>
 </main>
 
+<script src="../app.js"></script>
 <script>
-
-document.getElementById("signupForm")
-.addEventListener("submit", async function(e){
-
+document.getElementById("signupForm").addEventListener("submit", function(e){
     e.preventDefault();
-
-    const user = {
-        full_name: document.getElementById("fullName").value,
-        email: document.getElementById("email").value,
-        password: document.getElementById("password").value
-    };
-
-    const response = await fetch(
-        "http://localhost:8080/signup",
-        {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(user)
-        }
-    );
-
-    if(response.ok){
-
-        document.getElementById("message")
-        .innerHTML = "Account created. Redirecting to login...";
-
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 1000);
-
-    } else {
-
-        document.getElementById("message")
-        .innerHTML = "Unable to create account. Please try again.";
-
-    }
-
+    localStorage.setItem("weddinghub_demo_user", JSON.stringify({
+        fullName: document.getElementById("fullName").value,
+        email: document.getElementById("email").value
+    }));
+    WeddingHub.getData();
+    document.getElementById("message").textContent = "Your demo workspace is ready. Opening WeddingHub...";
+    setTimeout(() => { window.location.href = "dashboard.html"; }, 600);
 });
-
 </script>
 
 </body>

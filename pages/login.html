@@ -50,47 +50,13 @@
     </section>
 </main>
 
+<script src="../app.js"></script>
 <script>
-
-document.getElementById("loginForm")
-.addEventListener("submit", async function(e){
-
+document.getElementById("loginForm").addEventListener("submit", function(e){
     e.preventDefault();
-
-    const user = {
-        email: document.getElementById("email").value.trim(),
-        password: document.getElementById("password").value.trim()
-    };
-
-    const response = await fetch(
-        "http://localhost:8080/login",
-        {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(user)
-        }
-    );
-
-    if(response.ok){
-
-        document.getElementById("message")
-        .innerHTML = "Login successful. Opening dashboard...";
-
-        setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 1000);
-
-    } else {
-
-        document.getElementById("message")
-        .innerHTML = "Invalid email or password.";
-
-    }
-
+    document.getElementById("message").textContent = "Welcome back. Opening your wedding workspace...";
+    setTimeout(() => { window.location.href = "dashboard.html"; }, 600);
 });
-
 </script>
 
 </body>

@@ -1,66 +1,34 @@
 package main
 
 import (
-	"fmt"
+	"errors"
+	"log"
 	"net/http"
+	"os"
+	"time"
 
-	"weddinghub/handlers"
+	"weddinghub/api"
+	"weddinghub/repository"
 )
 
-func home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "WeddingHub API Running 🚀")
-}
-
 func main() {
-	http.HandleFunc("/", home)
-
-	http.HandleFunc("/signup", handlers.Signup)
-	http.HandleFunc("/users", handlers.GetUsers)
-	http.HandleFunc("/login", handlers.Login)
-
-	http.HandleFunc("/upload", handlers.UploadPhoto)
-	http.HandleFunc("/events", handlers.CreateEvent)
-	http.HandleFunc("/events/all", handlers.GetEvents)
-	http.HandleFunc("/event", handlers.GetEvent)
-	http.HandleFunc("/events/delete", handlers.DeleteEvent)
-
-	http.HandleFunc("/rsvp", handlers.SubmitRSVP)
-	http.HandleFunc("/rsvp/all", handlers.GetRSVPs)
-	http.HandleFunc("/chat", handlers.GuestChat)
-
-	fs := http.FileServer(
-		http.Dir("./uploads"),
-	)
-
-	http.Handle(
-		"/uploads/",
-		http.StripPrefix(
-			"/uploads/",
-			fs,
-		),
-	)
-
-	fmt.Println("Server running on http://localhost:8080")
-
-	err := http.ListenAndServe(
-		":8080",
-		enableCORS(http.DefaultServeMux),
-	)
-	if err != nil {
-		fmt.Println(err)
+	address := os.Getenv("WEDDINGHUB_ADDR")
+	if address == "" {
+		address = ":8080"
 	}
-}
-func enableCORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+	server := &http.Server{
+		Addr:              address,
+		Handler:           api.New(repository.NewMemoryRepository()),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
+		MaxHeaderBytes:    1 << 20,
+	}
 
-		if r.Method == "OPTIONS" {
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
+	log.Printf("WeddingHub MVP API listening on %s", address)
+	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
 }
