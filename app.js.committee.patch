@@ -1,0 +1,218 @@
+// EXTEND app.js - Add this to the seed object definition
+
+// Add to existing seed object after announcements array:
+
+committee: {
+  members: [
+    {
+      id: "cmm_james",
+      name: "James Aondo",
+      email: "james@example.com",
+      phone: "+234 801 234 5678",
+      role: "Best Man",
+      status: "accepted",
+      token: "demo-committee-james-7fb3c8a1",
+      joinedAt: "2026-09-05",
+      permissions: ["edit_wedding", "manage_events", "manage_announcements", "view_guests", "chat"],
+      invitationStatus: "accepted",
+      invitedAt: "2026-08-20"
+    },
+    {
+      id: "cmm_grace",
+      name: "Grace Ter",
+      email: "grace@example.com",
+      phone: "+234 802 345 6789",
+      role: "Bridesmaid",
+      status: "accepted",
+      token: "demo-committee-grace-91ca48ef",
+      joinedAt: "2026-09-08",
+      permissions: ["manage_events", "manage_announcements", "view_guests", "chat"],
+      invitationStatus: "accepted",
+      invitedAt: "2026-08-25"
+    },
+    {
+      id: "cmm_michael",
+      name: "Michael Oche",
+      email: "michael@example.com",
+      phone: "+234 803 456 7890",
+      role: "Groomsman",
+      status: "pending",
+      token: "demo-committee-michael-a8452db9",
+      permissions: [],
+      invitationStatus: "pending",
+      invitedAt: "2026-09-01"
+    },
+    {
+      id: "cmm_ada",
+      name: "Ada Eze",
+      email: "ada@example.com",
+      phone: "+234 804 567 8901",
+      role: "Bridesmaid",
+      status: "declined",
+      token: "demo-committee-ada-36dc184f",
+      permissions: [],
+      invitationStatus: "declined",
+      invitedAt: "2026-08-28",
+      declinedAt: "2026-09-02"
+    }
+  ],
+  tasks: [
+    {
+      id: "task_1",
+      title: "Confirm catering details",
+      description: "Finalize menu options and headcount with caterer. Must confirm by Nov 15.",
+      status: "pending",
+      priority: "high",
+      assignee: "James Aondo",
+      assigneeId: "cmm_james",
+      dueDate: "2026-11-15",
+      createdAt: "2026-09-10",
+      createdBy: "admin",
+      category: "catering"
+    },
+    {
+      id: "task_2",
+      title: "Coordinate decoration setup",
+      description: "Schedule decoration team and confirm timeline for venue setup.",
+      status: "in-progress",
+      priority: "high",
+      assignee: "Grace Ter",
+      assigneeId: "cmm_grace",
+      dueDate: "2026-12-01",
+      createdAt: "2026-09-08",
+      createdBy: "admin",
+      category: "decoration"
+    },
+    {
+      id: "task_3",
+      title: "Confirm transportation",
+      description: "Arrange shuttle service for guests from airport and hotel.",
+      status: "completed",
+      priority: "medium",
+      assignee: "Michael Oche",
+      assigneeId: "cmm_michael",
+      dueDate: "2026-09-20",
+      completedAt: "2026-09-18",
+      createdAt: "2026-09-05",
+      createdBy: "admin",
+      category: "logistics"
+    },
+    {
+      id: "task_4",
+      title: "Finalize seating arrangements",
+      description: "Coordinate with admin to finalize table assignments and seating chart.",
+      status: "pending",
+      priority: "high",
+      assignee: "James Aondo",
+      assigneeId: "cmm_james",
+      dueDate: "2026-11-30",
+      createdAt: "2026-09-10",
+      createdBy: "admin",
+      category: "planning"
+    },
+    {
+      id: "task_5",
+      title: "Coordinate ceremony rehearsal",
+      description: "Schedule and arrange ceremony rehearsal with all participants.",
+      status: "pending",
+      priority: "medium",
+      assignee: "Grace Ter",
+      assigneeId: "cmm_grace",
+      dueDate: "2026-12-10",
+      createdAt: "2026-09-10",
+      createdBy: "admin",
+      category: "ceremony"
+    }
+  ],
+  chatMessages: [
+    {
+      id: "msg_1",
+      senderId: "cmm_james",
+      senderName: "James Aondo",
+      senderRole: "Best Man",
+      content: "Guys, the caterer confirmed they can do the menu we discussed. Let's move forward!",
+      timestamp: "2026-09-10T14:23:00Z",
+      status: "delivered"
+    },
+    {
+      id: "msg_2",
+      senderId: "cmm_grace",
+      senderName: "Grace Ter",
+      senderRole: "Bridesmaid",
+      content: "Great news! I found a decorator who can work with our color scheme and budget. Should we book them?",
+      timestamp: "2026-09-10T14:35:00Z",
+      status: "delivered"
+    },
+    {
+      id: "msg_3",
+      senderId: "cmm_james",
+      senderName: "James Aondo",
+      senderRole: "Best Man",
+      content: "Yes! Let's get them booked. Michael, can you confirm the shuttle details with the vendor?",
+      timestamp: "2026-09-10T14:42:00Z",
+      status: "delivered"
+    },
+    {
+      id: "msg_4",
+      senderId: "cmm_grace",
+      senderName: "Grace Ter",
+      senderRole: "Bridesmaid",
+      content: "Also, we should finalize the decoration timeline. I'm thinking setup on the morning of the 19th?",
+      timestamp: "2026-09-10T15:10:00Z",
+      status: "delivered"
+    },
+    {
+      id: "msg_5",
+      senderId: "cmm_james",
+      senderName: "James Aondo",
+      senderRole: "Best Man",
+      content: "Perfect! Let me coordinate with the venue to ensure everything aligns.",
+      timestamp: "2026-09-10T15:15:00Z",
+      status: "delivered"
+    }
+  ],
+  announcements: [
+    {
+      id: "ann_cmm_1",
+      title: "Committee Meeting - This Sunday",
+      message: "We're having a planning meeting this Sunday at 3 PM to discuss final details. Please come prepared!",
+      date: "2026-09-10",
+      status: "published",
+      visibility: "committee",
+      createdAt: "2026-09-08",
+      createdBy: "admin"
+    },
+    {
+      id: "ann_cmm_2",
+      title: "Final Budget Review",
+      message: "We've confirmed the final budget. All spending is on track.",
+      date: "2026-09-09",
+      status: "published",
+      visibility: "committee",
+      createdAt: "2026-09-09",
+      createdBy: "admin"
+    }
+  ]
+},
+
+// Add helper functions to WeddingHub export:
+function committeeByToken(data = getData()) {
+  const token = query("token");
+  return data.committee?.members?.find(m => m.token === token);
+}
+
+function getCommitteeRole(data = getData()) {
+  const token = query("token");
+  const member = committeeByToken(data);
+  return member?.status === "accepted" ? "committee_member" : null;
+}
+
+function getGuestRole(data = getData()) {
+  const guest = guestByToken(data);
+  return guest?.rsvp === "attending" ? "guest" : null;
+}
+
+// Export these new functions
+window.WeddingHub.committeeByToken = committeeByToken;
+window.WeddingHub.getCommitteeRole = getCommitteeRole;
+window.WeddingHub.getGuestRole = getGuestRole;
