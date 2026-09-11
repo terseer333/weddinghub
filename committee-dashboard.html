@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="WeddingHub Committee Dashboard - Wedding Planning Workspace">
+    <title>Committee Dashboard · WeddingHub</title>
+    <link rel="stylesheet" href="weddinghub.css">
+    <link rel="stylesheet" href="committee-dashboard.css">
+</head>
+<body class="committee-page">
+
+<div id="committeeContainer" class="committee-container">
+    <!-- Header -->
+    <header id="committeeHeader" class="committee-header"></header>
+
+    <!-- Main Content -->
+    <div class="committee-main">
+        <!-- Navigation Tabs -->
+        <nav id="committeeNav" class="committee-nav"></nav>
+
+        <!-- Views Container -->
+        <main class="committee-views">
+            <div id="view-overview" class="committee-view active"></div>
+            <div id="view-tasks" class="committee-view"></div>
+            <div id="view-events" class="committee-view"></div>
+            <div id="view-announcements" class="committee-view"></div>
+            <div id="view-content" class="committee-view"></div>
+            <div id="view-chat" class="committee-view"></div>
+        </main>
+    </div>
+</div>
+
+<!-- Access Denied -->
+<div id="accessDenied" style="display:none;" class="access-denied"></div>
+
+<script src="app.js"></script>
+<script src="api-client.js"></script>
+<script src="invitation-role-selector.js"></script>
+<script src="committee-dashboard.js"></script>
+
+</body>
+</html>

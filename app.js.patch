@@ -1,0 +1,87 @@
+// ADD TO app.js - Extend seed data with committee structures
+
+// APPEND TO seed object:
+committee: {
+  members: [
+    {
+      id: "cmm_james",
+      name: "James Aondo",
+      email: "james@example.com",
+      role: "Best Man",
+      status: "accepted",
+      token: "demo-committee-james-7fb3c8a1",
+      joinedAt: "2026-09-05",
+      permissions: ["edit_events", "manage_announcements", "chat", "view_guests"]
+    },
+    {
+      id: "cmm_grace",
+      name: "Grace Ter",
+      email: "grace@example.com",
+      role: "Bridesmaid",
+      status: "accepted",
+      token: "demo-committee-grace-91ca48ef",
+      joinedAt: "2026-09-08",
+      permissions: ["edit_events", "manage_announcements", "chat", "view_guests"]
+    },
+    {
+      id: "cmm_michael",
+      name: "Michael Oche",
+      email: "michael@example.com",
+      role: "Groomsman",
+      status: "pending",
+      token: "demo-committee-michael-a8452db9",
+      permissions: []
+    }
+  ],
+  tasks: [
+    {
+      id: "task_1",
+      title: "Confirm catering details",
+      description: "Finalize menu options and headcount with caterer",
+      status: "pending",
+      assignee: "James Aondo",
+      dueDate: "2026-11-15",
+      createdAt: "2026-09-10"
+    },
+    {
+      id: "task_2",
+      title: "Coordinate decoration setup",
+      description: "Schedule decoration team and confirm timeline",
+      status: "pending",
+      assignee: "Grace Ter",
+      dueDate: "2026-12-01"
+    },
+    {
+      id: "task_3",
+      title: "Confirm transportation",
+      description: "Arrange shuttle service for guests",
+      status: "completed",
+      assignee: "Michael Oche",
+      dueDate: "2026-09-20",
+      completedAt: "2026-09-18"
+    }
+  ],
+  chatMessages: [
+    {
+      id: "msg_1",
+      senderId: "cmm_james",
+      senderName: "James Aondo",
+      content: "Guys, the caterer confirmed they can do the menu we discussed. Let's move forward!",
+      timestamp: "2026-09-10T14:23:00Z"
+    },
+    {
+      id: "msg_2",
+      senderId: "cmm_grace",
+      senderName: "Grace Ter",
+      content: "Great news! I found a decorator who can work with our color scheme. Should we book them?",
+      timestamp: "2026-09-10T14:35:00Z"
+    },
+    {
+      id: "msg_3",
+      senderId: "cmm_james",
+      senderName: "James Aondo",
+      content: "Yes! Let's get them booked. Michael, can you coordinate the shuttle details?",
+      timestamp: "2026-09-10T14:42:00Z"
+    }
+  ]
+}
