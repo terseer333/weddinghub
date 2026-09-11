@@ -27,9 +27,7 @@ function renderEnhancedOverview() {
   const overviewContent = $('#view-overview');
   if (!overviewContent) return;
 
-  const currentHTML = overviewContent.innerHTML;
-  
-  // Inject committee metrics panel before guest metrics
+  // Inject committee metrics panel
   const newPanel = document.createElement('div');
   newPanel.id = 'committeeMetricsPanel';
   newPanel.className = 'metrics-panel committee-panel';
@@ -47,7 +45,7 @@ function renderEnhancedOverview() {
         </div>
       </div>
       <div class="mini-metric">
-        <span class="metric-icon">◐</span>
+        <span class="metric-icon">○</span>
         <div>
           <span class="metric-label">Pending</span>
           <span class="metric-number">${committeePending.length}</span>
@@ -89,7 +87,6 @@ function renderEnhancedOverview() {
     </div>
   `;
 
-  // Insert into overview
   const existingPanel = overviewContent.querySelector('#committeeMetricsPanel');
   if (existingPanel) {
     existingPanel.replaceWith(newPanel);
@@ -158,7 +155,6 @@ function renderCommitteeManagement() {
     </div>
   `;
 
-  // Event listeners
   const inviteBtn = view.querySelector('#inviteCommitteeMemberBtn');
   if (inviteBtn) {
     inviteBtn.addEventListener('click', showCommitteeInviteModal);
@@ -171,72 +167,6 @@ function renderCommitteeManagement() {
   view.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => removeCommitteeMember(btn.getAttribute('data-member-id')));
   });
-}
-
-/**
- * Enhanced Guests Management
- * Now separates committee members from regular guests
- */
-function renderEnhancedGuestManagement() {
-  const view = $('#view-guests') || createAdminView('guests', 'Guests');
-  const guests = (data.guests || []).filter(g => !data.committee?.members?.some(m => m.email === g.email));
-
-  view.innerHTML = `
-    <div class="admin-section">
-      <div class="section-header">
-        <h2>Guest List</h2>
-        <button id="inviteGuestBtn" class="button secondary">+ Invite Guest</button>
-      </div>
-
-      <div class="guest-summary">
-        <div class="summary-stat">
-          <span class="stat-value">${guests.length}</span>
-          <span class="stat-label">Total Guests</span>
-        </div>
-        <div class="summary-stat">
-          <span class="stat-value">${guests.filter(g => g.rsvp === 'attending').length}</span>
-          <span class="stat-label">Attending</span>
-        </div>
-        <div class="summary-stat">
-          <span class="stat-value">${guests.filter(g => g.rsvp === 'pending').length}</span>
-          <span class="stat-label">Pending</span>
-        </div>
-        <div class="summary-stat">
-          <span class="stat-value">${guests.filter(g => g.rsvp === 'declined').length}</span>
-          <span class="stat-label">Declined</span>
-        </div>
-      </div>
-
-      <div class="guests-table">
-        <div class="table-row table-head">
-          <span>Guest</span>
-          <span>Category</span>
-          <span>Email</span>
-          <span>RSVP</span>
-          <span>Party</span>
-          <span>Actions</span>
-        </div>
-        ${guests.length ? guests.map(guest => `
-          <div class="table-row guest-row" data-guest-id="${guest.id}">
-            <span class="guest-name">${guest.name}</span>
-            <span class="guest-category">${guest.category}</span>
-            <span class="guest-email">${guest.email}</span>
-            <span class="rsvp-badge rsvp-${guest.rsvp}">${guest.rsvp || 'pending'}</span>
-            <span class="party-size">${guest.partySize || 1}</span>
-            <span class="actions-cell">
-              <button class="action-btn edit-btn" data-guest-id="${guest.id}">Edit</button>
-              <button class="action-btn remove-btn" data-guest-id="${guest.id}">Remove</button>
-            </span>
-          </div>
-        `).join('') : '<div class="empty-row"><p>No guests invited yet.</p></div>'}
-      </div>
-    </div>
-  `;
-
-  const inviteBtn = view.querySelector('#inviteGuestBtn');
-  if (inviteBtn) {
-    inviteBtn.addEventListener('click', showGuestInviteModal);
-  }
 }
 
 /**
@@ -294,20 +224,21 @@ function showCommitteeInviteModal() {
   document.body.appendChild(modal);
   modal.showModal();
 
-  $('#committeeInviteForm').addEventListener('submit', (e) => {
+  const form = modal.querySelector('#committeeInviteForm');
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     const committee = data.committee || { members: [] };
     data.committee = committee;
 
-    const permissions = Array.from(document.querySelectorAll('#committeeInviteForm input[name="perm"]:checked'))
+    const permissions = Array.from(modal.querySelectorAll('input[name="perm"]:checked'))
       .map(cb => cb.value);
 
     committee.members.push({
       id: `cmm_${Date.now()}`,
-      name: $('#committeeName').value,
-      email: $('#committeeEmail').value,
-      phone: $('#committeePhone').value,
-      role: $('#committeeRole').value,
+      name: modal.querySelector('#committeeName').value,
+      email: modal.querySelector('#committeeEmail').value,
+      phone: modal.querySelector('#committeePhone').value,
+      role: modal.querySelector('#committeeRole').value,
       status: 'pending',
       token: `committee-${Math.random().toString(36).substr(2, 9)}`,
       permissions,
@@ -370,11 +301,11 @@ function editCommitteeMember(memberId) {
   document.body.appendChild(modal);
   modal.showModal();
 
-  $('#editCommitteeForm').addEventListener('submit', (e) => {
+  modal.querySelector('#editCommitteeForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    member.name = $('#editCommitteeName').value;
-    member.role = $('#editCommitteeRole').value;
-    member.status = $('#editCommitteeStatus').value;
+    member.name = modal.querySelector('#editCommitteeName').value;
+    member.role = modal.querySelector('#editCommitteeRole').value;
+    member.status = modal.querySelector('#editCommitteeStatus').value;
     WH.saveData(data);
     modal.close();
     renderCommitteeManagement();
@@ -400,76 +331,10 @@ function removeCommitteeMember(memberId) {
 }
 
 /**
- * Show guest invite modal (existing, but enhanced)
- */
-function showGuestInviteModal() {
-  const modal = document.createElement('dialog');
-  modal.className = 'invite-modal';
-  modal.innerHTML = `
-    <div class="modal-content">
-      <h3>Invite Guest</h3>
-      <form id="guestInviteForm">
-        <div class="form-group">
-          <label>Guest Name *</label>
-          <input type="text" id="guestName" required>
-        </div>
-        <div class="form-group">
-          <label>Email *</label>
-          <input type="email" id="guestEmail" required>
-        </div>
-        <div class="form-group">
-          <label>Phone</label>
-          <input type="tel" id="guestPhone">
-        </div>
-        <div class="form-group">
-          <label>Category *</label>
-          <select id="guestCategory" required>
-            <option value="">Select category</option>
-            <option value="Family">Family</option>
-            <option value="Friends">Friends</option>
-            <option value="Colleagues">Colleagues</option>
-            <option value="Extended Family">Extended Family</option>
-          </select>
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="button primary">Send Invitation</button>
-          <button type="button" class="button secondary" onclick="this.closest('dialog').close()">Cancel</button>
-        </div>
-      </form>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-  modal.showModal();
-
-  $('#guestInviteForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    data.guests = data.guests || [];
-    data.guests.push({
-      id: `guest_${Date.now()}`,
-      name: $('#guestName').value,
-      email: $('#guestEmail').value,
-      phone: $('#guestPhone').value,
-      category: $('#guestCategory').value,
-      invitationStatus: 'sent',
-      token: `guest-${Math.random().toString(36).substr(2, 9)}`,
-      rsvp: 'pending',
-      partySize: 1,
-      invitedAt: new Date().toISOString()
-    });
-    WH.saveData(data);
-    modal.close();
-    renderEnhancedGuestManagement();
-    WH.toast('Guest invited successfully');
-    persist('Guest added');
-  });
-}
-
-/**
  * Helper to create admin view if it doesn't exist
  */
 function createAdminView(id, title) {
-  const container = $('#adminViewsContainer') || document.querySelector('.admin-views');
+  const container = document.querySelector('.admin-views');
   if (!container) return null;
 
   const view = document.createElement('div');
@@ -477,13 +342,4 @@ function createAdminView(id, title) {
   view.className = 'admin-view';
   container.appendChild(view);
   return view;
-}
-
-// Hook into existing AdminApp initialization
-// Call these in renderAll():
-function renderAllEnhanced() {
-  renderAll(); // Call original
-  renderEnhancedOverview();
-  renderCommitteeManagement();
-  renderEnhancedGuestManagement();
 }
