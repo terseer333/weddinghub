@@ -2,6 +2,7 @@ package repository
 
 import (
 	"crypto/subtle"
+	"sort"
 	"sync"
 	"time"
 
@@ -58,14 +59,33 @@ func (r *MemoryRepository) UpdateWedding(w models.Wedding) (models.Wedding, erro
 	if r.slugExists(w.Slug, w.ID) {
 		return models.Wedding{}, ErrConflict
 	}
-	// Invitation capabilities and guest responses cannot be replaced through wedding content updates.
+	// Invitation capabilities, guest responses, and committee state cannot be replaced through wedding content updates.
 	w.Invitations = current.Invitations
 	w.Guests = current.Guests
+	w.CommitteeMembers = current.CommitteeMembers
+	w.PlanningTasks = current.PlanningTasks
+	w.CommitteeChat = current.CommitteeChat
 	w.RSVPs = current.RSVPs
 	w.GuestMessages = current.GuestMessages
+	w.AdminTokenHash = current.AdminTokenHash
 	w.CreatedAt = current.CreatedAt
 	r.weddings[w.ID] = cloneWedding(w)
 	return cloneWedding(w), nil
+}
+
+// WeddingByAdminHash resolves an admin capability token to its wedding using a constant-time comparison.
+func (r *MemoryRepository) WeddingByAdminHash(hash string) (models.Wedding, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if hash == "" {
+		return models.Wedding{}, ErrNotFound
+	}
+	for _, w := range r.weddings {
+		if len(w.AdminTokenHash) == len(hash) && subtle.ConstantTimeCompare([]byte(w.AdminTokenHash), []byte(hash)) == 1 {
+			return cloneWedding(w), nil
+		}
+	}
+	return models.Wedding{}, ErrNotFound
 }
 
 func (r *MemoryRepository) DeleteWedding(id string) error {
@@ -134,12 +154,24 @@ func (r *MemoryRepository) RespondToInvitation(hash string, status models.Invita
 		inv = w.Invitations[i]
 		break
 	}
-	if status == models.InvitationAccepted && !hasGuest(w.Guests, inv.ID) {
-		guestID, err := models.NewID()
-		if err != nil {
-			return models.Wedding{}, models.Invitation{}, err
+	// Acceptance materializes wedding-scoped membership for the role the invitation was issued for.
+	if status == models.InvitationAccepted {
+		if inv.Type.Normalized() == models.InvitationCommittee {
+			if !hasCommitteeMember(w.CommitteeMembers, inv.ID) {
+				memberID, err := models.NewID()
+				if err != nil {
+					return models.Wedding{}, models.Invitation{}, err
+				}
+				w.CommitteeMembers = append(w.CommitteeMembers, models.CommitteeMember{ID: memberID, InvitationID: inv.ID,
+					Name: inv.GuestName, Email: inv.GuestEmail, Phone: inv.GuestPhone, Title: inv.CommitteeTitle, JoinedAt: at})
+			}
+		} else if !hasGuest(w.Guests, inv.ID) {
+			guestID, err := models.NewID()
+			if err != nil {
+				return models.Wedding{}, models.Invitation{}, err
+			}
+			w.Guests = append(w.Guests, models.Guest{ID: guestID, InvitationID: inv.ID, Name: inv.GuestName, Email: inv.GuestEmail, Phone: inv.GuestPhone})
 		}
-		w.Guests = append(w.Guests, models.Guest{ID: guestID, InvitationID: inv.ID, Name: inv.GuestName, Email: inv.GuestEmail})
 	}
 	w.UpdatedAt = at
 	r.weddings[w.ID] = cloneWedding(w)
@@ -197,7 +229,102 @@ func (r *MemoryRepository) AddGuestMessage(hash string, message models.GuestMess
 	return cloneWedding(w), message, nil
 }
 
+// AddCommitteeMessage stores a private planning message. Authorization happens in the API layer;
+// the wedding must still exist when the message is written.
+func (r *MemoryRepository) AddCommitteeMessage(weddingID string, message models.CommitteeMessage) (models.CommitteeMessage, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.CommitteeMessage{}, ErrNotFound
+	}
+	message.WeddingID = w.ID
+	w.CommitteeChat = append(w.CommitteeChat, message)
+	w.UpdatedAt = message.CreatedAt
+	r.weddings[weddingID] = cloneWedding(w)
+	return message, nil
+}
+
+func (r *MemoryRepository) CommitteeMessages(weddingID string, since time.Time) ([]models.CommitteeMessage, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return nil, ErrNotFound
+	}
+	out := make([]models.CommitteeMessage, 0, len(w.CommitteeChat))
+	for _, message := range w.CommitteeChat {
+		if since.IsZero() || message.CreatedAt.After(since) {
+			out = append(out, message)
+		}
+	}
+	sort.SliceStable(out, func(i, j int) bool { return out[i].CreatedAt.Before(out[j].CreatedAt) })
+	return out, nil
+}
+
+func (r *MemoryRepository) AddPlanningTask(weddingID string, task models.PlanningTask) (models.PlanningTask, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.PlanningTask{}, ErrNotFound
+	}
+	for _, existing := range w.PlanningTasks {
+		if existing.ID == task.ID {
+			return models.PlanningTask{}, ErrConflict
+		}
+	}
+	w.PlanningTasks = append(w.PlanningTasks, task)
+	w.UpdatedAt = task.CreatedAt
+	r.weddings[weddingID] = cloneWedding(w)
+	return task, nil
+}
+
+// UpdatePlanningTask replaces the mutable fields of an existing task and preserves its creation metadata.
+func (r *MemoryRepository) UpdatePlanningTask(weddingID string, task models.PlanningTask) (models.PlanningTask, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.PlanningTask{}, ErrNotFound
+	}
+	for i := range w.PlanningTasks {
+		if w.PlanningTasks[i].ID != task.ID {
+			continue
+		}
+		task.CreatedAt = w.PlanningTasks[i].CreatedAt
+		task.CreatedBy = w.PlanningTasks[i].CreatedBy
+		w.PlanningTasks[i] = task
+		w.UpdatedAt = task.UpdatedAt
+		r.weddings[weddingID] = cloneWedding(w)
+		return task, nil
+	}
+	return models.PlanningTask{}, ErrNotFound
+}
+
+func (r *MemoryRepository) DeletePlanningTask(weddingID, taskID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return ErrNotFound
+	}
+	for i := range w.PlanningTasks {
+		if w.PlanningTasks[i].ID != taskID {
+			continue
+		}
+		w.PlanningTasks = append(w.PlanningTasks[:i:i], w.PlanningTasks[i+1:]...)
+		w.UpdatedAt = time.Now().UTC()
+		r.weddings[weddingID] = cloneWedding(w)
+		return nil
+	}
+	return ErrNotFound
+}
+
 func (r *MemoryRepository) findInvitation(hash string) (models.Wedding, models.Invitation, bool) {
+	if hash == "" {
+		return models.Wedding{}, models.Invitation{}, false
+	}
 	for _, w := range r.weddings {
 		for _, inv := range w.Invitations {
 			if len(inv.TokenHash) == len(hash) && subtle.ConstantTimeCompare([]byte(inv.TokenHash), []byte(hash)) == 1 {
@@ -226,14 +353,26 @@ func hasGuest(guests []models.Guest, invitationID string) bool {
 	return false
 }
 
+func hasCommitteeMember(members []models.CommitteeMember, invitationID string) bool {
+	for _, member := range members {
+		if member.InvitationID == invitationID {
+			return true
+		}
+	}
+	return false
+}
+
 func cloneWedding(w models.Wedding) models.Wedding {
 	w.Admins = append([]models.Admin(nil), w.Admins...)
 	w.Guests = append([]models.Guest(nil), w.Guests...)
+	w.CommitteeMembers = append([]models.CommitteeMember(nil), w.CommitteeMembers...)
 	w.Invitations = append([]models.Invitation(nil), w.Invitations...)
 	w.Events = append([]models.Event(nil), w.Events...)
 	w.Photos = append([]models.Photo(nil), w.Photos...)
 	w.StorySections = append([]models.StorySection(nil), w.StorySections...)
 	w.Announcements = append([]models.Announcement(nil), w.Announcements...)
+	w.PlanningTasks = append([]models.PlanningTask(nil), w.PlanningTasks...)
+	w.CommitteeChat = append([]models.CommitteeMessage(nil), w.CommitteeChat...)
 	w.RSVPs = append([]models.RSVP(nil), w.RSVPs...)
 	w.GuestMessages = append([]models.GuestMessage(nil), w.GuestMessages...)
 	return w
