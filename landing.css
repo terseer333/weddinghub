@@ -139,6 +139,7 @@ body.auth-page button { cursor: pointer; }
 .hero {
     position: relative;
     padding: 64px 0 112px;
+    overflow: hidden;
 }
 
 .hero::before {
@@ -543,6 +544,22 @@ body.auth-page button { cursor: pointer; }
     .auth-intro { padding-inline: 20px; }
     .auth-main { padding-inline: 20px; }
     .auth-card h1 { font-size: 42px; }
+}
+
+@media (max-width: 380px) {
+    .hero h1 { font-size: clamp(42px, 12vw, 48px); }
+    .hero-copy .landing-eyebrow { letter-spacing: .1em; }
+    .public-nav { gap: 14px; flex-wrap: wrap; padding-block: 8px; }
+    .public-brand { font-size: 15px; }
+    .public-brand .brand-mark { width: 34px; height: 34px; font-size: 16px; }
+    .public-nav-links { gap: 14px; }
+    .landing-button.compact { padding-inline: 14px; }
+    .section-heading h2, .flow-copy h2 { font-size: 36px; }
+    .cta-panel { padding: 36px 20px; border-radius: 18px; }
+    .preview-card { padding: 22px !important; }
+    .preview-card .preview-copy h3 { font-size: 30px; }
+    .phone-mockup { width: 128px; }
+    .auth-card h1 { font-size: 38px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
