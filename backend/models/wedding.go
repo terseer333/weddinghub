@@ -214,6 +214,8 @@ type Announcement struct {
 	Audience    Audience          `json:"audience,omitempty"`
 	PublishedAt *time.Time        `json:"published_at,omitempty"`
 	Status      PublicationStatus `json:"status"`
+	AuthorName  string            `json:"author_name,omitempty"`
+	CreatedAt   time.Time         `json:"created_at,omitempty"`
 }
 
 type RSVPStatus string

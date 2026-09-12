@@ -47,22 +47,44 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("GET /healthz", a.health)
 	mux.HandleFunc("GET /api/weddings", a.listWeddings)
 	mux.HandleFunc("POST /api/weddings", a.createWedding)
+	// Admin-authenticated routes. requireAdmin resolves the wedding and verifies the
+	// caller holds the wedding's admin capability token before any data is touched.
 	mux.HandleFunc("GET /api/weddings/{weddingID}", a.getWedding)
 	mux.HandleFunc("PUT /api/weddings/{weddingID}", a.updateWedding)
 	mux.HandleFunc("DELETE /api/weddings/{weddingID}", a.deleteWedding)
 	mux.HandleFunc("POST /api/weddings/{weddingID}/invitations", a.createInvitation)
 	mux.HandleFunc("GET /api/weddings/{weddingID}/admin/overview", a.adminOverview)
+	mux.HandleFunc("GET /api/weddings/{weddingID}/admin/roster", a.adminRoster)
+	// Invitation capability-token routes, open to the invitee who holds the link.
 	mux.HandleFunc("GET /api/invitations/{token}", a.getInvitation)
 	mux.HandleFunc("POST /api/invitations/{token}/accept", a.acceptInvitation)
 	mux.HandleFunc("POST /api/invitations/{token}/decline", a.declineInvitation)
+	// Guest routes require an accepted guest-type invitation.
 	mux.HandleFunc("GET /api/guest/{token}/dashboard", a.guestDashboard)
 	mux.HandleFunc("PUT /api/guest/{token}/rsvp", a.updateRSVP)
 	mux.HandleFunc("POST /api/guest/{token}/messages", a.createGuestMessage)
+	// Committee routes require the admin token or an accepted committee invitation.
+	mux.HandleFunc("GET /api/weddings/{weddingID}/committee/dashboard", a.committeeDashboard)
+	mux.HandleFunc("GET /api/weddings/{weddingID}/committee/chat", a.committeeChat)
+	mux.HandleFunc("POST /api/weddings/{weddingID}/committee/chat", a.sendCommitteeMessage)
+	mux.HandleFunc("POST /api/weddings/{weddingID}/committee/tasks", a.createCommitteeTask)
+	mux.HandleFunc("PUT /api/weddings/{weddingID}/committee/tasks/{taskID}", a.updateCommitteeTask)
+	mux.HandleFunc("DELETE /api/weddings/{weddingID}/committee/tasks/{taskID}", a.deleteCommitteeTask)
+	mux.HandleFunc("POST /api/weddings/{weddingID}/committee/announcements", a.createCommitteeAnnouncement)
+	mux.HandleFunc("PUT /api/weddings/{weddingID}/committee/announcements/{announcementID}", a.updateCommitteeAnnouncement)
+	mux.HandleFunc("DELETE /api/weddings/{weddingID}/committee/announcements/{announcementID}", a.deleteCommitteeAnnouncement)
 	return securityHeaders(corsMiddleware(parseAllowedOrigins(allowedOrigins), allowLoopback, mux))
 }
 
 func (a *API) health(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
+// weddingCreated wraps a newly created wedding together with its one-time admin
+// capability token. Only the token hash is stored; the raw token is returned here once.
+type weddingCreated struct {
+	Wedding    models.Wedding `json:"wedding"`
+	AdminToken string         `json:"admin_token"`
 }
 
 func (a *API) createWedding(w http.ResponseWriter, r *http.Request) {
@@ -83,28 +105,55 @@ func (a *API) createWedding(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	adminToken, adminHash, err := models.NewOpaqueToken()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "could not secure this wedding")
+		return
+	}
+	wedding.AdminTokenHash = adminHash
 	created, err := a.repo.CreateWedding(wedding)
 	if err != nil {
 		writeRepositoryError(w, err)
 		return
 	}
-	writeJSON(w, http.StatusCreated, created)
+	writeJSON(w, http.StatusCreated, weddingCreated{Wedding: created, AdminToken: adminToken})
 }
 
+type weddingSummary struct {
+	ID         string                   `json:"id"`
+	Slug       string                   `json:"slug"`
+	Title      string                   `json:"title"`
+	PartnerOne string                   `json:"partner_one"`
+	PartnerTwo string                   `json:"partner_two"`
+	Date       *time.Time               `json:"date,omitempty"`
+	Status     models.PublicationStatus `json:"status"`
+}
+
+// listWeddings exposes only identifiers and names so strangers cannot read guest,
+// committee, or planning data from a public directory.
 func (a *API) listWeddings(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, a.repo.ListWeddings())
+	weddings := a.repo.ListWeddings()
+	out := make([]weddingSummary, 0, len(weddings))
+	for _, wedding := range weddings {
+		out = append(out, weddingSummary{ID: wedding.ID, Slug: wedding.Slug, Title: wedding.Title,
+			PartnerOne: wedding.PartnerOne, PartnerTwo: wedding.PartnerTwo, Date: wedding.Date, Status: wedding.Status})
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 func (a *API) getWedding(w http.ResponseWriter, r *http.Request) {
-	wedding, err := a.repo.GetWedding(r.PathValue("weddingID"))
-	if err != nil {
-		writeRepositoryError(w, err)
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
 		return
 	}
 	writeJSON(w, http.StatusOK, wedding)
 }
 
 func (a *API) updateWedding(w http.ResponseWriter, r *http.Request) {
+	_, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
 	var wedding models.Wedding
 	if err := decodeJSON(w, r, &wedding); err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
@@ -127,6 +176,10 @@ func (a *API) updateWedding(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) deleteWedding(w http.ResponseWriter, r *http.Request) {
+	_, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
 	if err := a.repo.DeleteWedding(r.PathValue("weddingID")); err != nil {
 		writeRepositoryError(w, err)
 		return
@@ -135,10 +188,13 @@ func (a *API) deleteWedding(w http.ResponseWriter, r *http.Request) {
 }
 
 type invitationRequest struct {
-	GuestName    string     `json:"guest_name"`
-	GuestEmail   string     `json:"guest_email"`
-	MaxPartySize int        `json:"max_party_size"`
-	ExpiresAt    *time.Time `json:"expires_at"`
+	Type           models.InvitationType `json:"type"`
+	GuestName      string                `json:"guest_name"`
+	GuestEmail     string                `json:"guest_email"`
+	GuestPhone     string                `json:"guest_phone"`
+	CommitteeTitle string                `json:"committee_title"`
+	MaxPartySize   int                   `json:"max_party_size"`
+	ExpiresAt      *time.Time            `json:"expires_at"`
 }
 
 type invitationCreated struct {
@@ -147,15 +203,33 @@ type invitationCreated struct {
 }
 
 func (a *API) createInvitation(w http.ResponseWriter, r *http.Request) {
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
 	var input invitationRequest
 	if err := decodeJSON(w, r, &input); err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	input.GuestName = strings.TrimSpace(input.GuestName)
-	if input.GuestName == "" || input.MaxPartySize < 1 || input.MaxPartySize > 20 {
-		writeError(w, http.StatusBadRequest, "guest_name and max_party_size between 1 and 20 are required")
+	invitationType := input.Type.Normalized()
+	if !input.Type.Valid() {
+		writeError(w, http.StatusBadRequest, "type must be guest or committee")
 		return
+	}
+	input.GuestName = strings.TrimSpace(input.GuestName)
+	if input.GuestName == "" {
+		writeError(w, http.StatusBadRequest, "guest_name is required")
+		return
+	}
+	if invitationType == models.InvitationGuest {
+		if input.MaxPartySize < 1 || input.MaxPartySize > 20 {
+			writeError(w, http.StatusBadRequest, "max_party_size between 1 and 20 is required for guest invitations")
+			return
+		}
+	} else {
+		// Committee invitations represent a single planner, so party size is fixed.
+		input.MaxPartySize = 1
 	}
 	if input.ExpiresAt != nil && !input.ExpiresAt.After(a.now()) {
 		writeError(w, http.StatusBadRequest, "expires_at must be in the future")
@@ -171,8 +245,10 @@ func (a *API) createInvitation(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "could not generate invitation")
 		return
 	}
-	inv := models.Invitation{ID: id, GuestName: input.GuestName, GuestEmail: strings.TrimSpace(input.GuestEmail), MaxPartySize: input.MaxPartySize, Status: models.InvitationPending, TokenHash: hash, ExpiresAt: input.ExpiresAt, CreatedAt: a.now()}
-	created, err := a.repo.AddInvitation(r.PathValue("weddingID"), inv)
+	inv := models.Invitation{ID: id, Type: invitationType, GuestName: input.GuestName, GuestEmail: strings.TrimSpace(input.GuestEmail),
+		GuestPhone: strings.TrimSpace(input.GuestPhone), CommitteeTitle: strings.TrimSpace(input.CommitteeTitle),
+		MaxPartySize: input.MaxPartySize, Status: models.InvitationPending, TokenHash: hash, ExpiresAt: input.ExpiresAt, CreatedAt: a.now()}
+	created, err := a.repo.AddInvitation(wedding.ID, inv)
 	if err != nil {
 		writeRepositoryError(w, err)
 		return
@@ -195,11 +271,54 @@ func (a *API) getInvitation(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) acceptInvitation(w http.ResponseWriter, r *http.Request) {
-	a.respond(w, r.PathValue("token"), models.InvitationAccepted)
+	token := r.PathValue("token")
+	// The invitee states which role they are joining as. When provided, that role
+	// must match the type the admin issued the invitation for; otherwise a guest
+	// invitation could not be used to enter the committee workspace.
+	var input struct {
+		Role string `json:"role"`
+	}
+	if r.Body != nil {
+		body, readErr := io.ReadAll(io.LimitReader(r.Body, maxBodyBytes))
+		if readErr == nil && len(strings.TrimSpace(string(body))) > 0 {
+			if decodeErr := json.Unmarshal(body, &input); decodeErr != nil {
+				writeError(w, http.StatusBadRequest, "invalid JSON body")
+				return
+			}
+		}
+	}
+	if strings.TrimSpace(input.Role) != "" {
+		requested := normalizeRole(strings.TrimSpace(input.Role))
+		if requested == "" {
+			writeError(w, http.StatusBadRequest, "role must be guest or committee")
+			return
+		}
+		_, invitation, err := a.invitation(token)
+		if err != nil {
+			writeRepositoryError(w, err)
+			return
+		}
+		if requested != invitation.Type.Role() {
+			writeError(w, http.StatusForbidden, "this invitation is for the role of "+string(invitation.Type.Role())+", not "+string(requested))
+			return
+		}
+	}
+	a.respond(w, token, models.InvitationAccepted)
 }
 
 func (a *API) declineInvitation(w http.ResponseWriter, r *http.Request) {
 	a.respond(w, r.PathValue("token"), models.InvitationDeclined)
+}
+
+// normalizeRole maps the human-facing labels used by invitation links onto backend roles.
+func normalizeRole(value string) models.Role {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "committee", "committee_member":
+		return models.RoleCommitteeMember
+	case "guest":
+		return models.RoleGuest
+	}
+	return ""
 }
 
 func (a *API) respond(w http.ResponseWriter, token string, status models.InvitationStatus) {
@@ -248,6 +367,10 @@ func (a *API) guestDashboard(w http.ResponseWriter, r *http.Request) {
 	wedding, inv, err := a.invitation(r.PathValue("token"))
 	if err != nil {
 		writeRepositoryError(w, err)
+		return
+	}
+	if inv.Type.Normalized() != models.InvitationGuest {
+		writeError(w, http.StatusForbidden, "committee invitations cannot open the guest experience")
 		return
 	}
 	if inv.Status != models.InvitationAccepted {
@@ -300,6 +423,10 @@ func (a *API) createGuestMessage(w http.ResponseWriter, r *http.Request) {
 		writeRepositoryError(w, err)
 		return
 	}
+	if inv.Type.Normalized() != models.InvitationGuest {
+		writeError(w, http.StatusForbidden, "committee invitations cannot use the guest RSVP flow")
+		return
+	}
 	if inv.Status != models.InvitationAccepted {
 		writeError(w, http.StatusForbidden, "accepted invitation required")
 		return
@@ -331,6 +458,10 @@ func (a *API) updateRSVP(w http.ResponseWriter, r *http.Request) {
 		writeRepositoryError(w, err)
 		return
 	}
+	if inv.Type.Normalized() != models.InvitationGuest {
+		writeError(w, http.StatusForbidden, "committee invitations cannot use the guest RSVP flow")
+		return
+	}
 	if response.PartySize < 0 || response.PartySize > inv.MaxPartySize || (response.Status == models.RSVPAttending && response.PartySize < 1) || (response.Status == models.RSVPNotAttending && response.PartySize != 0) {
 		writeError(w, http.StatusBadRequest, "party_size is invalid for this invitation")
 		return
@@ -345,23 +476,39 @@ func (a *API) updateRSVP(w http.ResponseWriter, r *http.Request) {
 }
 
 type overviewView struct {
-	WeddingID          string `json:"wedding_id"`
-	InvitationsTotal   int    `json:"invitations_total"`
-	InvitationsPending int    `json:"invitations_pending"`
-	Accepted           int    `json:"accepted"`
-	Declined           int    `json:"declined"`
-	AttendingPartySize int    `json:"attending_party_size"`
-	GuestMessages      int    `json:"guest_messages"`
+	WeddingID            string `json:"wedding_id"`
+	InvitationsTotal     int    `json:"invitations_total"`
+	InvitationsPending   int    `json:"invitations_pending"`
+	Accepted             int    `json:"accepted"`
+	Declined             int    `json:"declined"`
+	AttendingPartySize   int    `json:"attending_party_size"`
+	GuestMessages        int    `json:"guest_messages"`
+	CommitteeTotal       int    `json:"committee_total"`
+	CommitteePending     int    `json:"committee_pending"`
+	CommitteeAccepted    int    `json:"committee_accepted"`
+	CommitteeDeclined    int    `json:"committee_declined"`
 }
 
 func (a *API) adminOverview(w http.ResponseWriter, r *http.Request) {
-	wedding, err := a.repo.GetWedding(r.PathValue("weddingID"))
-	if err != nil {
-		writeRepositoryError(w, err)
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
 		return
 	}
 	view := overviewView{WeddingID: wedding.ID, InvitationsTotal: len(wedding.Invitations), GuestMessages: len(wedding.GuestMessages)}
 	for _, inv := range wedding.Invitations {
+		if inv.Type.Normalized() == models.InvitationCommittee {
+			view.CommitteeTotal++
+			switch inv.Status {
+			case models.InvitationPending:
+				view.CommitteePending++
+			case models.InvitationAccepted:
+				view.CommitteeAccepted++
+			case models.InvitationDeclined:
+				view.CommitteeDeclined++
+			}
+			continue
+		}
+		view.InvitationsTotal++
 		switch inv.Status {
 		case models.InvitationPending:
 			view.InvitationsPending++
@@ -377,6 +524,353 @@ func (a *API) adminOverview(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	writeJSON(w, http.StatusOK, view)
+}
+
+type rosterView struct {
+	WeddingID        string                     `json:"wedding_id"`
+	Invitations      []models.Invitation        `json:"invitations"`
+	Guests           []models.Guest             `json:"guests"`
+	CommitteeMembers []models.CommitteeMember   `json:"committee_members"`
+}
+
+// adminRoster returns the full invitation status of both groups so the admin can
+// separate committee members from guests. Admin scope only.
+func (a *API) adminRoster(w http.ResponseWriter, r *http.Request) {
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	writeJSON(w, http.StatusOK, rosterView{WeddingID: wedding.ID, Invitations: wedding.Invitations, Guests: wedding.Guests, CommitteeMembers: wedding.CommitteeMembers})
+}
+
+type committeeActor struct {
+	Role         models.Role `json:"role"`
+	Name         string      `json:"name"`
+	MemberID     string      `json:"member_id,omitempty"`
+	InvitationID string      `json:"invitation_id,omitempty"`
+}
+
+type guestStats struct {
+	Invited   int `json:"invited"`
+	Accepted  int `json:"accepted"`
+	Pending   int `json:"pending"`
+	Declined  int `json:"declined"`
+	Attending int `json:"attending_party_size"`
+}
+
+// committeeDashboardView merges the shared published wedding content with the
+// committee-only planning data. Announcements carry their audience so guests are
+// never sent the committee-only copy of the same wedding.
+type committeeDashboardView struct {
+	Wedding       publicWedding            `json:"wedding"`
+	Actor         committeeActor           `json:"actor"`
+	Members       []models.CommitteeMember `json:"committee_members"`
+	Tasks         []models.PlanningTask    `json:"planning_tasks"`
+	Announcements []models.Announcement    `json:"announcements"`
+	GuestStats    guestStats               `json:"guest_stats"`
+}
+
+func (a *API) committeeDashboard(w http.ResponseWriter, r *http.Request) {
+	wedding, actor, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	view := committeeDashboardView{
+		Wedding: publishedWedding(wedding),
+		Actor:   committeeActor{Role: actor.Role, Name: actor.Name, MemberID: actor.MemberID, InvitationID: actor.InvitationID},
+		Members: wedding.CommitteeMembers,
+		Tasks:   wedding.PlanningTasks,
+	}
+	for _, item := range wedding.Announcements {
+		if item.Status == models.StatusPublished {
+			view.Announcements = append(view.Announcements, item)
+		}
+	}
+	view.GuestStats = computeGuestStats(wedding)
+	writeJSON(w, http.StatusOK, view)
+}
+
+// computeGuestStats aggregates the guest group only, so the committee sees an
+// RSVP overview without exposing individual guest records.
+func computeGuestStats(w models.Wedding) guestStats {
+	var stats guestStats
+	guestInvitations := make(map[string]bool)
+	for _, inv := range w.Invitations {
+		if inv.Type.Normalized() != models.InvitationGuest {
+			continue
+		}
+		guestInvitations[inv.ID] = true
+		stats.Invited++
+		switch inv.Status {
+		case models.InvitationAccepted:
+			stats.Accepted++
+		case models.InvitationPending:
+			stats.Pending++
+		case models.InvitationDeclined:
+			stats.Declined++
+		}
+	}
+	for _, response := range w.RSVPs {
+		if response.Status == models.RSVPAttending && guestInvitations[response.InvitationID] {
+			stats.Attending += response.PartySize
+		}
+	}
+	return stats
+}
+
+// committeeChat returns the private planning conversation, optionally only messages
+// created after the given RFC3339 timestamp so clients can poll for new messages.
+func (a *API) committeeChat(w http.ResponseWriter, r *http.Request) {
+	wedding, _, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	var since time.Time
+	if raw := strings.TrimSpace(r.URL.Query().Get("since")); raw != "" {
+		if parsed, err := time.Parse(time.RFC3339, raw); err == nil {
+			since = parsed
+		}
+	}
+	messages, err := a.repo.CommitteeMessages(wedding.ID, since)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, messages)
+}
+
+type committeeMessageRequest struct {
+	Message string `json:"message"`
+	Body    string `json:"body"`
+}
+
+func (a *API) sendCommitteeMessage(w http.ResponseWriter, r *http.Request) {
+	wedding, actor, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	var input committeeMessageRequest
+	if err := decodeJSON(w, r, &input); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	input.Message = strings.TrimSpace(input.Message)
+	input.Body = strings.TrimSpace(input.Body)
+	body := input.Message
+	if body == "" {
+		body = input.Body
+	}
+	if body == "" {
+		writeError(w, http.StatusBadRequest, "message cannot be empty")
+		return
+	}
+	if utf8.RuneCountInString(body) > maxGuestMessageLength {
+		writeError(w, http.StatusBadRequest, "message must be at most 2000 characters")
+		return
+	}
+	authorID := actor.MemberID
+	if authorID == "" {
+		authorID = string(actor.Role)
+	}
+	message := models.CommitteeMessage{ID: mustID(w), AuthorID: authorID, AuthorName: actor.Name, AuthorRole: actor.Role, Body: body, CreatedAt: a.now()}
+	if message.ID == "" {
+		return
+	}
+	created, err := a.repo.AddCommitteeMessage(wedding.ID, message)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, created)
+}
+
+type planningTaskRequest struct {
+	Title      string            `json:"title"`
+	Details    string            `json:"details"`
+	AssignedTo string            `json:"assigned_to"`
+	DueOn      string            `json:"due_on"`
+	Status     models.TaskStatus `json:"status"`
+}
+
+func (a *API) createCommitteeTask(w http.ResponseWriter, r *http.Request) {
+	wedding, actor, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	input, valid := parseTaskInput(w, r)
+	if !valid {
+		return
+	}
+	now := a.now()
+	taskID := mustID(w)
+	if taskID == "" {
+		return
+	}
+	task := models.PlanningTask{ID: taskID, Title: input.Title, Details: input.Details, AssignedTo: input.AssignedTo,
+		DueOn: input.DueOn, Status: input.Status, CreatedBy: actor.Name, CreatedAt: now, UpdatedAt: now}
+	created, err := a.repo.AddPlanningTask(wedding.ID, task)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, created)
+}
+
+func (a *API) updateCommitteeTask(w http.ResponseWriter, r *http.Request) {
+	wedding, _, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	input, valid := parseTaskInput(w, r)
+	if !valid {
+		return
+	}
+	now := a.now()
+	task := models.PlanningTask{ID: r.PathValue("taskID"), Title: input.Title, Details: input.Details, AssignedTo: input.AssignedTo,
+		DueOn: input.DueOn, Status: input.Status, UpdatedAt: now}
+	updated, err := a.repo.UpdatePlanningTask(wedding.ID, task)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, updated)
+}
+
+func (a *API) deleteCommitteeTask(w http.ResponseWriter, r *http.Request) {
+	wedding, _, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	if err := a.repo.DeletePlanningTask(wedding.ID, r.PathValue("taskID")); err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// parseTaskInput validates a shared planning-task payload. The caller owns the
+// repository write.
+func parseTaskInput(w http.ResponseWriter, r *http.Request) (planningTaskRequest, bool) {
+	var input planningTaskRequest
+	if err := decodeJSON(w, r, &input); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return input, false
+	}
+	input.Title = strings.TrimSpace(input.Title)
+	if input.Title == "" {
+		writeError(w, http.StatusBadRequest, "title is required")
+		return input, false
+	}
+	if input.Status == "" {
+		input.Status = models.TaskTodo
+	}
+	if !input.Status.Valid() {
+		writeError(w, http.StatusBadRequest, "status must be todo, in_progress, or done")
+		return input, false
+	}
+	return input, true
+}
+
+type announcementRequest struct {
+	Title    string             `json:"title"`
+	Body     string             `json:"body"`
+	Audience models.Audience    `json:"audience"`
+	Status   models.PublicationStatus `json:"status"`
+}
+
+func parseAnnouncementInput(w http.ResponseWriter, r *http.Request) (announcementRequest, bool) {
+	var input announcementRequest
+	if err := decodeJSON(w, r, &input); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return input, false
+	}
+	input.Title = strings.TrimSpace(input.Title)
+	input.Body = strings.TrimSpace(input.Body)
+	if input.Title == "" || input.Body == "" {
+		writeError(w, http.StatusBadRequest, "title and body are required")
+		return input, false
+	}
+	if input.Audience == "" {
+		input.Audience = models.AudiencePublic
+	}
+	if !input.Audience.Valid() {
+		writeError(w, http.StatusBadRequest, "audience must be public or committee")
+		return input, false
+	}
+	if input.Status == "" {
+		input.Status = models.StatusDraft
+	}
+	if !input.Status.Valid() {
+		writeError(w, http.StatusBadRequest, "status must be draft, published, or hidden")
+		return input, false
+	}
+	return input, true
+}
+
+func (a *API) createCommitteeAnnouncement(w http.ResponseWriter, r *http.Request) {
+	wedding, actor, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	input, valid := parseAnnouncementInput(w, r)
+	if !valid {
+		return
+	}
+	announcementID := mustID(w)
+	if announcementID == "" {
+		return
+	}
+	now := a.now()
+	publishedAt := (*time.Time)(nil)
+	if input.Status == models.StatusPublished {
+		value := now
+		publishedAt = &value
+	}
+	announcement := models.Announcement{ID: announcementID, Title: input.Title, Body: input.Body,
+		Audience: input.Audience.Normalized(), Status: input.Status, PublishedAt: publishedAt, AuthorName: actor.Name, CreatedAt: now}
+	created, err := a.repo.AddAnnouncement(wedding.ID, announcement)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, created)
+}
+
+func (a *API) updateCommitteeAnnouncement(w http.ResponseWriter, r *http.Request) {
+	wedding, _, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	input, valid := parseAnnouncementInput(w, r)
+	if !valid {
+		return
+	}
+	now := a.now()
+	publishedAt := (*time.Time)(nil)
+	if input.Status == models.StatusPublished {
+		value := now
+		publishedAt = &value
+	}
+	announcement := models.Announcement{ID: r.PathValue("announcementID"), Title: input.Title, Body: input.Body,
+		Audience: input.Audience.Normalized(), Status: input.Status, PublishedAt: publishedAt}
+	updated, err := a.repo.UpdateAnnouncement(wedding.ID, announcement)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, updated)
+}
+
+func (a *API) deleteCommitteeAnnouncement(w http.ResponseWriter, r *http.Request) {
+	wedding, _, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	if err := a.repo.DeleteAnnouncement(wedding.ID, r.PathValue("announcementID")); err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (a *API) invitation(token string) (models.Wedding, models.Invitation, error) {
@@ -415,7 +909,7 @@ func publishedWedding(w models.Wedding) publicWedding {
 		}
 	}
 	for _, item := range w.Announcements {
-		if item.Status == models.StatusPublished {
+		if item.Status == models.StatusPublished && item.Audience.GuestVisible() {
 			view.Announcements = append(view.Announcements, item)
 		}
 	}

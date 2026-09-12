@@ -31,7 +31,7 @@ function showAccessGate() {
 }
 
 function renderGuestDashboard() {
-  const visibility = { story: WH.published(data.stories).length > 0, gallery: WH.published(data.photos).length > 0, events: WH.published(data.events).length > 0, announcements: WH.published(data.announcements).length > 0 };
+  const visibility = { story: WH.published(data.stories).length > 0, gallery: WH.published(data.photos).length > 0, events: WH.published(data.events).length > 0, announcements: WH.publicAnnouncements(data.announcements).length > 0 };
   Object.entries(visibility).forEach(([id, visible]) => { const section=document.getElementById(id); if(section)section.hidden=!visible; const link=document.querySelector(`.guest-links a[href="#${id}"]`); if(link)link.hidden=!visible; });
   document.getElementById("guestHero").style.backgroundImage = `url('${wedding.heroImage}')`;
   document.getElementById("detailImage").style.backgroundImage = `url('${data.photos[2]?.url || wedding.heroImage}')`;
@@ -64,7 +64,7 @@ function renderGuestDashboard() {
       <small>${event.time}</small><h3>${WH.escape(event.name)}</h3><p>${WH.escape(event.venue)}<br>${WH.escape(event.address)}</p></div>
       <a href="https://maps.google.com/?q=${encodeURIComponent(event.address)}" target="_blank">Map ↗</a></article>`;
   }).join("");
-  const announcements = WH.published(data.announcements);
+  const announcements = WH.publicAnnouncements(data.announcements);
   document.getElementById("guestAnnouncements").innerHTML = announcements.length ? announcements.map(item => `
     <article><small>${WH.formatDate(item.date)}</small><h3>${WH.escape(item.title)}</h3><p>${WH.escape(item.message)}</p></article>`).join("") : "<p>No announcements yet.</p>";
 }

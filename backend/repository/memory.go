@@ -321,6 +321,63 @@ func (r *MemoryRepository) DeletePlanningTask(weddingID, taskID string) error {
 	return ErrNotFound
 }
 
+// AddAnnouncement stores an announcement (public or committee-only) in the wedding aggregate.
+func (r *MemoryRepository) AddAnnouncement(weddingID string, announcement models.Announcement) (models.Announcement, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.Announcement{}, ErrNotFound
+	}
+	for _, existing := range w.Announcements {
+		if existing.ID == announcement.ID {
+			return models.Announcement{}, ErrConflict
+		}
+	}
+	w.Announcements = append(w.Announcements, announcement)
+	w.UpdatedAt = time.Now().UTC()
+	r.weddings[weddingID] = cloneWedding(w)
+	return announcement, nil
+}
+
+func (r *MemoryRepository) UpdateAnnouncement(weddingID string, announcement models.Announcement) (models.Announcement, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.Announcement{}, ErrNotFound
+	}
+	for i := range w.Announcements {
+		if w.Announcements[i].ID != announcement.ID {
+			continue
+		}
+		w.Announcements[i] = announcement
+		w.UpdatedAt = time.Now().UTC()
+		r.weddings[weddingID] = cloneWedding(w)
+		return announcement, nil
+	}
+	return models.Announcement{}, ErrNotFound
+}
+
+func (r *MemoryRepository) DeleteAnnouncement(weddingID, announcementID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return ErrNotFound
+	}
+	for i := range w.Announcements {
+		if w.Announcements[i].ID != announcementID {
+			continue
+		}
+		w.Announcements = append(w.Announcements[:i:i], w.Announcements[i+1:]...)
+		w.UpdatedAt = time.Now().UTC()
+		r.weddings[weddingID] = cloneWedding(w)
+		return nil
+	}
+	return ErrNotFound
+}
+
 func (r *MemoryRepository) findInvitation(hash string) (models.Wedding, models.Invitation, bool) {
 	if hash == "" {
 		return models.Wedding{}, models.Invitation{}, false

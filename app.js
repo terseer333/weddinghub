@@ -9,7 +9,7 @@
   ];
 
   const seed = {
-    version: 2,
+    version: 3,
     wedding: {
       id: "wed_blessing_terseer",
       slug: "blessing-and-terseer",
@@ -43,14 +43,33 @@
       { id: "story_4", year: "2026", title: "Forever Begins", content: "We cannot wait to celebrate this next chapter with you.", status: "published", order: 4 }
     ],
     announcements: [
-      { id: "ann_1", title: "A little wedding update", message: "Please arrive at the church by 9:30 AM. Ushers will be available to help with seating.", date: "2026-09-08", status: "published" },
-      { id: "ann_2", title: "Hotel recommendations", message: "Our accommodation guide will be shared with travelling guests soon.", date: "2026-09-10", status: "draft" }
+      { id: "ann_1", title: "A little wedding update", message: "Please arrive at the church by 9:30 AM. Ushers will be available to help with seating.", date: "2026-09-08", status: "published", audience: "public" },
+      { id: "ann_2", title: "Hotel recommendations", message: "Our accommodation guide will be shared with travelling guests soon.", date: "2026-09-10", status: "draft", audience: "public" },
+      { id: "ann_3", title: "Committee: rehearsal this Friday", message: "Committee-only: rehearsal at St. Theresa Cathedral, 4 PM. All ushers and coordinators must attend.", date: "2026-09-11", status: "published", audience: "committee" }
     ],
     guests: [
-      { id: "guest_james", name: "James Aondo", email: "james@example.com", phone: "+234 801 234 5678", category: "Family", invitationStatus: "accepted", token: "demo-james-7fb3c8a1", rsvp: "attending", partySize: 2, openedAt: "2026-09-04" },
-      { id: "guest_grace", name: "Grace Ter", email: "grace@example.com", phone: "+234 802 345 6789", category: "Friends", invitationStatus: "opened", token: "demo-grace-91ca48ef", rsvp: "pending", partySize: 1, openedAt: "2026-09-09" },
-      { id: "guest_michael", name: "Michael Oche", email: "michael@example.com", phone: "+234 803 456 7890", category: "Colleagues", invitationStatus: "sent", token: "demo-michael-a8452db9", rsvp: "pending", partySize: 1 },
-      { id: "guest_ada", name: "Ada Eze", email: "ada@example.com", phone: "+234 804 567 8901", category: "Friends", invitationStatus: "declined", token: "demo-ada-36dc184f", rsvp: "declined", partySize: 1 }
+      { id: "guest_james", name: "James Aondo", type: "guest", email: "james@example.com", phone: "+234 801 234 5678", category: "Family", invitationStatus: "accepted", token: "demo-james-7fb3c8a1", rsvp: "attending", partySize: 2, openedAt: "2026-09-04" },
+      { id: "guest_grace", name: "Grace Ter", type: "guest", email: "grace@example.com", phone: "+234 802 345 6789", category: "Friends", invitationStatus: "opened", token: "demo-grace-91ca48ef", rsvp: "pending", partySize: 1, openedAt: "2026-09-09" },
+      { id: "guest_michael", name: "Michael Oche", type: "guest", email: "michael@example.com", phone: "+234 803 456 7890", category: "Colleagues", invitationStatus: "sent", token: "demo-michael-a8452db9", rsvp: "pending", partySize: 1 },
+      { id: "guest_ada", name: "Ada Eze", type: "guest", email: "ada@example.com", phone: "+234 804 567 8901", category: "Friends", invitationStatus: "declined", token: "demo-ada-36dc184f", rsvp: "declined", partySize: 1 }
+    ],
+    committeeMembers: [
+      { id: "cm_grace", name: "Grace Ter", title: "Chief Bridesmaid", email: "grace@example.com", phone: "+234 802 345 6789", invitationStatus: "accepted", token: "demo-cm-grace", joinedAt: "2026-09-03" },
+      { id: "cm_ibrahim", name: "Ibrahim Musa", title: "Best Man", email: "ibrahim@example.com", phone: "+234 805 677 8899", invitationStatus: "accepted", token: "demo-cm-ibrahim", joinedAt: "2026-09-04" },
+      { id: "cm_funmi", name: "Funmilayo Ade", title: "Wedding Coordinator", email: "funmi@example.com", phone: "+234 806 788 9900", invitationStatus: "accepted", token: "demo-cm-funmi", joinedAt: "2026-09-05" },
+      { id: "cm_peter", name: "Peter Ior", title: "Logistics Lead", email: "peter@example.com", phone: "+234 807 899 0011", invitationStatus: "pending", token: "demo-cm-peter" },
+      { id: "cm_tina", name: "Tina Paul", title: "Ushers Lead", email: "tina@example.com", phone: "+234 808 900 1122", invitationStatus: "pending", token: "demo-cm-tina" }
+    ],
+    planningTasks: [
+      { id: "task_1", title: "Finalize reception decoration", details: "Confirm the floral setup and table styling with the decorator.", assignedTo: "Grace Ter", dueOn: "2026-10-02", status: "in_progress", createdBy: "Blessing" },
+      { id: "task_2", title: "Confirm catering menu", details: "Choose between the two buffet proposals for guests.", assignedTo: "Ibrahim Musa", dueOn: "2026-09-26", status: "todo", createdBy: "Blessing" },
+      { id: "task_3", title: "Escort cards & seating chart", details: "Confirm final seating by Sunday.", assignedTo: "Funmilayo Ade", dueOn: "2026-12-01", status: "todo", createdBy: "Blessing" },
+      { id: "task_4", title: "Rehearsal coordination", details: "Rehearsal is handled; ushers confirmed.", assignedTo: "Tina Paul", dueOn: "2026-09-20", status: "done", createdBy: "Blessing" }
+    ],
+    committeeChat: [
+      { id: "cc_1", authorName: "Blessing", authorRole: "admin", body: "We need to finalize the reception decoration.", createdAt: "2026-09-10T09:15:00Z" },
+      { id: "cc_2", authorName: "Grace Ter", authorRole: "committee_member", body: "I spoke with the decorator. They can provide the setup by 2 PM.", createdAt: "2026-09-10T09:22:00Z" },
+      { id: "cc_3", authorName: "Ibrahim Musa", authorRole: "committee_member", body: "I think we should use the floral design from the second proposal.", createdAt: "2026-09-10T09:31:00Z" }
     ],
     messages: [
       { id: "msg_1", guestId: "guest_james", name: "James Aondo", message: "Wishing you both a lifetime full of laughter, grace and beautiful adventures.", status: "approved", date: "2026-09-05" }
@@ -72,7 +91,12 @@
   function resetData() { localStorage.removeItem(KEY); return getData(); }
   function query(name) { return new URLSearchParams(location.search).get(name); }
   function guestByToken(data = getData()) { const token = query("token"); return data.guests.find(g => g.token === token); }
+  function committeeMemberByToken(data = getData()) { const token = query("token"); return data.committeeMembers?.find(m => m.token === token); }
   function published(items) { return (items || []).filter(item => item.status === "published"); }
+  // publicAnnouncements returns announcements published to guests; committee-only
+  // announcements are filtered out so a guest page never renders planning updates.
+  function publicAnnouncements(items) { return published(items).filter(item => item.audience !== "committee"); }
+  function committeeAnnouncements(items) { return published(items).filter(item => item.audience === "committee"); }
   function escape(value) { const el = document.createElement("div"); el.textContent = value ?? ""; return el.innerHTML; }
   function formatDate(value, options = { day: "numeric", month: "long", year: "numeric" }) { return new Intl.DateTimeFormat("en-GB", options).format(new Date(value)); }
   function toast(message) {
@@ -107,5 +131,5 @@
     tick(); return setInterval(tick, 1000);
   }
 
-  window.WeddingHub = { getData, saveData, resetData, query, guestByToken, published, escape, formatDate, toast, templates, countdown };
+  window.WeddingHub = { getData, saveData, resetData, query, guestByToken, committeeMemberByToken, published, publicAnnouncements, committeeAnnouncements, escape, formatDate, toast, templates, countdown };
 })();

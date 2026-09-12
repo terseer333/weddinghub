@@ -283,14 +283,27 @@ func TestInvitationAcceptAndRSVP(t *testing.T) {
 	if createResponse.Code != http.StatusCreated {
 		t.Fatalf("create status = %d: %s", createResponse.Code, createResponse.Body)
 	}
-	var wedding models.Wedding
-	if err := json.Unmarshal(createResponse.Body.Bytes(), &wedding); err != nil {
+	var createdWedding weddingCreated
+	if err := json.Unmarshal(createResponse.Body.Bytes(), &createdWedding); err != nil {
 		t.Fatal(err)
+	}
+	if createdWedding.AdminToken == "" {
+		t.Fatal("create did not return a wedding admin token")
+	}
+	wedding := createdWedding.Wedding
+
+	// Admin-authenticated invitation creation.
+	editor := httptest.NewRecorder()
+	handler.ServeHTTP(editor, httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding.ID+"/invitations", bytes.NewBufferString(`{"guest_name":"Taylor","max_party_size":2}`)))
+	if editor.Code != http.StatusUnauthorized {
+		t.Fatalf("unauthenticated invite status = %d (expected 401)", editor.Code)
 	}
 
 	inviteBody := bytes.NewBufferString(`{"guest_name":"Taylor","max_party_size":2}`)
 	inviteResponse := httptest.NewRecorder()
-	handler.ServeHTTP(inviteResponse, httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding.ID+"/invitations", inviteBody))
+	inviteRequest := httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding.ID+"/invitations", inviteBody)
+	inviteRequest.Header.Set("Authorization", "Bearer "+createdWedding.AdminToken)
+	handler.ServeHTTP(inviteResponse, inviteRequest)
 	if inviteResponse.Code != http.StatusCreated {
 		t.Fatalf("invite status = %d: %s", inviteResponse.Code, inviteResponse.Body)
 	}
@@ -300,6 +313,13 @@ func TestInvitationAcceptAndRSVP(t *testing.T) {
 	}
 	if created.Token == "" {
 		t.Fatal("creation did not return token")
+	}
+
+	// Role validation: a guest invitation cannot be accepted as a committee member.
+	mismatch := httptest.NewRecorder()
+	handler.ServeHTTP(mismatch, httptest.NewRequest(http.MethodPost, "/api/invitations/"+created.Token+"/accept", bytes.NewBufferString(`{"role":"committee"}`)))
+	if mismatch.Code != http.StatusForbidden {
+		t.Fatalf("role mismatch accept status = %d: %s", mismatch.Code, mismatch.Body)
 	}
 
 	acceptResponse := httptest.NewRecorder()
@@ -312,5 +332,159 @@ func TestInvitationAcceptAndRSVP(t *testing.T) {
 	handler.ServeHTTP(rsvpResponse, httptest.NewRequest(http.MethodPut, "/api/guest/"+created.Token+"/rsvp", bytes.NewBufferString(`{"status":"attending","party_size":2}`)))
 	if rsvpResponse.Code != http.StatusOK {
 		t.Fatalf("rsvp status = %d: %s", rsvpResponse.Code, rsvpResponse.Body)
+	}
+}
+
+func TestCommitteeAuthorizesMembersAndRejectsGuests(t *testing.T) {
+	repo := repository.NewMemoryRepository()
+	handler := New(repo)
+	createBody := bytes.NewBufferString(`{"slug":"committee-wed","title":"A & B","status":"published"}`)
+	createResponse := httptest.NewRecorder()
+	handler.ServeHTTP(createResponse, httptest.NewRequest(http.MethodPost, "/api/weddings", createBody))
+	var created weddingCreated
+	if err := json.Unmarshal(createResponse.Body.Bytes(), &created); err != nil {
+		t.Fatal(err)
+	}
+	wedding := created.Wedding
+	adminToken := created.AdminToken
+
+	createInvite := func(name, inviteType string) (string, string) {
+		payload := `{"guest_name":"` + name + `","type":"` + inviteType + `","committee_title":"Coordinator","max_party_size":2}`
+		response := httptest.NewRecorder()
+		request := httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding.ID+"/invitations", bytes.NewBufferString(payload))
+		request.Header.Set("Authorization", "Bearer "+adminToken)
+		handler.ServeHTTP(response, request)
+		if response.Code != http.StatusCreated {
+			t.Fatalf("create %s invitation status = %d: %s", inviteType, response.Code, response.Body)
+		}
+		var createdIn invitationCreated
+		if err := json.Unmarshal(response.Body.Bytes(), &createdIn); err != nil {
+			t.Fatal(err)
+		}
+		return createdIn.Token, createdIn.Invitation.ID
+	}
+
+	committeeToken, committeeInvitationID := createInvite("Committed Member", "committee")
+	guestToken, _ := createInvite("Casual Guest", "guest")
+
+	// Accepting a committee invitation records a committee member.
+	accept := httptest.NewRecorder()
+	handler.ServeHTTP(accept, httptest.NewRequest(http.MethodPost, "/api/invitations/"+committeeToken+"/accept", bytes.NewBufferString(`{"role":"committee"}`)))
+	if accept.Code != http.StatusOK {
+		t.Fatalf("committee accept status = %d: %s", accept.Code, accept.Body)
+	}
+	stored, err := repo.GetWedding(wedding.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(stored.CommitteeMembers) != 1 || stored.CommitteeMembers[0].InvitationID != committeeInvitationID {
+		t.Fatalf("committee member not materialized: %#v", stored.CommitteeMembers)
+	}
+
+	committeePath := "/api/weddings/" + wedding.ID + "/committee/dashboard"
+
+	// A pending committee member cannot access the workspace.
+	pendingToken, _ := createInvite("Pending Member", "committee")
+	pending := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, committeePath, nil)
+	request.Header.Set("Authorization", "Bearer "+pendingToken)
+	handler.ServeHTTP(pending, request)
+	if pending.Code != http.StatusForbidden {
+		t.Fatalf("pending committee access status = %d", pending.Code)
+	}
+
+	// An accepted committee member can.
+	member := httptest.NewRecorder()
+	request = httptest.NewRequest(http.MethodGet, committeePath, nil)
+	request.Header.Set("Authorization", "Bearer "+committeeToken)
+	handler.ServeHTTP(member, request)
+	if member.Code != http.StatusOK {
+		t.Fatalf("committee member access status = %d: %s", member.Code, member.Body)
+	}
+
+	// A guest token is rejected on the committee route.
+	guest := httptest.NewRecorder()
+	request = httptest.NewRequest(http.MethodGet, committeePath, nil)
+	request.Header.Set("Authorization", "Bearer "+guestToken)
+	handler.ServeHTTP(guest, request)
+	if guest.Code != http.StatusForbidden {
+		t.Fatalf("guest committee access status = %d (expected 403)", guest.Code)
+	}
+
+	// The accepted committee member cannot act as an admin.
+	roster := httptest.NewRecorder()
+	request = httptest.NewRequest(http.MethodGet, "/api/weddings/"+wedding.ID+"/admin/roster", nil)
+	request.Header.Set("Authorization", "Bearer "+committeeToken)
+	handler.ServeHTTP(roster, request)
+	if roster.Code != http.StatusForbidden {
+		t.Fatalf("committee member trying admin roster status = %d (expected 403)", roster.Code)
+	}
+
+	chat := httptest.NewRecorder()
+	chatRequest := httptest.NewRequest(http.MethodGet, "/api/weddings/"+wedding.ID+"/committee/chat", nil)
+	chatRequest.Header.Set("Authorization", "Bearer "+committeeToken)
+	handler.ServeHTTP(chat, chatRequest)
+	if chat.Code != http.StatusOK {
+		t.Fatalf("committee chat status = %d", chat.Code)
+	}
+	var before []models.CommitteeMessage
+	if err := json.Unmarshal(chat.Body.Bytes(), &before); err != nil {
+		t.Fatal(err)
+	}
+	send := httptest.NewRecorder()
+	sendRequest := httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding.ID+"/committee/chat", bytes.NewBufferString(`{"message":"Decor is confirmed."}`))
+	sendRequest.Header.Set("Authorization", "Bearer "+committeeToken)
+	handler.ServeHTTP(send, sendRequest)
+	if send.Code != http.StatusCreated {
+		t.Fatalf("send chat status = %d: %s", send.Code, send.Body)
+	}
+	chat2 := httptest.NewRecorder()
+	chat2Request := httptest.NewRequest(http.MethodGet, "/api/weddings/"+wedding.ID+"/committee/chat", nil)
+	chat2Request.Header.Set("Authorization", "Bearer "+committeeToken)
+	handler.ServeHTTP(chat2, chat2Request)
+	var after []models.CommitteeMessage
+	if err := json.Unmarshal(chat2.Body.Bytes(), &after); err != nil {
+		t.Fatal(err)
+	}
+	if len(after) != len(before)+1 || after[len(after)-1].AuthorName != "Committed Member" || after[len(after)-1].Body != "Decor is confirmed." {
+		t.Fatalf("unexpected chat history: %#v", after)
+	}
+}
+
+func TestGuestDashboardExcludesCommitteeAnnouncements(t *testing.T) {
+	repo := repository.NewMemoryRepository()
+	handler := New(repo)
+	now := time.Now().UTC()
+	token, hash, err := models.NewOpaqueToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = hash
+	wedding := models.Wedding{ID: "w1", Slug: "public-only", Title: "Public Only", Status: models.StatusPublished,
+		Announcements: []models.Announcement{
+			{ID: "public-note", Title: "Welcome", Body: "Public", Status: models.StatusPublished, Audience: models.AudiencePublic},
+			{ID: "committee-note", Title: "Rehearsal", Body: "Committee only", Status: models.StatusPublished, Audience: models.AudienceCommittee},
+		}, CreatedAt: now, UpdatedAt: now}
+	if _, err := repo.CreateWedding(wedding); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = repo.AddInvitation("w1", models.Invitation{ID: "i1", GuestName: "Taylor", MaxPartySize: 2, Status: models.InvitationPending, TokenHash: hash, CreatedAt: now}); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err = repo.RespondToInvitation(hash, models.InvitationAccepted, now); err != nil {
+		t.Fatal(err)
+	}
+
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/api/guest/"+token+"/dashboard", nil))
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d: %s", response.Code, response.Body)
+	}
+	body := response.Body.String()
+	if strings.Contains(body, "committee-note") || strings.Contains(body, "Committee only") {
+		t.Fatal("guest dashboard leaked committee-only announcement")
+	}
+	if !strings.Contains(body, "public-note") {
+		t.Fatal("guest dashboard missing public announcement")
 	}
 }

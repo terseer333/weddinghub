@@ -50,10 +50,12 @@ function renderOverview() {
   const attending = data.guests.filter(guest => guest.rsvp === 'attending');
   const pending = data.guests.filter(guest => guest.rsvp === 'pending');
   const viewed = data.guests.filter(guest => ['opened','accepted','declined'].includes(guest.invitationStatus));
+  const committee = data.committeeMembers || [];
   $('#metricGuests').textContent = data.guests.length;
   $('#metricAttending').textContent = attending.reduce((sum, guest) => sum + Number(guest.partySize || 1), 0);
   $('#metricPending').textContent = pending.length;
   $('#metricViews').textContent = viewed.length;
+  $('#metricCommittee').textContent = committee.length;
   const progress = completion();
   $('#progressValue').textContent = `${progress}%`;
   $('#progressRing').style.background = `conic-gradient(#527565 ${progress}%, #d9e2dc 0)`;
@@ -88,6 +90,12 @@ function renderGuests(filter = '') {
   const guests = data.guests.filter(guest => `${guest.name} ${guest.email}`.toLowerCase().includes(filter.toLowerCase()));
   $('#guestTable').innerHTML = '<div class="table-row table-head"><span>Guest</span><span>Category</span><span>Invitation</span><span>RSVP</span><span>Party</span><span>Actions</span></div>' + guests.map(guest => `<div class="table-row"><span class="guest-cell"><i>${initials(guest.name)}</i><span><strong>${WH.escape(guest.name)}</strong><small>${WH.escape(guest.email)}</small></span></span><span>${WH.escape(guest.category)}</span><span><b class="status ${guest.invitationStatus}">${guest.invitationStatus}</b></span><span>${guest.rsvp}</span><span>${guest.partySize}</span><span class="row-menu"><button data-share-guest="${guest.id}">Share</button><button data-copy="${guest.token}">Copy</button><button data-action="delete-guest" data-id="${guest.id}">Delete</button></span></div>`).join('');
 }
+function renderCommittee() {
+  const committee = data.committeeMembers || [];
+  $('#committeeTable').innerHTML = committee.length ? '<div class="table-row table-head"><span>Member</span><span>Role</span><span>Invitation</span><span>Contact</span><span>Actions</span></div>' + committee.map(member => `<div class="table-row"><span class="guest-cell"><i>${initials(member.name)}</i><span><strong>${WH.escape(member.name)}</strong><small>via ${member.email ? WH.escape(member.email) : member.token ? "invitation link" : "local seed"}</small></span></span><span>${WH.escape(member.title || 'Committee member')}</span><span><b class="status ${member.invitationStatus || 'pending'}">${member.invitationStatus || 'pending'}</b></span><span>${member.phone ? WH.escape(member.phone) : '—'}</span><span class="row-menu"><button data-copy="${member.token}">Copy</button><button data-action="delete-member" data-id="${member.id}">Remove</button></span></div>`).join('') : emptyState('No committee members yet', 'Invite your bridal party and coordinators to plan together.');
+  const tasks = data.planningTasks || [];
+  $('#adminTaskList').innerHTML = tasks.length ? tasks.map(task => `<article class="manage-card"><span class="calendar-tile task-tile">${['✓','◷','○'][['done','in_progress','todo'].indexOf(task.status) + 1] || '○'}</span><div class="manage-copy"><h3>${WH.escape(task.title)} <i class="status ${task.status}">${task.status.replace('_', ' ')}</i></h3><p>${WH.escape(task.details || '')}</p><small>${task.assignedTo ? `Assigned to ${WH.escape(task.assignedTo)}` : 'Unassigned'}${task.dueOn ? ` · Due ${WH.escape(task.dueOn)}` : ''}</small></div></article>`).join('') : emptyState('No planning tasks yet', 'Tasks created in the committee workspace appear here.');
+}
 function renderContent() {
   $('#photoAdminGrid').innerHTML = data.photos.length ? data.photos.map((photo,index) => `<figure><img src="${photo.url}" alt="${WH.escape(photo.caption)}"><figcaption><span>${WH.escape(photo.caption)}</span><span class="photo-actions"><button data-photo-action="up" data-id="${photo.id}" aria-label="Move photo earlier" ${index===0?'disabled':''}>↑</button><button data-photo-action="down" data-id="${photo.id}" aria-label="Move photo later" ${index===data.photos.length-1?'disabled':''}>↓</button><button data-photo-action="replace" data-id="${photo.id}">Replace</button><button data-action="delete-photo" data-id="${photo.id}" aria-label="Delete photo">×</button></span></figcaption></figure>`).join('') : emptyState('No photos yet','Add photos to build your guest slideshow.');
   $('#photoAdminPreview').innerHTML = data.photos.length ? `<div class="admin-gallery-stage">${data.photos.map((photo,index)=>`<img src="${photo.url}" alt="${WH.escape(photo.caption)}" class="${index===0?'active':''}">`).join('')}</div><p class="admin-gallery-caption">Guest view · ${data.photos.length} ${data.photos.length===1?'photo':'photos'} · transitions automatically</p>` : emptyState('Slideshow preview','Your guest gallery preview will appear here after you add photos.');
@@ -96,13 +104,13 @@ function renderContent() {
   $('#storyAdminList').innerHTML = data.stories.length ? [...data.stories].sort((a,b)=>a.order-b.order).map(story => `<article><span>☷</span><div><small>${WH.escape(story.year)}</small><strong>${WH.escape(story.title)}</strong><p>${WH.escape(story.content)}</p></div><b class="status ${story.status}">${story.status}</b><div class="row-menu"><button data-action="edit-story" data-id="${story.id}">Edit</button><button data-action="delete-story" data-id="${story.id}">Delete</button></div></article>`).join('') : emptyState('No story chapters yet','Tell guests how your journey began.');
 }
 function renderAnnouncements() {
-  $('#announcementList').innerHTML = data.announcements.length ? data.announcements.map(item => `<article class="manage-card"><span class="manage-icon">◉</span><div class="manage-copy"><h3>${WH.escape(item.title)} <i class="status ${item.status}">${item.status}</i></h3><p>${WH.escape(item.message)}</p><small>${WH.formatDate(item.date)}</small></div><div class="row-menu"><button data-action="edit-announcement" data-id="${item.id}">Edit</button><button data-action="delete-announcement" data-id="${item.id}">Delete</button></div></article>`).join('') : emptyState('No announcements','Publish an update when guests need to know something.');
+  $('#announcementList').innerHTML = data.announcements.length ? data.announcements.map(item => `<article class="manage-card"><span class="manage-icon">◉</span><div class="manage-copy"><h3>${WH.escape(item.title)} <i class="status ${item.status}">${item.status}</i> ${item.audience === 'committee' ? '<b class="audience-badge committee">Committee only</b>' : ''}</h3><p>${WH.escape(item.message)}</p><small>${WH.formatDate(item.date)}</small></div><div class="row-menu"><button data-action="edit-announcement" data-id="${item.id}">Edit</button><button data-action="delete-announcement" data-id="${item.id}">Delete</button></div></article>`).join('') : emptyState('No announcements','Publish an update when guests need to know something.');
 }
 function renderMessages() {
   $('#messageList').innerHTML = data.messages.length ? data.messages.map(message => `<article class="manage-card"><span class="activity-avatar">${initials(message.name)}</span><div class="manage-copy"><h3>${WH.escape(message.name)} <i class="status ${message.status}">${message.status}</i></h3><p>“${WH.escape(message.message)}”</p><small>${WH.formatDate(message.date)}</small></div><div class="row-menu"><button data-action="approve-message" data-id="${message.id}">Approve</button><button data-action="hide-message" data-id="${message.id}">Hide</button><button data-action="delete-message" data-id="${message.id}">Delete</button></div></article>`).join('') : emptyState('No guest messages','Wishes and blessings will appear here.');
 }
 function emptyState(title, text) { return `<div class="empty-state"><span>✦</span><h3>${title}</h3><p>${text}</p></div>`; }
-function renderAll() { setupIdentity(); renderOverview(); fillWeddingForm(); renderTemplates(); renderEvents(); renderGuests(); renderContent(); renderAnnouncements(); renderMessages(); }
+function renderAll() { setupIdentity(); renderOverview(); fillWeddingForm(); renderTemplates(); renderEvents(); renderGuests(); renderCommittee(); renderContent(); renderAnnouncements(); renderMessages(); }
 async function persist(message = 'Changes saved') {
   WH.saveData(data);
   renderAll();

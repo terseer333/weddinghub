@@ -35,4 +35,8 @@ type Repository interface {
 	AddPlanningTask(weddingID string, task models.PlanningTask) (models.PlanningTask, error)
 	UpdatePlanningTask(weddingID string, task models.PlanningTask) (models.PlanningTask, error)
 	DeletePlanningTask(weddingID, taskID string) error
+	// AddAnnouncement stores a new published or draft update for the wedding.
+	AddAnnouncement(weddingID string, announcement models.Announcement) (models.Announcement, error)
+	UpdateAnnouncement(weddingID string, announcement models.Announcement) (models.Announcement, error)
+	DeleteAnnouncement(weddingID, announcementID string) error
 }

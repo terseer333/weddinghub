@@ -6,3 +6,37 @@ html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}body{f
 .photo-preview-card{margin-bottom:15px;padding:15px}.photo-preview-card h3{margin:0;font-family:var(--play);font-size:16px;font-weight:500}.admin-gallery-stage{position:relative;height:220px;overflow:hidden;border-radius:9px;background:#e9efeb}.admin-gallery-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease}.admin-gallery-stage img.active{opacity:1}.admin-gallery-caption{margin:9px 0 0;color:#728078;font-size:10px}.photo-admin-grid figcaption{display:flex;align-items:flex-end;gap:8px}.photo-admin-grid figcaption>span:first-child{flex:1;min-width:0}.photo-actions{display:flex;align-items:center;gap:3px}.photo-actions button{width:auto!important;min-width:24px;padding:0 6px;border:1px solid #ffffff55!important;border-radius:5px!important;color:#fff;background:#17251ccc!important;font-size:10px}.photo-actions button:disabled{opacity:.35}.photo-actions button[data-photo-action=replace]{min-width:auto;font-size:8px}.form-divider{display:flex;align-items:center;gap:8px;margin:2px 0 10px;color:#89958e;font-size:10px}.form-divider:before,.form-divider:after{flex:1;height:1px;background:#e1e7e3;content:""}.admin-sidebar{overscroll-behavior-y:contain}.sidebar-close{touch-action:manipulation}.sidebar-backdrop{touch-action:manipulation}
 @media(max-width:1000px){.admin-sidebar{padding-top:max(24px,env(safe-area-inset-top));padding-bottom:max(28px,env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;scrollbar-width:thin}.admin-sidebar.open{will-change:transform}.side-nav{padding-bottom:8px}.sidebar-bottom{padding-bottom:env(safe-area-inset-bottom)}}
 @media(max-width:700px){.admin-gallery-stage{height:190px}.photo-preview-card{padding:12px}.photo-admin-grid figcaption{padding:35px 8px 7px}.photo-actions{gap:2px}.photo-actions button{min-width:22px;padding:0 4px}.photo-actions button[data-photo-action=replace]{font-size:7px}}
+/* ---------- WeddingHub role selection (invitation entry point) ---------- */
+.role-selector{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:20px;background:rgba(18,26,23,.55);backdrop-filter:blur(7px);animation:rsFade .25s ease}
+@keyframes rsFade{from{opacity:0}to{opacity:1}}
+.role-selector-card{width:min(460px,100%);padding:30px;border-radius:22px;background:#fffdf9;box-shadow:0 30px 80px rgba(16,26,22,.35);animation:rsPop .28s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes rsPop{from{transform:translateY(16px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+.role-selector-head{text-align:center;margin-bottom:22px}
+.role-selector-brand{width:46px;height:46px;display:grid;place-items:center;margin:0 auto 12px;border-radius:13px;color:#fff;font-weight:800;background:linear-gradient(145deg,#345346,#223a31);box-shadow:0 8px 20px rgba(34,58,49,.25)}
+.role-selector-head .eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#85968c;margin:0 0 6px}
+.role-selector-head h2{font-family:Georgia,'Times New Roman',serif;font-size:26px;color:#25362e;margin:0}
+.role-selector-head p:last-child{font-size:12.5px;color:#5f7067;margin:8px 0 0}
+.role-selector-options{display:grid;gap:12px}
+.role-selector-option{display:flex;flex-direction:column;align-items:flex-start;gap:3px;width:100%;padding:16px 18px;text-align:left;border:1.5px solid #e3e9e5;border-radius:14px;background:#fafcfb;cursor:pointer;transition:.18s}
+.role-selector-option:hover{border-color:#8fa39b;transform:translateY(-1px);box-shadow:0 10px 22px rgba(34,55,46,.08)}
+.role-selector-option.wrong{border-color:#e2a8a0;background:#fff5f3}
+.role-selector-option .role-selector-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:#edf2ef;color:#345346;font-size:17px}
+.role-selector-option.guest .role-selector-icon{background:#f6edf0;color:#8a4a5a}
+.role-selector-option strong{font-size:15px;color:#25362e}
+.role-selector-option small{font-size:11.5px;color:#6c7d74}
+.role-selector-error{font-size:12.5px;color:#a4403a;background:#fdf1ee;border:1px solid #f2d3cd;padding:10px 12px;border-radius:10px;margin:14px 0 0;transition:.2s}
+.role-selector-note{font-size:10.5px;color:#88998f;text-align:center;margin:16px 0 0}
+@media(max-width:480px){.role-selector-card{padding:24px 18px}.role-selector-head h2{font-size:22px}}
+
+/* ---------- Planning committee (admin) ---------- */
+.committee-admin-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:18px;align-items:start}
+.committee-admin-grid .manage-card{padding:13px 15px}
+.committee-admin-grid .manage-card h3{font-size:13.5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.committee-admin-grid .calendar-tile{min-width:44px;padding:.45rem .3rem;font-size:.7rem}
+.committee-admin-grid .calendar-tile b{font-size:1.1rem}
+.task-tile{background:#344f44;color:#fff}
+.audience-badge{border:1px solid #e1e7e3;border-radius:2rem;padding:.15rem .55rem;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.audience-badge.committee{background:#fdf0ef;color:#a4403a;border-color:#f2d3cd}
+.form-fieldset{border:0;padding:0;margin:0;min-width:0}
+.form-fieldset[hidden]{display:none}
+@media(max-width:900px){.committee-admin-grid{grid-template-columns:1fr}}
