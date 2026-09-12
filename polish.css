@@ -40,3 +40,14 @@ html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}body{f
 .form-fieldset{border:0;padding:0;margin:0;min-width:0}
 .form-fieldset[hidden]{display:none}
 @media(max-width:900px){.committee-admin-grid{grid-template-columns:1fr}}
+
+/* ---------- Responsive wedding card preview ---------- */
+/* Keep card mirrors (design preview / share sheet) on screen: never taller than
+   the viewport, and scroll inside the modal instead of overflowing the page. */
+.modal{max-height:88vh;overflow-y:auto}
+.modal:has(.template-preview-modal,.share-layout){width:min(640px,100%)}
+.template-preview-modal{display:grid;gap:14px;justify-items:center;text-align:center}
+.template-preview-modal h2{margin:0}
+.template-preview-modal .button,.share-layout .button{justify-self:center}
+.share-layout{display:grid;gap:16px}
+.share-heading{text-align:center}

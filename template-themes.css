@@ -17,8 +17,8 @@
 }
 
 .invitation-card[class*="design-"] {
-  width: min(100%, 920px);
-  min-height: 820px;
+  width: min(100%, 560px);
+  aspect-ratio: 3 / 4;
   margin-inline: auto;
 }
 
