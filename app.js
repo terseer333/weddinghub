@@ -9,7 +9,7 @@
   ];
 
   const seed = {
-    version: 4,
+    version: 5,
     wedding: {
       id: "wed_blessing_terseer",
       slug: "blessing-and-terseer",
@@ -59,26 +59,10 @@
       { id: "guest_michael", name: "Michael Oche", type: "guest", email: "michael@example.com", phone: "+234 803 456 7890", category: "Colleagues", invitationStatus: "sent", token: "demo-michael-a8452db9", rsvp: "pending", partySize: 1 },
       { id: "guest_ada", name: "Ada Eze", type: "guest", email: "ada@example.com", phone: "+234 804 567 8901", category: "Friends", invitationStatus: "declined", token: "demo-ada-36dc184f", rsvp: "declined", partySize: 1 }
     ],
-    committeeRoles: [
-      { id: "role_chairman", name: "Chairman", description: "Overall wedding committee leadership" },
-      { id: "role_secretary", name: "Secretary", description: "Meeting records and correspondence" },
-      { id: "role_finance", name: "Finance", description: "Budget and contributions coordination" },
-      { id: "role_decoration", name: "Decoration", description: "Floral design and venue aesthetic" },
-      { id: "role_media", name: "Media", description: "Photography, videography and social media" },
-      { id: "role_catering", name: "Catering", description: "Food, drinks and hospitality" }
-    ],
+    committeeRoles: [],
     committeeMembers: [],
-    planningTasks: [
-      { id: "task_1", title: "Finalize reception decoration", details: "Confirm the floral setup and table styling with the decorator.", assignedTo: "Grace Ter", dueOn: "2026-10-02", status: "in_progress", createdBy: "Blessing" },
-      { id: "task_2", title: "Confirm catering menu", details: "Choose between the two buffet proposals for guests.", assignedTo: "Ibrahim Musa", dueOn: "2026-09-26", status: "todo", createdBy: "Blessing" },
-      { id: "task_3", title: "Escort cards & seating chart", details: "Confirm final seating by Sunday.", assignedTo: "Funmilayo Ade", dueOn: "2026-12-01", status: "todo", createdBy: "Blessing" },
-      { id: "task_4", title: "Rehearsal coordination", details: "Rehearsal is handled; ushers confirmed.", assignedTo: "Tina Paul", dueOn: "2026-09-20", status: "done", createdBy: "Blessing" }
-    ],
-    committeeChat: [
-      { id: "cc_1", authorName: "Blessing", authorRole: "admin", body: "We need to finalize the reception decoration.", createdAt: "2026-09-10T09:15:00Z" },
-      { id: "cc_2", authorName: "Grace Ter", authorRole: "committee_member", body: "I spoke with the decorator. They can provide the setup by 2 PM.", createdAt: "2026-09-10T09:22:00Z" },
-      { id: "cc_3", authorName: "Ibrahim Musa", authorRole: "committee_member", body: "I think we should use the floral design from the second proposal.", createdAt: "2026-09-10T09:31:00Z" }
-    ],
+    planningTasks: [],
+    committeeChat: [],
     messages: [
       { id: "msg_1", guestId: "guest_james", name: "James Aondo", message: "Wishing you both a lifetime full of laughter, grace and beautiful adventures.", status: "approved", date: "2026-09-05" }
     ]

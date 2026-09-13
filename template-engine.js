@@ -80,10 +80,59 @@
     ]
   };
 
-  let templatesCache = null;
+  const DEFAULT_TEMPLATE = {
+    id: "luxury-sage-download",
+    name: "Sage Botanical Luxe",
+    category: "luxury-floral",
+    categoryLabel: "Luxury Floral",
+    description: "Deep sage green with 3D gold botanical flourishes and double gold frame",
+    fonts: { couple: "Great Vibes", heading: "Playfair Display", body: "Cormorant Garamond" },
+    colors: { background: "#2d4030", text: "#f7f4ed", accent: "#d4af37", border: "#e5c158", secondary: "#a3b49e" },
+    decorations: { floralStyle: "sage-botanical-corners", borderStyle: "double-gold", layout: "centered-classic", frameGlow: true, datePill: true },
+    layout: "centered-classic",
+    premium: true
+  };
+
+  const LAYOUT_OPTIONS = [
+    { id: "centered-classic", name: "Centered Classic" },
+    { id: "top-arch", name: "Top Floral Arch" },
+    { id: "royal-frame", name: "Gilded Royal Frame" },
+    { id: "tropical-fringe", name: "Tropical Fringe" },
+    { id: "modern-minimal", name: "Modern Minimal" },
+    { id: "editorial-top", name: "Editorial Stack" }
+  ];
+
+  const BACKGROUND_OPTIONS = [
+    { id: "solid", name: "Solid" },
+    { id: "paper", name: "Paper Texture" },
+    { id: "gradient", name: "Soft Gradient" },
+    { id: "duotone", name: "Duotone Wash" }
+  ];
+
+  let templatesCache = (typeof window !== "undefined" && window.WEDDINGHUB_BUILTIN_TEMPLATES && window.WEDDINGHUB_BUILTIN_TEMPLATES.length > 0)
+    ? window.WEDDINGHUB_BUILTIN_TEMPLATES
+    : [DEFAULT_TEMPLATE];
+
+  function fetchWithTimeout(url, ms) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), ms);
+    return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(timer));
+  }
 
   async function loadTemplates() {
-    if (templatesCache && templatesCache.length > 0) return templatesCache;
+    // Prefer the server-side catalog when the backend is reachable
+    try {
+      const resp = await fetchWithTimeout("/api/templates", 2500);
+      if (resp.ok) {
+        const list = await resp.json();
+        if (Array.isArray(list) && list.length > 0) {
+          templatesCache = list;
+          if (typeof window !== "undefined") window.WEDDINGHUB_BUILTIN_TEMPLATES = list;
+          return list;
+        }
+      }
+    } catch (_) {}
+    if (templatesCache && templatesCache.length > 1) return templatesCache;
     const sources = [
       "../templates/templates.json",
       "templates/templates.json",
@@ -101,31 +150,19 @@
         }
       } catch (_) {}
     }
-    // Fallback if fetch is blocked: minimal seed array
-    templatesCache = [
-      {
-        id: "luxury-sage-download",
-        name: "Sage Botanical Luxe",
-        category: "luxury-floral",
-        categoryLabel: "Luxury Floral",
-        description: "Deep sage green with 3D gold botanical flourishes and double gold frame",
-        fonts: { couple: "Great Vibes", heading: "Playfair Display", body: "Cormorant Garamond" },
-        colors: { background: "#2d4030", text: "#f7f4ed", accent: "#d4af37", border: "#e5c158", secondary: "#a3b49e" },
-        decorations: { floralStyle: "sage-botanical-corners", borderStyle: "double-gold", layout: "centered-classic", frameGlow: true, datePill: true },
-        layout: "centered-classic",
-        premium: true
-      }
-    ];
     return templatesCache;
   }
 
   function allTemplatesSync() {
-    return templatesCache || [];
+    if (typeof window !== "undefined" && window.WEDDINGHUB_BUILTIN_TEMPLATES && window.WEDDINGHUB_BUILTIN_TEMPLATES.length > 0) {
+      return window.WEDDINGHUB_BUILTIN_TEMPLATES;
+    }
+    return templatesCache && templatesCache.length > 0 ? templatesCache : [DEFAULT_TEMPLATE];
   }
 
   function getTemplateSync(id) {
     const list = allTemplatesSync();
-    return list.find(t => t.id === id) || list[0] || null;
+    return list.find(t => t.id === id) || list[0] || DEFAULT_TEMPLATE;
   }
 
   function getFavorites() {
@@ -173,6 +210,8 @@
     fonts: () => FONTS_CATALOG,
     palettes: () => COLOR_PALETTES,
     decorations: () => DECORATION_STYLES,
+    layouts: () => LAYOUT_OPTIONS,
+    backgrounds: () => BACKGROUND_OPTIONS,
     getFavorites,
     isFavorite,
     toggleFavorite,

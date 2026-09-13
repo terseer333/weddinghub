@@ -236,6 +236,9 @@
   async function updateAnnouncement(weddingID, announcementID, announcement, token) {
     return request(`/api/weddings/${encodeURIComponent(weddingID)}/committee/announcements/${encodeURIComponent(announcementID)}`, { method: "PUT", headers: authHeader(token || committeeToken()), body: JSON.stringify(announcement) });
   }
+  async function deleteAnnouncement(weddingID, announcementID, token) {
+    return request(`/api/weddings/${encodeURIComponent(weddingID)}/committee/announcements/${encodeURIComponent(announcementID)}`, { method: "DELETE", headers: authHeader(token || committeeToken()) });
+  }
   async function saveCardConfig(weddingID, config) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
     if (!online || !id) return null;
@@ -272,5 +275,5 @@
     adminOverview, adminRoster, committeeDashboard, committeeChat, sendCommitteeMessage, createTask, updateTask, deleteTask,
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
     saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,
-    isOnline, mergeAPI, baseURL, adminToken, storeAdminToken };
+    isOnline, mergeAPI, toAPI, baseURL, adminToken, storeAdminToken };
 })();

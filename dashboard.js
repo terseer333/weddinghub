@@ -2,7 +2,16 @@ const WH = WeddingHub;
 const API = WeddingHubAPI;
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
-let data = WH.getData();
+let data = WH.getData() || {};
+data.wedding = data.wedding || {};
+data.events = data.events || [];
+data.photos = data.photos || [];
+data.stories = data.stories || [];
+data.announcements = data.announcements || [];
+data.guests = data.guests || [];
+data.messages = data.messages || [];
+data.committeeMembers = data.committeeMembers || [];
+data.committeeRoles = data.committeeRoles || [];
 
 function initials(value) {
   return String(value || "Wedding Admin").split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase();
@@ -150,20 +159,22 @@ function renderMessages() {
 }
 function emptyState(title, text) { return `<div class="empty-state"><span>✦</span><h3>${title}</h3><p>${text}</p></div>`; }
 function renderAll() {
-  setupIdentity();
-  renderOverview();
-  fillWeddingForm();
-  if (window.CardStudio && document.getElementById('cardStudioContainer')) {
-    window.CardStudio.init();
-  } else {
-    renderTemplates();
-  }
-  renderEvents();
-  renderGuests();
-  renderCommittee();
-  renderContent();
-  renderAnnouncements();
-  renderMessages();
+  try { setupIdentity(); } catch (e) { console.warn("setupIdentity:", e); }
+  try { renderOverview(); } catch (e) { console.warn("renderOverview:", e); }
+  try { fillWeddingForm(); } catch (e) { console.warn("fillWeddingForm:", e); }
+  try {
+    if (window.CardStudio && document.getElementById('cardStudioContainer')) {
+      window.CardStudio.init();
+    } else {
+      renderTemplates();
+    }
+  } catch (e) { console.warn("CardStudio:", e); }
+  try { renderEvents(); } catch (e) { console.warn("renderEvents:", e); }
+  try { renderGuests(); } catch (e) { console.warn("renderGuests:", e); }
+  try { renderCommittee(); } catch (e) { console.warn("renderCommittee:", e); }
+  try { renderContent(); } catch (e) { console.warn("renderContent:", e); }
+  try { renderAnnouncements(); } catch (e) { console.warn("renderAnnouncements:", e); }
+  try { renderMessages(); } catch (e) { console.warn("renderMessages:", e); }
 }
 async function persist(message = 'Changes saved') {
   WH.saveData(data);
@@ -172,12 +183,28 @@ async function persist(message = 'Changes saved') {
   catch (error) { WH.toast(`${message} locally · API unavailable`); }
 }
 window.AdminApp = { get data(){return data}, set data(value){data=value}, openView, renderAll, renderTemplates, renderGuests, persist, initials };
-$$('.side-link[data-view]').forEach(link => link.onclick = () => openView(link.dataset.view));
-$$('[data-jump]').forEach(button => button.onclick = () => openView(button.dataset.jump));
-$('#menuButton').onclick = openSidebar;
-$('#sidebarClose').onclick = closeSidebar;
-$('#sidebarBackdrop').onclick = closeSidebar;
+
+$$('.side-link[data-view]').forEach(link => {
+  link.onclick = (e) => {
+    e.preventDefault();
+    openView(link.dataset.view);
+  };
+});
+$$('[data-jump]').forEach(button => {
+  button.onclick = (e) => {
+    e.preventDefault();
+    openView(button.dataset.jump);
+  };
+});
+
+const menuBtn = $('#menuButton');
+if (menuBtn) menuBtn.onclick = openSidebar;
+const sideClose = $('#sidebarClose');
+if (sideClose) sideClose.onclick = closeSidebar;
+const sideBackdrop = $('#sidebarBackdrop');
+if (sideBackdrop) sideBackdrop.onclick = closeSidebar;
 document.addEventListener('keydown', event => { if (event.key === 'Escape') closeSidebar(); });
+
 if ($('#templateSearch')) $('#templateSearch').oninput = renderTemplates;
 if ($('#templateCategory')) {
   $('#templateCategory').onchange = renderTemplates;
@@ -185,9 +212,31 @@ if ($('#templateCategory')) {
   $('#templateCategory').innerHTML += categories.map(category => `<option>${category}</option>`).join('');
 }
 if ($('#guestSearch')) $('#guestSearch').oninput = event => renderGuests(event.target.value);
+
 renderAll();
 if (location.hash) openView(location.hash.slice(1));
-async function syncFromAPI(){const result=await API.bootstrap(data);data=result.data;$('#apiStatus').textContent=result.online?'● API connected':'● Offline mode';$('#apiStatus').classList.toggle('online',result.online);renderAll()}
+
+async function syncFromAPI() {
+  try {
+    const result = await API.bootstrap(data);
+    if (result && result.data) {
+      data = result.data;
+      $('#apiStatus').textContent = result.online ? '● API connected' : '● Offline mode';
+      $('#apiStatus').classList.toggle('online', Boolean(result.online));
+      renderAll();
+    }
+  } catch (err) {
+    console.warn("syncFromAPI error:", err);
+    $('#apiStatus').textContent = '● Offline mode';
+  }
+}
 syncFromAPI();
-setInterval(()=>{const active=document.querySelector('.admin-view.active')?.id;if(['view-overview','view-guests','view-messages'].includes(active)&&!document.querySelector('.modal-backdrop.open'))syncFromAPI()},30000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncFromAPI()});
+setInterval(() => {
+  const active = document.querySelector('.admin-view.active')?.id;
+  if (['view-overview','view-guests','view-messages'].includes(active) && !document.querySelector('.modal-backdrop.open')) {
+    syncFromAPI();
+  }
+}, 30000);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') syncFromAPI();
+});

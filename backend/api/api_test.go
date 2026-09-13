@@ -335,6 +335,50 @@ func TestInvitationAcceptAndRSVP(t *testing.T) {
 	}
 }
 
+func TestAdminOverviewCountsGuestsAndCommitteeSeparately(t *testing.T) {
+	repo := repository.NewMemoryRepository()
+	handler := New(repo)
+	createResponse := httptest.NewRecorder()
+	handler.ServeHTTP(createResponse, httptest.NewRequest(http.MethodPost, "/api/weddings", bytes.NewBufferString(`{"slug":"overview-wed","title":"A & B","status":"published"}`)))
+	if createResponse.Code != http.StatusCreated {
+		t.Fatalf("create status = %d: %s", createResponse.Code, createResponse.Body)
+	}
+	var created weddingCreated
+	if err := json.Unmarshal(createResponse.Body.Bytes(), &created); err != nil {
+		t.Fatal(err)
+	}
+
+	editor := func(method, path string, body string) *httptest.ResponseRecorder {
+		response := httptest.NewRecorder()
+		request := httptest.NewRequest(method, path, bytes.NewBufferString(body))
+		request.Header.Set("Authorization", "Bearer "+created.AdminToken)
+		handler.ServeHTTP(response, request)
+		return response
+	}
+
+	if response := editor(http.MethodPost, "/api/weddings/"+created.Wedding.ID+"/invitations", `{"type":"guest","guest_name":"Taylor","max_party_size":2}`); response.Code != http.StatusCreated {
+		t.Fatalf("guest invite status = %d: %s", response.Code, response.Body)
+	}
+	if response := editor(http.MethodPost, "/api/weddings/"+created.Wedding.ID+"/invitations", `{"type":"committee","guest_name":"Sam","committee_title":"Coordinator"}`); response.Code != http.StatusCreated {
+		t.Fatalf("committee invite status = %d: %s", response.Code, response.Body)
+	}
+
+	response := editor(http.MethodGet, "/api/weddings/"+created.Wedding.ID+"/admin/overview", "")
+	if response.Code != http.StatusOK {
+		t.Fatalf("overview status = %d: %s", response.Code, response.Body)
+	}
+	var view overviewView
+	if err := json.Unmarshal(response.Body.Bytes(), &view); err != nil {
+		t.Fatal(err)
+	}
+	if view.InvitationsTotal != 1 {
+		t.Fatalf("invitations_total = %d, want 1 (guests only, not double-counted)", view.InvitationsTotal)
+	}
+	if view.InvitationsPending != 1 || view.CommitteeTotal != 1 || view.CommitteePending != 1 {
+		t.Fatalf("unexpected overview counts: %+v", view)
+	}
+}
+
 func TestCommitteeAuthorizesMembersAndRejectsGuests(t *testing.T) {
 	repo := repository.NewMemoryRepository()
 	handler := New(repo)

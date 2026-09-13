@@ -856,3 +856,37 @@
   justify-content: center;
 }
 
+
+/* --- Card Studio Gallery layout tag & effect toggles --- */
+.template-mini-card {
+  position: relative;
+}
+.mini-layout-tag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 999px;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+}
+.customizer-section .effect-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  color: var(--muted, #666);
+  cursor: pointer;
+}
+.customizer-section .effect-toggle input {
+  accent-color: #d4af37;
+  width: 16px;
+  height: 16px;
+}

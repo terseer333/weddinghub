@@ -53,10 +53,21 @@
                 window.WeddingHub.saveData(data);
                 localStorage.removeItem("weddinghub_api_wedding_id");
             }
-        } else if (!localStorage.getItem(profileKey) && !localStorage.getItem("weddinghub_user")) {
-            submitButton.disabled = false;
-            message.textContent = "No wedding workspace was found in this browser. Create one to continue.";
-            return;
+        } else {
+            let profile = null;
+            try {
+                profile = JSON.parse(localStorage.getItem(profileKey) || localStorage.getItem("weddinghub_user") || "null");
+            } catch (_) {}
+            if (!profile) {
+                const emailVal = form.elements.email.value.trim();
+                const defaultName = emailVal.split("@")[0].replace(/[._-]/g, " ") || "Wedding Admin";
+                profile = {
+                    fullName: defaultName.charAt(0).toUpperCase() + defaultName.slice(1),
+                    email: emailVal
+                };
+                localStorage.setItem(profileKey, JSON.stringify(profile));
+                localStorage.setItem("weddinghub_user", JSON.stringify(profile));
+            }
         }
 
         window.setTimeout(() => {

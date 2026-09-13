@@ -263,6 +263,7 @@ type CardDecorations struct {
 	Layout      string `json:"layout,omitempty"`
 	FrameGlow   bool   `json:"frame_glow,omitempty"`
 	DatePill    bool   `json:"date_pill,omitempty"`
+	Background  string `json:"background,omitempty"`
 }
 
 type CardConfig struct {
@@ -278,19 +279,22 @@ type CommitteeRole struct {
 	WeddingID   string    `json:"wedding_id,omitempty"`
 	Name        string    `json:"name"`
 	Description string    `json:"description,omitempty"`
+	IsCustom    bool      `json:"is_custom,omitempty"`
 	CreatedAt   time.Time `json:"created_at,omitempty"`
 }
 
 type Template struct {
-	ID          string          `json:"id"`
-	Name        string          `json:"name"`
-	Category    string          `json:"category"`
-	Description string          `json:"description,omitempty"`
-	Fonts       CardFonts       `json:"fonts"`
-	Colors      CardColors      `json:"colors"`
-	Decorations CardDecorations `json:"decorations"`
-	Layout      string          `json:"layout,omitempty"`
-	Premium     bool            `json:"premium,omitempty"`
+	ID            string          `json:"id"`
+	Name          string          `json:"name"`
+	Category      string          `json:"category"`
+	CategoryLabel string          `json:"categoryLabel,omitempty"`
+	Description   string          `json:"description,omitempty"`
+	Fonts         CardFonts       `json:"fonts"`
+	Colors        CardColors      `json:"colors"`
+	Decorations   CardDecorations `json:"decorations"`
+	Layout        string          `json:"layout,omitempty"`
+	Background    map[string]any  `json:"background,omitempty"`
+	Premium       bool            `json:"premium,omitempty"`
 }
 
 type FontItem struct {

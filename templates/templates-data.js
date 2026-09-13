@@ -1,4 +1,5 @@
-[
+window.WEDDINGHUB_BUILTIN_TEMPLATES = [
+
   {
     "id": "luxury-sage-download",
     "name": "Sage Botanical Luxe",
@@ -3457,4 +3458,4 @@
       "split": "vertical"
     }
   }
-]
+];

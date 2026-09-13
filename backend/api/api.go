@@ -507,7 +507,7 @@ func (a *API) adminOverview(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	view := overviewView{WeddingID: wedding.ID, InvitationsTotal: len(wedding.Invitations), GuestMessages: len(wedding.GuestMessages)}
+	view := overviewView{WeddingID: wedding.ID, GuestMessages: len(wedding.GuestMessages)}
 	for _, inv := range wedding.Invitations {
 		if inv.Type.Normalized() == models.InvitationCommittee {
 			view.CommitteeTotal++
