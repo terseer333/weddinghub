@@ -139,6 +139,7 @@ type CommitteeMember struct {
 	Email        string    `json:"email,omitempty"`
 	Phone        string    `json:"phone,omitempty"`
 	Title        string    `json:"title,omitempty"`
+	RoleID       string    `json:"role_id,omitempty"`
 	JoinedAt     time.Time `json:"joined_at"`
 }
 
@@ -242,6 +243,63 @@ type GuestMessage struct {
 	CreatedAt    time.Time `json:"created_at"`
 }
 
+type CardFonts struct {
+	Couple  string `json:"couple"`
+	Heading string `json:"heading"`
+	Body    string `json:"body"`
+}
+
+type CardColors struct {
+	Background string `json:"background"`
+	Text       string `json:"text"`
+	Accent     string `json:"accent"`
+	Border     string `json:"border,omitempty"`
+	Secondary  string `json:"secondary,omitempty"`
+}
+
+type CardDecorations struct {
+	FloralStyle string `json:"floral_style,omitempty"`
+	BorderStyle string `json:"border_style,omitempty"`
+	Layout      string `json:"layout,omitempty"`
+	FrameGlow   bool   `json:"frame_glow,omitempty"`
+	DatePill    bool   `json:"date_pill,omitempty"`
+}
+
+type CardConfig struct {
+	TemplateID   string            `json:"template_id"`
+	Fonts        CardFonts         `json:"fonts"`
+	Colors       CardColors        `json:"colors"`
+	Decorations  CardDecorations   `json:"decorations"`
+	CustomStyles map[string]string `json:"custom_styles,omitempty"`
+}
+
+type CommitteeRole struct {
+	ID          string    `json:"id"`
+	WeddingID   string    `json:"wedding_id,omitempty"`
+	Name        string    `json:"name"`
+	Description string    `json:"description,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+}
+
+type Template struct {
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Category    string          `json:"category"`
+	Description string          `json:"description,omitempty"`
+	Fonts       CardFonts       `json:"fonts"`
+	Colors      CardColors      `json:"colors"`
+	Decorations CardDecorations `json:"decorations"`
+	Layout      string          `json:"layout,omitempty"`
+	Premium     bool            `json:"premium,omitempty"`
+}
+
+type FontItem struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
+	Family   string `json:"family"`
+}
+
 // Wedding is the consistency boundary for its administrators, guests, committee, content, and responses.
 type Wedding struct {
 	ID         string            `json:"id"`
@@ -261,12 +319,14 @@ type Wedding struct {
 	DressCode  string            `json:"dress_code,omitempty"`
 	HeroImage  string            `json:"hero_image,omitempty"`
 	TemplateID string            `json:"template_id,omitempty"`
+	CardConfig *CardConfig       `json:"card_config,omitempty"`
 	// AdminTokenHash authenticates wedding administration. Only the SHA-256 hash is retained
 	// and it is never serialized; the raw token is returned once when the wedding is created.
 	AdminTokenHash   string             `json:"-"`
 	Admins           []Admin            `json:"admins"`
 	Guests           []Guest            `json:"guests"`
 	CommitteeMembers []CommitteeMember  `json:"committee_members"`
+	CommitteeRoles   []CommitteeRole    `json:"committee_roles,omitempty"`
 	Invitations      []Invitation       `json:"invitations"`
 	Events           []Event            `json:"events"`
 	Photos           []Photo            `json:"photos"`

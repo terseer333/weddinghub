@@ -63,6 +63,10 @@ func (r *MemoryRepository) UpdateWedding(w models.Wedding) (models.Wedding, erro
 	w.Invitations = current.Invitations
 	w.Guests = current.Guests
 	w.CommitteeMembers = current.CommitteeMembers
+	w.CommitteeRoles = current.CommitteeRoles
+	if w.CardConfig == nil && current.CardConfig != nil {
+		w.CardConfig = current.CardConfig
+	}
 	w.PlanningTasks = current.PlanningTasks
 	w.CommitteeChat = current.CommitteeChat
 	w.RSVPs = current.RSVPs
@@ -378,6 +382,97 @@ func (r *MemoryRepository) DeleteAnnouncement(weddingID, announcementID string) 
 	return ErrNotFound
 }
 
+func (r *MemoryRepository) UpdateCardConfig(weddingID string, config models.CardConfig) (models.CardConfig, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.CardConfig{}, ErrNotFound
+	}
+	w.CardConfig = &config
+	w.TemplateID = config.TemplateID
+	w.UpdatedAt = time.Now().UTC()
+	r.weddings[weddingID] = cloneWedding(w)
+	return config, nil
+}
+
+func (r *MemoryRepository) AddCommitteeRole(weddingID string, role models.CommitteeRole) (models.CommitteeRole, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.CommitteeRole{}, ErrNotFound
+	}
+	for _, existing := range w.CommitteeRoles {
+		if existing.ID == role.ID || (existing.Name != "" && existing.Name == role.Name) {
+			return models.CommitteeRole{}, ErrConflict
+		}
+	}
+	w.CommitteeRoles = append(w.CommitteeRoles, role)
+	w.UpdatedAt = time.Now().UTC()
+	r.weddings[weddingID] = cloneWedding(w)
+	return role, nil
+}
+
+func (r *MemoryRepository) DeleteCommitteeRole(weddingID, roleID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return ErrNotFound
+	}
+	for i := range w.CommitteeRoles {
+		if w.CommitteeRoles[i].ID != roleID {
+			continue
+		}
+		w.CommitteeRoles = append(w.CommitteeRoles[:i:i], w.CommitteeRoles[i+1:]...)
+		w.UpdatedAt = time.Now().UTC()
+		r.weddings[weddingID] = cloneWedding(w)
+		return nil
+	}
+	return ErrNotFound
+}
+
+func (r *MemoryRepository) UpdateCommitteeMember(weddingID string, member models.CommitteeMember) (models.CommitteeMember, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.CommitteeMember{}, ErrNotFound
+	}
+	for i := range w.CommitteeMembers {
+		if w.CommitteeMembers[i].ID != member.ID {
+			continue
+		}
+		member.InvitationID = w.CommitteeMembers[i].InvitationID
+		member.JoinedAt = w.CommitteeMembers[i].JoinedAt
+		w.CommitteeMembers[i] = member
+		w.UpdatedAt = time.Now().UTC()
+		r.weddings[weddingID] = cloneWedding(w)
+		return member, nil
+	}
+	return models.CommitteeMember{}, ErrNotFound
+}
+
+func (r *MemoryRepository) DeleteCommitteeMember(weddingID, memberID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return ErrNotFound
+	}
+	for i := range w.CommitteeMembers {
+		if w.CommitteeMembers[i].ID != memberID {
+			continue
+		}
+		w.CommitteeMembers = append(w.CommitteeMembers[:i:i], w.CommitteeMembers[i+1:]...)
+		w.UpdatedAt = time.Now().UTC()
+		r.weddings[weddingID] = cloneWedding(w)
+		return nil
+	}
+	return ErrNotFound
+}
+
 func (r *MemoryRepository) findInvitation(hash string) (models.Wedding, models.Invitation, bool) {
 	if hash == "" {
 		return models.Wedding{}, models.Invitation{}, false
@@ -423,6 +518,18 @@ func cloneWedding(w models.Wedding) models.Wedding {
 	w.Admins = append([]models.Admin(nil), w.Admins...)
 	w.Guests = append([]models.Guest(nil), w.Guests...)
 	w.CommitteeMembers = append([]models.CommitteeMember(nil), w.CommitteeMembers...)
+	w.CommitteeRoles = append([]models.CommitteeRole(nil), w.CommitteeRoles...)
+	if w.CardConfig != nil {
+		cfg := *w.CardConfig
+		if cfg.CustomStyles != nil {
+			m := make(map[string]string, len(cfg.CustomStyles))
+			for k, v := range cfg.CustomStyles {
+				m[k] = v
+			}
+			cfg.CustomStyles = m
+		}
+		w.CardConfig = &cfg
+	}
 	w.Invitations = append([]models.Invitation(nil), w.Invitations...)
 	w.Events = append([]models.Event(nil), w.Events...)
 	w.Photos = append([]models.Photo(nil), w.Photos...)

@@ -73,6 +73,18 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("POST /api/weddings/{weddingID}/committee/announcements", a.createCommitteeAnnouncement)
 	mux.HandleFunc("PUT /api/weddings/{weddingID}/committee/announcements/{announcementID}", a.updateCommitteeAnnouncement)
 	mux.HandleFunc("DELETE /api/weddings/{weddingID}/committee/announcements/{announcementID}", a.deleteCommitteeAnnouncement)
+	// Public templates and fonts catalog
+	mux.HandleFunc("GET /api/templates", a.listTemplates)
+	mux.HandleFunc("GET /api/fonts", a.listFonts)
+	// Wedding card design customization
+	mux.HandleFunc("GET /api/weddings/{weddingID}/card", a.getCardConfig)
+	mux.HandleFunc("PUT /api/weddings/{weddingID}/card", a.updateCardConfig)
+	// Dynamic committee roles and member management
+	mux.HandleFunc("GET /api/weddings/{weddingID}/committee/roles", a.listCommitteeRoles)
+	mux.HandleFunc("POST /api/weddings/{weddingID}/committee/roles", a.createCommitteeRole)
+	mux.HandleFunc("DELETE /api/weddings/{weddingID}/committee/roles/{roleID}", a.deleteCommitteeRole)
+	mux.HandleFunc("PUT /api/weddings/{weddingID}/committee/members/{memberID}", a.updateCommitteeMember)
+	mux.HandleFunc("DELETE /api/weddings/{weddingID}/committee/members/{memberID}", a.deleteCommitteeMember)
 	return securityHeaders(corsMiddleware(parseAllowedOrigins(allowedOrigins), allowLoopback, mux))
 }
 
@@ -357,6 +369,7 @@ type publicWedding struct {
 	DressCode     string                `json:"dress_code,omitempty"`
 	HeroImage     string                `json:"hero_image,omitempty"`
 	TemplateID    string                `json:"template_id,omitempty"`
+	CardConfig    *models.CardConfig    `json:"card_config,omitempty"`
 	Events        []models.Event        `json:"events"`
 	Photos        []models.Photo        `json:"photos"`
 	StorySections []models.StorySection `json:"story_sections"`
@@ -531,6 +544,7 @@ type rosterView struct {
 	Invitations      []models.Invitation        `json:"invitations"`
 	Guests           []models.Guest             `json:"guests"`
 	CommitteeMembers []models.CommitteeMember   `json:"committee_members"`
+	CommitteeRoles   []models.CommitteeRole     `json:"committee_roles"`
 }
 
 // adminRoster returns the full invitation status of both groups so the admin can
@@ -540,7 +554,17 @@ func (a *API) adminRoster(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	writeJSON(w, http.StatusOK, rosterView{WeddingID: wedding.ID, Invitations: wedding.Invitations, Guests: wedding.Guests, CommitteeMembers: wedding.CommitteeMembers})
+	roles := wedding.CommitteeRoles
+	if roles == nil {
+		roles = []models.CommitteeRole{}
+	}
+	writeJSON(w, http.StatusOK, rosterView{
+		WeddingID:        wedding.ID,
+		Invitations:      wedding.Invitations,
+		Guests:           wedding.Guests,
+		CommitteeMembers: wedding.CommitteeMembers,
+		CommitteeRoles:   roles,
+	})
 }
 
 type committeeActor struct {
@@ -565,6 +589,7 @@ type committeeDashboardView struct {
 	Wedding       publicWedding            `json:"wedding"`
 	Actor         committeeActor           `json:"actor"`
 	Members       []models.CommitteeMember `json:"committee_members"`
+	Roles         []models.CommitteeRole   `json:"committee_roles"`
 	Tasks         []models.PlanningTask    `json:"planning_tasks"`
 	Announcements []models.Announcement    `json:"announcements"`
 	GuestStats    guestStats               `json:"guest_stats"`
@@ -575,10 +600,15 @@ func (a *API) committeeDashboard(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+	roles := wedding.CommitteeRoles
+	if roles == nil {
+		roles = []models.CommitteeRole{}
+	}
 	view := committeeDashboardView{
 		Wedding: publishedWedding(wedding),
 		Actor:   committeeActor{Role: actor.Role, Name: actor.Name, MemberID: actor.MemberID, InvitationID: actor.InvitationID},
 		Members: wedding.CommitteeMembers,
+		Roles:   roles,
 		Tasks:   wedding.PlanningTasks,
 	}
 	for _, item := range wedding.Announcements {
@@ -873,6 +903,223 @@ func (a *API) deleteCommitteeAnnouncement(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func (a *API) listTemplates(w http.ResponseWriter, _ *http.Request) {
+	templates := getTemplatesCatalog()
+	writeJSON(w, http.StatusOK, templates)
+}
+
+func (a *API) listFonts(w http.ResponseWriter, _ *http.Request) {
+	writeJSON(w, http.StatusOK, getFontsCatalog())
+}
+
+func (a *API) getCardConfig(w http.ResponseWriter, r *http.Request) {
+	weddingID := r.PathValue("weddingID")
+	wedding, err := a.repo.GetWedding(weddingID)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	if wedding.CardConfig != nil {
+		writeJSON(w, http.StatusOK, wedding.CardConfig)
+		return
+	}
+	defaultConfig := models.CardConfig{
+		TemplateID: wedding.TemplateID,
+		Fonts: models.CardFonts{
+			Couple:  "Great Vibes",
+			Heading: "Playfair Display",
+			Body:    "Cormorant Garamond",
+		},
+		Colors: models.CardColors{
+			Background: "#2d4030",
+			Text:       "#f7f4ed",
+			Accent:     "#d4af37",
+			Border:     "#e5c158",
+		},
+		Decorations: models.CardDecorations{
+			FloralStyle: "sage-botanical-corners",
+			BorderStyle: "double-gold",
+			Layout:      "centered-classic",
+		},
+	}
+	writeJSON(w, http.StatusOK, defaultConfig)
+}
+
+func (a *API) updateCardConfig(w http.ResponseWriter, r *http.Request) {
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	var config models.CardConfig
+	if err := decodeJSON(w, r, &config); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	config.TemplateID = strings.TrimSpace(config.TemplateID)
+	if config.TemplateID == "" {
+		config.TemplateID = wedding.TemplateID
+	}
+	updated, err := a.repo.UpdateCardConfig(wedding.ID, config)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, updated)
+}
+
+func (a *API) listCommitteeRoles(w http.ResponseWriter, r *http.Request) {
+	wedding, _, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	roles := wedding.CommitteeRoles
+	if roles == nil {
+		roles = []models.CommitteeRole{}
+	}
+	writeJSON(w, http.StatusOK, roles)
+}
+
+func (a *API) createCommitteeRole(w http.ResponseWriter, r *http.Request) {
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	var role models.CommitteeRole
+	if err := decodeJSON(w, r, &role); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	role.Name = strings.TrimSpace(role.Name)
+	if role.Name == "" {
+		writeError(w, http.StatusBadRequest, "role name is required")
+		return
+	}
+	role.ID = mustID(w)
+	if role.ID == "" {
+		return
+	}
+	role.WeddingID = wedding.ID
+	role.CreatedAt = a.now()
+	created, err := a.repo.AddCommitteeRole(wedding.ID, role)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, created)
+}
+
+func (a *API) deleteCommitteeRole(w http.ResponseWriter, r *http.Request) {
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	roleID := r.PathValue("roleID")
+	if err := a.repo.DeleteCommitteeRole(wedding.ID, roleID); err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (a *API) updateCommitteeMember(w http.ResponseWriter, r *http.Request) {
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	var member models.CommitteeMember
+	if err := decodeJSON(w, r, &member); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	member.ID = r.PathValue("memberID")
+	member.Name = strings.TrimSpace(member.Name)
+	if member.Name == "" {
+		writeError(w, http.StatusBadRequest, "member name is required")
+		return
+	}
+	updated, err := a.repo.UpdateCommitteeMember(wedding.ID, member)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, updated)
+}
+
+func (a *API) deleteCommitteeMember(w http.ResponseWriter, r *http.Request) {
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	memberID := r.PathValue("memberID")
+	if err := a.repo.DeleteCommitteeMember(wedding.ID, memberID); err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func getFontsCatalog() []models.FontItem {
+	return []models.FontItem{
+		{ID: "great-vibes", Name: "Great Vibes", Category: "couple", Family: "'Great Vibes', cursive"},
+		{ID: "allura", Name: "Allura", Category: "couple", Family: "'Allura', cursive"},
+		{ID: "alex-brush", Name: "Alex Brush", Category: "couple", Family: "'Alex Brush', cursive"},
+		{ID: "dancing-script", Name: "Dancing Script", Category: "couple", Family: "'Dancing Script', cursive"},
+		{ID: "parisienne", Name: "Parisienne", Category: "couple", Family: "'Parisienne', cursive"},
+		{ID: "cinzel", Name: "Cinzel Decorative", Category: "couple", Family: "'Cinzel Decorative', serif"},
+		{ID: "pinyon-script", Name: "Pinyon Script", Category: "couple", Family: "'Pinyon Script', cursive"},
+		{ID: "playfair-display", Name: "Playfair Display", Category: "heading", Family: "'Playfair Display', serif"},
+		{ID: "cormorant-garamond", Name: "Cormorant Garamond", Category: "heading", Family: "'Cormorant Garamond', serif"},
+		{ID: "libre-baskerville", Name: "Libre Baskerville", Category: "heading", Family: "'Libre Baskerville', serif"},
+		{ID: "marcellus", Name: "Marcellus", Category: "heading", Family: "'Marcellus', serif"},
+		{ID: "bodoni-moda", Name: "Bodoni Moda", Category: "heading", Family: "'Bodoni Moda', serif"},
+		{ID: "prata", Name: "Prata", Category: "heading", Family: "'Prata', serif"},
+		{ID: "montserrat", Name: "Montserrat", Category: "body", Family: "'Montserrat', sans-serif"},
+		{ID: "lato", Name: "Lato", Category: "body", Family: "'Lato', sans-serif"},
+	}
+}
+
+func getTemplatesCatalog() []models.Template {
+	// Try loading templates from JSON file paths
+	paths := []string{"templates/templates.json", "../templates/templates.json", "/home/student/weddinghub/templates/templates.json"}
+	for _, p := range paths {
+		if data, err := os.ReadFile(p); err == nil {
+			var list []models.Template
+			if err := json.Unmarshal(data, &list); err == nil && len(list) > 0 {
+				return list
+			}
+		}
+	}
+	// Fallback seed template matching download.webp
+	return []models.Template{
+		{
+			ID:          "luxury-sage-download",
+			Name:        "Sage Botanical Luxe",
+			Category:    "luxury-floral",
+			Description: "Deep sage green with 3D gold botanical flourishes and double gold frame",
+			Fonts: models.CardFonts{
+				Couple:  "Great Vibes",
+				Heading: "Playfair Display",
+				Body:    "Cormorant Garamond",
+			},
+			Colors: models.CardColors{
+				Background: "#2d4030",
+				Text:       "#f7f4ed",
+				Accent:     "#d4af37",
+				Border:     "#e5c158",
+			},
+			Decorations: models.CardDecorations{
+				FloralStyle: "sage-botanical-corners",
+				BorderStyle: "double-gold",
+				Layout:      "centered-classic",
+				FrameGlow:   true,
+				DatePill:    true,
+			},
+			Layout:  "centered-classic",
+			Premium: true,
+		},
+	}
+}
+
 func (a *API) invitation(token string) (models.Wedding, models.Invitation, error) {
 	if !validToken(token) {
 		return models.Wedding{}, models.Invitation{}, repository.ErrNotFound
@@ -891,6 +1138,7 @@ func publishedWedding(w models.Wedding) publicWedding {
 		ID: w.ID, Slug: w.Slug, Title: w.Title, PartnerOne: w.PartnerOne, PartnerTwo: w.PartnerTwo, Date: w.Date,
 		Venue: w.Venue, Address: w.Address, City: w.City, State: w.State, Country: w.Country,
 		Message: w.Message, Verse: w.Verse, DressCode: w.DressCode, HeroImage: w.HeroImage, TemplateID: w.TemplateID,
+		CardConfig: w.CardConfig,
 		Events: []models.Event{}, Photos: []models.Photo{}, StorySections: []models.StorySection{}, Announcements: []models.Announcement{},
 	}
 	for _, item := range w.Events {

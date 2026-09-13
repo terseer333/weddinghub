@@ -17,7 +17,11 @@
   let unreadCount = 0;
 
   function actor() {
-    if (member) return { role: member.invitationStatus === "accepted" ? "committee_member" : "pending", name: member.name, title: member.title || "Committee member" };
+    if (member) {
+      const roleObj = (data.committeeRoles || []).find(r => r.id === (member.roleId || member.role_id));
+      const roleTitle = roleObj?.name || member.title || member.committeeTitle || "Committee member";
+      return { role: member.invitationStatus === "accepted" ? "committee_member" : "pending", name: member.name, title: roleTitle };
+    }
     if (isAdmin) return { role: "admin", name: (() => { try { return JSON.parse(localStorage.getItem("weddinghub_user") || localStorage.getItem("weddinghub_local_profile"))?.fullName || "Wedding admin"; } catch (_) { return "Wedding admin"; } })(), title: "Wedding admin" };
     return null;
   }

@@ -41,7 +41,8 @@
       partner_two: w.groomName, date: new Date(w.date).toISOString(), status: w.status,
       venue: w.venue, address: w.address, city: w.city, state: w.state, country: w.country,
       message: w.message, verse: w.verse, dress_code: w.dressCode, hero_image: w.heroImage,
-      template_id: w.templateId, admins: [], guests: [], invitations: [], rsvps: [], guest_messages: [],
+      template_id: w.templateId, card_config: w.cardConfig || null, committee_roles: data.committeeRoles || [],
+      admins: [], guests: [], invitations: [], rsvps: [], guest_messages: [],
       events: data.events.map(e => ({ id: apiID(e.id), name: e.name, description: e.description,
         starts_at: new Date(`${e.date}T${e.time || "00:00"}:00`).toISOString(), venue: e.venue,
         address: e.address, status: e.status })),
@@ -69,7 +70,11 @@
       city: w.city || data.wedding.city, state: w.state || data.wedding.state,
       country: w.country || data.wedding.country, message: w.message || data.wedding.message,
       verse: w.verse || data.wedding.verse, dressCode: w.dress_code || data.wedding.dressCode,
-      heroImage: w.hero_image || data.wedding.heroImage, templateId: w.template_id || data.wedding.templateId };
+      heroImage: w.hero_image || data.wedding.heroImage, templateId: w.template_id || data.wedding.templateId,
+      cardConfig: w.card_config || data.wedding.cardConfig };
+    if (w.committee_roles) {
+      data.committeeRoles = w.committee_roles.map(r => ({ id: r.id, name: r.name, description: r.description || "" }));
+    }
     if (w.events) data.events = w.events.map(e => ({ id: e.id, name: e.name, description: e.description,
       date: String(e.starts_at).slice(0, 10), time: new Date(e.starts_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",hour12:false}),
       venue: e.venue, address: e.address, status: e.status }));
@@ -231,13 +236,41 @@
   async function updateAnnouncement(weddingID, announcementID, announcement, token) {
     return request(`/api/weddings/${encodeURIComponent(weddingID)}/committee/announcements/${encodeURIComponent(announcementID)}`, { method: "PUT", headers: authHeader(token || committeeToken()), body: JSON.stringify(announcement) });
   }
-  async function deleteAnnouncement(weddingID, announcementID, token) {
-    return request(`/api/weddings/${encodeURIComponent(weddingID)}/committee/announcements/${encodeURIComponent(announcementID)}`, { method: "DELETE", headers: authHeader(token || committeeToken()) });
+  async function saveCardConfig(weddingID, config) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!online || !id) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/card`, { method: "PUT", headers: authHeader(), body: JSON.stringify(config) });
+  }
+  async function getCardConfig(weddingID) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!online || !id) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/card`);
+  }
+  async function createCommitteeRole(weddingID, role) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!online || !id) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/committee/roles`, { method: "POST", headers: authHeader(), body: JSON.stringify(role) });
+  }
+  async function deleteCommitteeRole(weddingID, roleID) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!online || !id) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/committee/roles/${encodeURIComponent(roleID)}`, { method: "DELETE", headers: authHeader() });
+  }
+  async function updateCommitteeMember(weddingID, memberID, member) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!online || !id) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/committee/members/${encodeURIComponent(memberID)}`, { method: "PUT", headers: authHeader(), body: JSON.stringify(member) });
+  }
+  async function deleteCommitteeMember(weddingID, memberID) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!online || !id) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/committee/members/${encodeURIComponent(memberID)}`, { method: "DELETE", headers: authHeader() });
   }
   function isOnline() { return online; }
 
   window.WeddingHubAPI = { connect, bootstrap, saveWedding, addGuest, respond, updateRSVP, invitation, dashboard, sendMessage,
     adminOverview, adminRoster, committeeDashboard, committeeChat, sendCommitteeMessage, createTask, updateTask, deleteTask,
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
+    saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,
     isOnline, mergeAPI, baseURL, adminToken, storeAdminToken };
 })();

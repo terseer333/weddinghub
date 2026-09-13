@@ -9,7 +9,7 @@
   ];
 
   const seed = {
-    version: 3,
+    version: 4,
     wedding: {
       id: "wed_blessing_terseer",
       slug: "blessing-and-terseer",
@@ -27,7 +27,13 @@
       verse: "I have found the one whom my soul loves. — Song of Solomon 3:4",
       dressCode: "Garden formal · Sage, champagne & warm neutrals",
       heroImage: hero,
-      templateId: "black-gold-03",
+      templateId: "luxury-sage-download",
+      cardConfig: {
+        template_id: "luxury-sage-download",
+        fonts: { couple: "Great Vibes", heading: "Playfair Display", body: "Cormorant Garamond" },
+        colors: { background: "#2d4030", text: "#f7f4ed", accent: "#d4af37", border: "#e5c158" },
+        decorations: { floralStyle: "sage-botanical-corners", borderStyle: "double-gold", layout: "centered-classic", frameGlow: true, datePill: true }
+      },
       status: "published"
     },
     events: [
@@ -53,13 +59,15 @@
       { id: "guest_michael", name: "Michael Oche", type: "guest", email: "michael@example.com", phone: "+234 803 456 7890", category: "Colleagues", invitationStatus: "sent", token: "demo-michael-a8452db9", rsvp: "pending", partySize: 1 },
       { id: "guest_ada", name: "Ada Eze", type: "guest", email: "ada@example.com", phone: "+234 804 567 8901", category: "Friends", invitationStatus: "declined", token: "demo-ada-36dc184f", rsvp: "declined", partySize: 1 }
     ],
-    committeeMembers: [
-      { id: "cm_grace", name: "Grace Ter", title: "Chief Bridesmaid", email: "grace@example.com", phone: "+234 802 345 6789", invitationStatus: "accepted", token: "demo-cm-grace", joinedAt: "2026-09-03" },
-      { id: "cm_ibrahim", name: "Ibrahim Musa", title: "Best Man", email: "ibrahim@example.com", phone: "+234 805 677 8899", invitationStatus: "accepted", token: "demo-cm-ibrahim", joinedAt: "2026-09-04" },
-      { id: "cm_funmi", name: "Funmilayo Ade", title: "Wedding Coordinator", email: "funmi@example.com", phone: "+234 806 788 9900", invitationStatus: "accepted", token: "demo-cm-funmi", joinedAt: "2026-09-05" },
-      { id: "cm_peter", name: "Peter Ior", title: "Logistics Lead", email: "peter@example.com", phone: "+234 807 899 0011", invitationStatus: "pending", token: "demo-cm-peter" },
-      { id: "cm_tina", name: "Tina Paul", title: "Ushers Lead", email: "tina@example.com", phone: "+234 808 900 1122", invitationStatus: "pending", token: "demo-cm-tina" }
+    committeeRoles: [
+      { id: "role_chairman", name: "Chairman", description: "Overall wedding committee leadership" },
+      { id: "role_secretary", name: "Secretary", description: "Meeting records and correspondence" },
+      { id: "role_finance", name: "Finance", description: "Budget and contributions coordination" },
+      { id: "role_decoration", name: "Decoration", description: "Floral design and venue aesthetic" },
+      { id: "role_media", name: "Media", description: "Photography, videography and social media" },
+      { id: "role_catering", name: "Catering", description: "Food, drinks and hospitality" }
     ],
+    committeeMembers: [],
     planningTasks: [
       { id: "task_1", title: "Finalize reception decoration", details: "Confirm the floral setup and table styling with the decorator.", assignedTo: "Grace Ter", dueOn: "2026-10-02", status: "in_progress", createdBy: "Blessing" },
       { id: "task_2", title: "Confirm catering menu", details: "Choose between the two buffet proposals for guests.", assignedTo: "Ibrahim Musa", dueOn: "2026-09-26", status: "todo", createdBy: "Blessing" },
@@ -105,6 +113,9 @@
     el.textContent = message; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2600);
   }
   function templates() {
+    if (window.WeddingTemplates && window.WeddingTemplates.all().length > 0) {
+      return window.WeddingTemplates.all();
+    }
     const designs = [
       ["romantic-floral","Romantic Floral","Floral"],["rose-elegance","Rose Elegance","Romantic"],
       ["garden-wedding","Secret Garden","Garden wedding"],["botanical","Botanical Arch","Botanical"],

@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <!-- Gradients for realistic metallic gold and sage leaves -->
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf3cd"/>
+      <stop offset="35%" stop-color="#d4af37"/>
+      <stop offset="70%" stop-color="#aa820a"/>
+      <stop offset="100%" stop-color="#e8cf78"/>
+    </linearGradient>
+    <linearGradient id="sage-petal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dce6d2"/>
+      <stop offset="50%" stop-color="#b8c7ab"/>
+      <stop offset="100%" stop-color="#8fa480"/>
+    </linearGradient>
+    <linearGradient id="sage-dark-petal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a4b895"/>
+      <stop offset="100%" stop-color="#6b805d"/>
+    </linearGradient>
+    <linearGradient id="leaf-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f2e2aa"/>
+      <stop offset="50%" stop-color="#c9a544"/>
+      <stop offset="100%" stop-color="#806218"/>
+    </linearGradient>
+    <linearGradient id="leaf-sage" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#99ad8c"/>
+      <stop offset="100%" stop-color="#4d6243"/>
+    </linearGradient>
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#142116" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- ================= TOP LEFT BOTANICAL CLUSTER ================= -->
+  <g class="botanical-top-left" filter="url(#soft-shadow)">
+    <!-- Arching golden branch -->
+    <path d="M-20 40 Q 90 20 180 90 T 260 260 T 220 420" stroke="url(#gold-grad)" stroke-width="3" fill="none" opacity="0.85"/>
+    <path d="M40 -20 Q 30 110 100 200 T 250 310" stroke="url(#leaf-sage)" stroke-width="2.5" fill="none" opacity="0.7"/>
+
+    <!-- Leaves on upper branch -->
+    <path d="M120 45 C 135 15, 175 20, 190 40 C 170 65, 135 65, 120 45 Z" fill="url(#leaf-sage)"/>
+    <path d="M120 45 Q 155 38 190 40" stroke="url(#gold-grad)" stroke-width="1" fill="none"/>
+    <path d="M150 70 C 180 50, 220 70, 230 100 C 200 115, 165 95, 150 70 Z" fill="url(#leaf-gold)"/>
+    <path d="M210 130 C 250 120, 280 150, 285 180 C 250 190, 220 165, 210 130 Z" fill="url(#leaf-sage)"/>
+    <path d="M245 200 C 290 200, 310 240, 305 270 C 270 270, 245 240, 245 200 Z" fill="url(#leaf-gold)"/>
+    <path d="M235 290 C 265 315, 270 360, 255 390 C 230 365, 225 325, 235 290 Z" fill="url(#leaf-sage)"/>
+    <path d="M205 370 C 225 410, 215 450, 190 470 C 180 435, 190 395, 205 370 Z" fill="url(#leaf-gold)"/>
+
+    <!-- Bud sprigs -->
+    <circle cx="270" cy="120" r="6" fill="url(#gold-grad)"/>
+    <circle cx="300" cy="160" r="5" fill="url(#leaf-gold)"/>
+    <circle cx="315" cy="230" r="6.5" fill="url(#gold-grad)"/>
+    <circle cx="265" cy="410" r="5.5" fill="url(#leaf-gold)"/>
+
+    <!-- Leaves on side stem -->
+    <path d="M45 110 C 20 140, 25 180, 50 195 C 70 170, 65 130, 45 110 Z" fill="url(#leaf-gold)"/>
+    <path d="M70 180 C 45 220, 55 265, 85 275 C 100 240, 90 200, 70 180 Z" fill="url(#leaf-sage)"/>
+    <path d="M85 260 C 60 300, 75 345, 105 355 C 120 320, 105 280, 85 260 Z" fill="url(#leaf-gold)"/>
+    <path d="M95 340 C 80 380, 95 425, 125 435 C 135 395, 120 360, 95 340 Z" fill="url(#leaf-sage)"/>
+
+    <!-- Main Large 3D Floral (matches download.webp hero flower) -->
+    <g transform="translate(170, 125)">
+      <path d="M0 0 C -45 -60, -25 -115, 0 -130 C 25 -115, 45 -60, 0 0 Z" fill="url(#sage-petal)"/>
+      <path d="M0 -15 Q 0 -80 0 -125" stroke="#fff" stroke-width="1" opacity="0.4"/>
+      <path d="M0 0 C 45 -55, 105 -50, 125 -20 C 115 15, 60 40, 0 0 Z" fill="url(#sage-dark-petal)"/>
+      <path d="M0 0 C 55 35, 95 90, 80 120 C 50 125, 10 75, 0 0 Z" fill="url(#sage-petal)"/>
+      <path d="M0 0 C -25 55, -55 105, -90 100 C -110 75, -80 25, 0 0 Z" fill="url(#sage-dark-petal)"/>
+      <path d="M0 0 C -65 -20, -115 -10, -125 -40 C -105 -65, -50 -55, 0 0 Z" fill="url(#sage-petal)"/>
+
+      <!-- Center Gold Stamen Core -->
+      <circle cx="0" cy="0" r="16" fill="url(#gold-grad)"/>
+      <circle cx="-5" cy="-4" r="3.5" fill="#fff" opacity="0.7"/>
+      <circle cx="5" cy="-3" r="3" fill="#6f5509"/>
+      <circle cx="-3" cy="5" r="3" fill="#6f5509"/>
+      <circle cx="4" cy="5" r="3" fill="#ffd700"/>
+      <circle cx="0" cy="-6" r="2.5" fill="#ffd700"/>
+      <g fill="#ffea9f">
+        <circle cx="-10" cy="-9" r="1.5"/><circle cx="8" cy="-8" r="1.5"/><circle cx="-8" cy="9" r="1.5"/>
+        <circle cx="9" cy="8" r="1.5"/><circle cx="0" cy="-11" r="1.5"/><circle cx="-11" cy="0" r="1.5"/>
+      </g>
+    </g>
+
+    <!-- Secondary Flower -->
+    <g transform="translate(65, 80) scale(0.68)">
+      <path d="M0 0 C -35 -50, -20 -95, 0 -110 C 20 -95, 35 -50, 0 0 Z" fill="url(#sage-petal)"/>
+      <path d="M0 0 C 40 -45, 90 -40, 105 -15 C 95 15, 50 35, 0 0 Z" fill="url(#sage-dark-petal)"/>
+      <path d="M0 0 C 45 30, 80 75, 65 100 C 40 105, 10 65, 0 0 Z" fill="url(#sage-petal)"/>
+      <path d="M0 0 C -20 45, -45 90, -75 85 C -90 65, -70 20, 0 0 Z" fill="url(#sage-dark-petal)"/>
+      <path d="M0 0 C -55 -15, -95 -10, -105 -35 C -90 -55, -40 -45, 0 0 Z" fill="url(#sage-petal)"/>
+      <circle cx="0" cy="0" r="13" fill="url(#gold-grad)"/>
+    </g>
+  </g>
+
+  <!-- ================= BOTTOM RIGHT BOTANICAL CLUSTER ================= -->
+  <g class="botanical-bottom-right" transform="translate(800, 1066) rotate(180)" filter="url(#soft-shadow)">
+    <path d="M-20 40 Q 90 20 180 90 T 260 260 T 220 420" stroke="url(#gold-grad)" stroke-width="3" fill="none" opacity="0.85"/>
+    <path d="M40 -20 Q 30 110 100 200 T 250 310" stroke="url(#leaf-sage)" stroke-width="2.5" fill="none" opacity="0.7"/>
+
+    <path d="M120 45 C 135 15, 175 20, 190 40 C 170 65, 135 65, 120 45 Z" fill="url(#leaf-sage)"/>
+    <path d="M150 70 C 180 50, 220 70, 230 100 C 200 115, 165 95, 150 70 Z" fill="url(#leaf-gold)"/>
+    <path d="M210 130 C 250 120, 280 150, 285 180 C 250 190, 220 165, 210 130 Z" fill="url(#leaf-sage)"/>
+    <path d="M245 200 C 290 200, 310 240, 305 270 C 270 270, 245 240, 245 200 Z" fill="url(#leaf-gold)"/>
+    <path d="M235 290 C 265 315, 270 360, 255 390 C 230 365, 225 325, 235 290 Z" fill="url(#leaf-sage)"/>
+    <path d="M205 370 C 225 410, 215 450, 190 470 C 180 435, 190 395, 205 370 Z" fill="url(#leaf-gold)"/>
+
+    <circle cx="270" cy="120" r="6" fill="url(#gold-grad)"/>
+    <circle cx="300" cy="160" r="5" fill="url(#leaf-gold)"/>
+    <circle cx="315" cy="230" r="6.5" fill="url(#gold-grad)"/>
+    <circle cx="265" cy="410" r="5.5" fill="url(#leaf-gold)"/>
+
+    <path d="M45 110 C 20 140, 25 180, 50 195 C 70 170, 65 130, 45 110 Z" fill="url(#leaf-gold)"/>
+    <path d="M70 180 C 45 220, 55 265, 85 275 C 100 240, 90 200, 70 180 Z" fill="url(#leaf-sage)"/>
+    <path d="M85 260 C 60 300, 75 345, 105 355 C 120 320, 105 280, 85 260 Z" fill="url(#leaf-gold)"/>
+    <path d="M95 340 C 80 380, 95 425, 125 435 C 135 395, 120 360, 95 340 Z" fill="url(#leaf-sage)"/>
+
+    <g transform="translate(180, 135)">
+      <path d="M0 0 C -45 -60, -25 -115, 0 -130 C 25 -115, 45 -60, 0 0 Z" fill="url(#sage-petal)"/>
+      <path d="M0 0 C 45 -55, 105 -50, 125 -20 C 115 15, 60 40, 0 0 Z" fill="url(#sage-dark-petal)"/>
+      <path d="M0 0 C 55 35, 95 90, 80 120 C 50 125, 10 75, 0 0 Z" fill="url(#sage-petal)"/>
+      <path d="M0 0 C -25 55, -55 105, -90 100 C -110 75, -80 25, 0 0 Z" fill="url(#sage-dark-petal)"/>
+      <path d="M0 0 C -65 -20, -115 -10, -125 -40 C -105 -65, -50 -55, 0 0 Z" fill="url(#sage-petal)"/>
+      <circle cx="0" cy="0" r="16" fill="url(#gold-grad)"/>
+      <circle cx="-5" cy="-4" r="3.5" fill="#fff" opacity="0.7"/>
+      <circle cx="5" cy="-3" r="3" fill="#6f5509"/>
+      <circle cx="-3" cy="5" r="3" fill="#6f5509"/>
+      <circle cx="4" cy="5" r="3" fill="#ffd700"/>
+    </g>
+
+    <g transform="translate(70, 75) scale(0.72)">
+      <path d="M0 0 C -35 -50, -20 -95, 0 -110 C 20 -95, 35 -50, 0 0 Z" fill="url(#sage-petal)"/>
+      <path d="M0 0 C 40 -45, 90 -40, 105 -15 C 95 15, 50 35, 0 0 Z" fill="url(#sage-dark-petal)"/>
+      <path d="M0 0 C 45 30, 80 75, 65 100 C 40 105, 10 65, 0 0 Z" fill="url(#sage-petal)"/>
+      <path d="M0 0 C -20 45, -45 90, -75 85 C -90 65, -70 20, 0 0 Z" fill="url(#sage-dark-petal)"/>
+      <path d="M0 0 C -55 -15, -95 -10, -105 -35 C -90 -55, -40 -45, 0 0 Z" fill="url(#sage-petal)"/>
+      <circle cx="0" cy="0" r="13" fill="url(#gold-grad)"/>
+    </g>
+  </g>
+</svg>

@@ -126,6 +126,33 @@ function renderInvitation() {
     <h2>${WH.escape(event.name)}</h2><p><strong>${WH.formatDate(event.date)} · ${event.time}</strong></p>
     <p>${WH.escape(event.venue)}<br>${WH.escape(event.address)}</p><small>${WH.escape(event.description)}</small>
     <a href="https://maps.google.com/?q=${encodeURIComponent(event.address)}" target="_blank">View location ↗</a></article>`).join("") : '<div class="invitation-empty"><span>✦</span><h2>Celebration details are coming soon</h2><p>The couple will publish the event schedule here.</p></div>';
+
+  const cardMount = document.getElementById("invitationCardMount");
+  if (cardMount && window.WeddingInvitation) {
+    cardMount.innerHTML = WeddingInvitation.card(data);
+  }
+  const downloadBtn = document.getElementById("downloadCardBtn");
+  if (downloadBtn && window.WeddingInvitation) {
+    downloadBtn.onclick = async () => {
+      try {
+        downloadBtn.disabled = true;
+        downloadBtn.textContent = "Generating card...";
+        const blob = await WeddingInvitation.imageBlob(data);
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `${wedding.slug || "wedding"}-invitation-card.png`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+        WH.toast("Invitation card downloaded successfully!");
+      } catch (err) {
+        console.error(err);
+        WH.toast("Could not download invitation card.");
+      } finally {
+        downloadBtn.disabled = false;
+        downloadBtn.textContent = "↓ Download Invitation Card";
+      }
+    };
+  }
 }
 
 function updateResponseState() {

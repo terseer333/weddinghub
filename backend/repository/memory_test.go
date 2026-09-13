@@ -97,3 +97,58 @@ func TestAddGuestMessageRejectsUnacceptedInvitation(t *testing.T) {
 		t.Fatalf("unauthorized message was stored: %#v", wedding.GuestMessages)
 	}
 }
+
+func TestCardConfigAndCommitteeRoleRepository(t *testing.T) {
+	repo := NewMemoryRepository()
+	_, err := repo.CreateWedding(models.Wedding{ID: "w2", Slug: "two", Title: "Two", Status: models.StatusPublished})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Test UpdateCardConfig
+	cfg := models.CardConfig{
+		TemplateID: "luxury-sage-download",
+		Fonts:      models.CardFonts{Couple: "Great Vibes", Heading: "Playfair Display", Body: "Cormorant Garamond"},
+		Colors:     models.CardColors{Background: "#2d4030", Text: "#f7f4ed", Accent: "#d4af37"},
+	}
+	savedCfg, err := repo.UpdateCardConfig("w2", cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if savedCfg.TemplateID != "luxury-sage-download" {
+		t.Fatalf("unexpected saved template id: %s", savedCfg.TemplateID)
+	}
+
+	// Verify wedding has card config and template ID updated
+	w, err := repo.GetWedding("w2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if w.CardConfig == nil || w.CardConfig.TemplateID != "luxury-sage-download" || w.TemplateID != "luxury-sage-download" {
+		t.Fatalf("wedding card config not persisted properly: %+v", w.CardConfig)
+	}
+
+	// Test AddCommitteeRole
+	role := models.CommitteeRole{ID: "r1", Name: "Finance Director"}
+	savedRole, err := repo.AddCommitteeRole("w2", role)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if savedRole.Name != "Finance Director" {
+		t.Fatalf("unexpected role name: %s", savedRole.Name)
+	}
+
+	// Duplicate role should conflict
+	if _, err := repo.AddCommitteeRole("w2", role); err != ErrConflict {
+		t.Fatalf("expected ErrConflict, got %v", err)
+	}
+
+	// Delete role
+	if err := repo.DeleteCommitteeRole("w2", "r1"); err != nil {
+		t.Fatal(err)
+	}
+	wAfter, _ := repo.GetWedding("w2")
+	if len(wAfter.CommitteeRoles) != 0 {
+		t.Fatalf("expected 0 committee roles, got %d", len(wAfter.CommitteeRoles))
+	}
+}

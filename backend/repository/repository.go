@@ -39,4 +39,11 @@ type Repository interface {
 	AddAnnouncement(weddingID string, announcement models.Announcement) (models.Announcement, error)
 	UpdateAnnouncement(weddingID string, announcement models.Announcement) (models.Announcement, error)
 	DeleteAnnouncement(weddingID, announcementID string) error
+	// Card customization
+	UpdateCardConfig(weddingID string, config models.CardConfig) (models.CardConfig, error)
+	// Dynamic committee roles and member management
+	AddCommitteeRole(weddingID string, role models.CommitteeRole) (models.CommitteeRole, error)
+	DeleteCommitteeRole(weddingID, roleID string) error
+	UpdateCommitteeMember(weddingID string, member models.CommitteeMember) (models.CommitteeMember, error)
+	DeleteCommitteeMember(weddingID, memberID string) error
 }

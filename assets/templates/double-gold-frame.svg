@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="frame-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff0bd"/>
+      <stop offset="25%" stop-color="#dfbb53"/>
+      <stop offset="60%" stop-color="#a88523"/>
+      <stop offset="85%" stop-color="#e8cd78"/>
+      <stop offset="100%" stop-color="#9a781b"/>
+    </linearGradient>
+    <filter id="frame-glow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ffd966" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Outer Gold Frame Line -->
+  <rect x="36" y="36" width="728" height="994" rx="3" stroke="url(#frame-gold)" stroke-width="2.5" filter="url(#frame-glow)"/>
+  <!-- Inner Gold Frame Line -->
+  <rect x="48" y="48" width="704" height="970" rx="1.5" stroke="url(#frame-gold)" stroke-width="1.2" opacity="0.85"/>
+  <!-- Subtle corner accent ticks -->
+  <path d="M42 42 L 54 42 M 42 42 L 42 54" stroke="url(#frame-gold)" stroke-width="2"/>
+  <path d="M758 42 L 746 42 M 758 42 L 758 54" stroke="url(#frame-gold)" stroke-width="2"/>
+  <path d="M42 1024 L 54 1024 M 42 1024 L 42 1012" stroke="url(#frame-gold)" stroke-width="2"/>
+  <path d="M758 1024 L 746 1024 M 758 1024 L 758 1012" stroke="url(#frame-gold)" stroke-width="2"/>
+</svg>

@@ -488,3 +488,139 @@ func TestGuestDashboardExcludesCommitteeAnnouncements(t *testing.T) {
 		t.Fatal("guest dashboard missing public announcement")
 	}
 }
+
+func TestTemplatesAndFontsCatalogs(t *testing.T) {
+	repo := repository.NewMemoryRepository()
+	handler := New(repo)
+
+	// Test GET /api/templates
+	templatesResp := httptest.NewRecorder()
+	handler.ServeHTTP(templatesResp, httptest.NewRequest(http.MethodGet, "/api/templates", nil))
+	if templatesResp.Code != http.StatusOK {
+		t.Fatalf("GET /api/templates status = %d: %s", templatesResp.Code, templatesResp.Body)
+	}
+	var templates []models.Template
+	if err := json.Unmarshal(templatesResp.Body.Bytes(), &templates); err != nil {
+		t.Fatalf("failed to decode templates: %v", err)
+	}
+	if len(templates) == 0 {
+		t.Fatal("expected at least 1 template")
+	}
+
+	// Test GET /api/fonts
+	fontsResp := httptest.NewRecorder()
+	handler.ServeHTTP(fontsResp, httptest.NewRequest(http.MethodGet, "/api/fonts", nil))
+	if fontsResp.Code != http.StatusOK {
+		t.Fatalf("GET /api/fonts status = %d: %s", fontsResp.Code, fontsResp.Body)
+	}
+	var fonts []models.FontItem
+	if err := json.Unmarshal(fontsResp.Body.Bytes(), &fonts); err != nil {
+		t.Fatalf("failed to decode fonts: %v", err)
+	}
+	if len(fonts) < 5 {
+		t.Fatalf("expected fonts catalog, got %d items", len(fonts))
+	}
+}
+
+func TestCardConfigAndCommitteeRoles(t *testing.T) {
+	repo := repository.NewMemoryRepository()
+	handler := New(repo)
+	now := time.Now().UTC()
+	adminToken, adminHash, err := models.NewOpaqueToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	wedding := models.Wedding{
+		ID:             "w_card_test",
+		Slug:           "card-test-wedding",
+		Title:          "Card Test Wedding",
+		Status:         models.StatusPublished,
+		AdminTokenHash: adminHash,
+		TemplateID:     "luxury-sage-download",
+		CreatedAt:      now,
+		UpdatedAt:      now,
+	}
+	if _, err := repo.CreateWedding(wedding); err != nil {
+		t.Fatal(err)
+	}
+
+	// 1. GET card config default
+	getCardReq := httptest.NewRequest(http.MethodGet, "/api/weddings/w_card_test/card", nil)
+	getCardResp := httptest.NewRecorder()
+	handler.ServeHTTP(getCardResp, getCardReq)
+	if getCardResp.Code != http.StatusOK {
+		t.Fatalf("GET card config status = %d: %s", getCardResp.Code, getCardResp.Body)
+	}
+
+	// 2. PUT card config
+	newCardConfig := models.CardConfig{
+		TemplateID: "royal-black-gold",
+		Fonts: models.CardFonts{
+			Couple:  "Allura",
+			Heading: "Cormorant Garamond",
+			Body:    "Montserrat",
+		},
+		Colors: models.CardColors{
+			Background: "#111111",
+			Text:       "#ffffff",
+			Accent:     "#ffd700",
+			Border:     "#ffd700",
+		},
+		Decorations: models.CardDecorations{
+			FloralStyle: "luxury-gold",
+			BorderStyle: "double-gold",
+			Layout:      "centered-classic",
+		},
+	}
+	payload, _ := json.Marshal(newCardConfig)
+	putCardReq := httptest.NewRequest(http.MethodPut, "/api/weddings/w_card_test/card", bytes.NewReader(payload))
+	putCardReq.Header.Set("Authorization", "Bearer "+adminToken)
+	putCardReq.Header.Set("Content-Type", "application/json")
+	putCardResp := httptest.NewRecorder()
+	handler.ServeHTTP(putCardResp, putCardReq)
+	if putCardResp.Code != http.StatusOK {
+		t.Fatalf("PUT card config status = %d: %s", putCardResp.Code, putCardResp.Body)
+	}
+
+	// 3. POST committee role
+	newRole := models.CommitteeRole{
+		Name:        "Decoration Lead",
+		Description: "Coordinates flower arrangements and hall decoration",
+	}
+	rolePayload, _ := json.Marshal(newRole)
+	createRoleReq := httptest.NewRequest(http.MethodPost, "/api/weddings/w_card_test/committee/roles", bytes.NewReader(rolePayload))
+	createRoleReq.Header.Set("Authorization", "Bearer "+adminToken)
+	createRoleReq.Header.Set("Content-Type", "application/json")
+	createRoleResp := httptest.NewRecorder()
+	handler.ServeHTTP(createRoleResp, createRoleReq)
+	if createRoleResp.Code != http.StatusCreated {
+		t.Fatalf("POST committee role status = %d: %s", createRoleResp.Code, createRoleResp.Body)
+	}
+
+	var createdRole models.CommitteeRole
+	if err := json.Unmarshal(createRoleResp.Body.Bytes(), &createdRole); err != nil {
+		t.Fatal(err)
+	}
+	if createdRole.Name != "Decoration Lead" || createdRole.ID == "" {
+		t.Fatalf("unexpected created role: %+v", createdRole)
+	}
+
+	// 4. GET committee roles
+	getRolesReq := httptest.NewRequest(http.MethodGet, "/api/weddings/w_card_test/committee/roles", nil)
+	getRolesReq.Header.Set("Authorization", "Bearer "+adminToken)
+	getRolesResp := httptest.NewRecorder()
+	handler.ServeHTTP(getRolesResp, getRolesReq)
+	if getRolesResp.Code != http.StatusOK {
+		t.Fatalf("GET committee roles status = %d: %s", getRolesResp.Code, getRolesResp.Body)
+	}
+
+	// 5. DELETE committee role
+	deleteRoleReq := httptest.NewRequest(http.MethodDelete, "/api/weddings/w_card_test/committee/roles/"+createdRole.ID, nil)
+	deleteRoleReq.Header.Set("Authorization", "Bearer "+adminToken)
+	deleteRoleResp := httptest.NewRecorder()
+	handler.ServeHTTP(deleteRoleResp, deleteRoleReq)
+	if deleteRoleResp.Code != http.StatusNoContent {
+		t.Fatalf("DELETE committee role status = %d: %s", deleteRoleResp.Code, deleteRoleResp.Body)
+	}
+}

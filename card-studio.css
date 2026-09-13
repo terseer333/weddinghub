@@ -1,0 +1,858 @@
+/* ================================================================
+   WeddingHub Card Studio & Luxury Invitation System
+   ================================================================ */
+
+/* Google Fonts & Base Typography */
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Allura&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400&family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@500;700&family=Great+Vibes&family=Lato:wght@300;400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Marcellus&family=Montserrat:wght@300;400;600&family=Parisienne&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Prata&display=swap');
+
+/* --- LUXURY INVITATION CARD COMPONENT --- */
+.luxury-invitation-card {
+  --card-bg: #2d4030;
+  --card-text: #f7f4ed;
+  --card-accent: #d4af37;
+  --card-border: #e5c158;
+  --font-couple: 'Great Vibes', cursive;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Cormorant Garamond', serif;
+
+  position: relative;
+  width: min(100%, 540px);
+  aspect-ratio: 3 / 4;
+  margin-inline: auto;
+  box-sizing: border-box;
+  background-color: var(--card-bg);
+  color: var(--card-text);
+  font-family: var(--font-body);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.45), 0 2px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Realistic Paper Stock Subtle Grain Overlay */
+.luxury-invitation-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 80%),
+                    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.015) 0px, rgba(0, 0, 0, 0.015) 1px, transparent 1px, transparent 4px);
+  z-index: 1;
+}
+
+/* Card Decorative Frames */
+.card-frame-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+/* Double Gold Frame Styling (inspired by download.webp) */
+.luxury-invitation-card[data-border="double-gold"] .card-frame-overlay {
+  background-image: url("assets/templates/double-gold-frame.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.luxury-invitation-card[data-border="single-gold"] {
+  border: 2px solid var(--card-border);
+}
+
+.luxury-invitation-card[data-border="thin-line"] {
+  border: 1px solid color-mix(in srgb, var(--card-border) 60%, transparent);
+}
+
+.luxury-invitation-card[data-border="royal-crest"] .card-frame-overlay {
+  background-image: url("assets/templates/royal-crest-frame.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Botanical Corners Layer */
+.card-floral-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.luxury-invitation-card[data-floral="sage-botanical-corners"] .card-floral-layer {
+  background-image: url("assets/templates/sage-botanical-corners.svg");
+}
+
+.luxury-invitation-card[data-floral="botanical-arch"] .card-floral-layer {
+  background-image: url("assets/templates/botanical-arch.svg");
+}
+
+.luxury-invitation-card[data-floral="rose-corners"] .card-floral-layer {
+  background-image: url("assets/templates/rose-corners.svg");
+}
+
+.luxury-invitation-card[data-floral="burgundy-flowers"] .card-floral-layer {
+  background-image: url("assets/templates/burgundy-flowers.svg");
+}
+
+.luxury-invitation-card[data-floral="wildflower-garden"] .card-floral-layer {
+  background-image: url("assets/templates/wildflower-garden.svg");
+}
+
+.luxury-invitation-card[data-floral="tropical-leaves"] .card-floral-layer {
+  background-image: url("assets/templates/tropical-leaves.svg");
+}
+
+.luxury-invitation-card[data-floral="traditional-flourish"] .card-floral-layer {
+  background-image: url("assets/templates/traditional-flourish.svg");
+}
+
+.luxury-invitation-card[data-floral="luxury-frame"] .card-floral-layer {
+  background-image: url("assets/templates/luxury-frame.svg");
+}
+
+.luxury-invitation-card[data-floral="minimal"] .card-floral-layer {
+  display: none;
+}
+
+/* Card Content Hierarchy */
+.card-inner-content {
+  position: relative;
+  z-index: 4;
+  width: 82%;
+  max-width: 440px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.8rem, 5vw, 3rem) clamp(1rem, 3vw, 2rem);
+  box-sizing: border-box;
+}
+
+/* Header Kicker */
+.card-kicker {
+  font-family: var(--font-heading);
+  font-size: clamp(0.55rem, 1.8vw, 0.72rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--card-accent);
+  margin: 0 0 clamp(0.6rem, 1.8vw, 1.2rem);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Couple Names Section */
+.card-couple-names {
+  font-family: var(--font-couple);
+  font-size: clamp(2.2rem, 6.8vw, 3.8rem);
+  line-height: 1.05;
+  color: var(--card-text);
+  margin: 0 0 clamp(0.5rem, 1.6vw, 1.1rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card-couple-names .name-amp {
+  font-size: 0.55em;
+  font-family: var(--font-heading);
+  font-style: italic;
+  color: var(--card-accent);
+  margin: -0.1em 0;
+  font-weight: 300;
+}
+
+/* Invitation Invitation Message */
+.card-invitation-message {
+  font-size: clamp(0.72rem, 2.2vw, 0.92rem);
+  line-height: 1.45;
+  color: var(--card-text);
+  opacity: 0.92;
+  margin: 0 0 clamp(0.6rem, 2vw, 1.2rem);
+  max-width: 320px;
+  font-style: italic;
+}
+
+/* Date Banner (matching download.webp) */
+.card-date-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 16px);
+  margin: clamp(0.4rem, 1.5vw, 0.9rem) 0 0.2rem;
+  width: 100%;
+}
+
+.date-divider {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-accent), transparent);
+  max-width: 70px;
+}
+
+.date-day-name, .date-time {
+  font-family: var(--font-heading);
+  font-size: clamp(0.58rem, 1.8vw, 0.72rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--card-text);
+  font-weight: 600;
+}
+
+.date-day-num {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 5.5vw, 2.8rem);
+  line-height: 1;
+  color: var(--card-accent);
+  font-weight: 400;
+  padding: 0 4px;
+}
+
+.date-month-year {
+  font-family: var(--font-heading);
+  font-size: clamp(0.62rem, 1.9vw, 0.76rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--card-accent);
+  font-weight: 600;
+  margin: 0 0 clamp(0.5rem, 1.8vw, 1.1rem);
+}
+
+/* Venue Line */
+.card-venue-line {
+  font-family: var(--font-heading);
+  font-size: clamp(0.74rem, 2.3vw, 0.96rem);
+  color: var(--card-text);
+  margin: 0 0 0.2rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.card-city-line {
+  font-size: clamp(0.65rem, 2vw, 0.82rem);
+  color: var(--card-text);
+  opacity: 0.82;
+  margin: 0 0 clamp(0.6rem, 2vw, 1.2rem);
+}
+
+/* RSVP Block */
+.card-rsvp-block {
+  margin-top: clamp(0.3rem, 1.2vw, 0.8rem);
+  font-style: italic;
+  font-size: clamp(0.68rem, 2vw, 0.84rem);
+  color: var(--card-text);
+  opacity: 0.9;
+  border-top: 1px solid color-mix(in srgb, var(--card-accent) 40%, transparent);
+  padding-top: clamp(0.3rem, 1vw, 0.6rem);
+  width: 85%;
+}
+
+.card-rsvp-block .rsvp-contact {
+  font-weight: 600;
+  color: var(--card-accent);
+  font-style: normal;
+}
+
+/* --- 3-PANEL CARD CUSTOMIZATION STUDIO LAYOUT --- */
+.card-studio-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr 360px;
+  gap: 20px;
+  min-height: calc(100vh - 120px);
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .card-studio-layout {
+    grid-template-columns: 300px 1fr;
+  }
+  .card-studio-controls-panel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .card-studio-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Studio Panel Base */
+.studio-panel {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.studio-panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  background: var(--surface-subtle, #f8fafc);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.studio-panel-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.studio-panel-header .badge {
+  font-size: 0.72rem;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Left Panel: Template Gallery */
+.template-gallery-panel {
+  max-height: 820px;
+}
+
+.gallery-search-box {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+
+.gallery-search-box input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #cbd5e1);
+  font-size: 0.88rem;
+  box-sizing: border-box;
+}
+
+.category-pills-row {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  scrollbar-width: thin;
+}
+
+.cat-pill {
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--surface-subtle, #f1f5f9);
+  border: 1px solid transparent;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+
+.cat-pill:hover, .cat-pill.active {
+  background: #2d4030;
+  color: #ffffff;
+}
+
+.template-cards-scroll {
+  padding: 16px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  max-height: 640px;
+}
+
+/* Template Miniature Card */
+.template-mini-card {
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.template-mini-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.template-mini-card.active {
+  border-color: #2d4030;
+  box-shadow: 0 0 0 3px rgba(45, 64, 48, 0.25);
+}
+
+.mini-card-thumb {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  box-sizing: border-box;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-card-thumb span.mini-name {
+  font-size: 0.85rem;
+  line-height: 1.1;
+  margin: 4px 0;
+}
+
+.mini-card-meta {
+  padding: 8px;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+}
+
+.mini-card-meta strong {
+  display: block;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-card-meta small {
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.fav-star-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  z-index: 5;
+  transition: color 0.15s ease;
+}
+
+.fav-star-btn.active {
+  color: #f59e0b;
+}
+
+/* Middle Panel: Interactive Live Preview */
+.live-preview-panel {
+  display: flex;
+  flex-direction: column;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+.preview-toolbar {
+  padding: 12px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.device-switcher {
+  display: flex;
+  background: #f1f5f9;
+  padding: 3px;
+  border-radius: 8px;
+}
+
+.device-btn {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.15s ease;
+}
+
+.device-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.zoom-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Live Stage Canvas Area */
+.preview-stage-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 600px;
+  overflow: auto;
+  position: relative;
+  background: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.card-stage-wrapper {
+  transform-origin: center center;
+  transition: transform 0.2s ease;
+}
+
+/* Phone Bezel Container */
+.phone-mockup-frame {
+  width: 380px;
+  padding: 24px 14px 34px;
+  background: #1e293b;
+  border-radius: 44px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45), inset 0 0 0 2px #334155;
+  position: relative;
+}
+
+.phone-mockup-frame .phone-screen {
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  background: #ffffff;
+}
+
+.phone-mockup-frame .phone-notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 18px;
+  background: #1e293b;
+  border-radius: 10px;
+  z-index: 10;
+}
+
+/* Right Panel: Customization Studio Controls */
+.customizer-tabs {
+  display: flex;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.customizer-tab-btn {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.customizer-tab-btn.active {
+  color: #2d4030;
+  border-bottom-color: #2d4030;
+  background: #ffffff;
+}
+
+.customizer-tab-content {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 700px;
+}
+
+.customizer-section {
+  margin-bottom: 24px;
+}
+
+.customizer-section h3 {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin: 0 0 12px;
+  font-weight: 700;
+}
+
+/* Font Selectors */
+.font-field-row {
+  margin-bottom: 14px;
+}
+
+.font-field-row label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.font-select-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* Color Palette Chips */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.palette-chip {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.palette-chip:hover, .palette-chip.active {
+  border-color: #2d4030;
+  box-shadow: 0 0 0 2px rgba(45, 64, 48, 0.2);
+}
+
+.palette-colors-row {
+  display: flex;
+  height: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.palette-colors-row span {
+  flex: 1;
+}
+
+.palette-chip small {
+  font-size: 0.68rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #475569;
+}
+
+/* Custom Color Pickers */
+.color-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.color-picker-item label {
+  display: block;
+  font-size: 0.78rem;
+  color: #475569;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: #ffffff;
+}
+
+.color-input-wrapper input[type="color"] {
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+}
+
+.color-input-wrapper input[type="text"] {
+  border: none;
+  font-family: monospace;
+  font-size: 0.82rem;
+  width: 70px;
+}
+
+/* Action buttons inside studio */
+.studio-action-row {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  gap: 10px;
+}
+
+.studio-action-row button {
+  flex: 1;
+}
+
+/* Committee Roles Grid & Cards */
+.role-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  padding: 16px 0;
+}
+
+.role-card-item {
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--surface, #ffffff);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.role-card-item .role-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.role-card-item h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.role-card-item p {
+  font-size: 0.82rem;
+  color: var(--muted, #64748b);
+  margin: 0;
+}
+
+.role-badge-custom {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.role-badge-core {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.role-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border, #f1f5f9);
+  padding-top: 8px;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+/* Public & Guest Page Card Showcase */
+.invitation-card-showcase-section {
+  padding: 50px 20px;
+  background: #1e2b20;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.card-showcase-container {
+  max-width: 580px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.card-showcase-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-showcase-toolbar .card-badge {
+  color: #d4af37;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.card-mount-stage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
