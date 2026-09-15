@@ -38,27 +38,32 @@
 
             <aside class="local-notice" aria-label="Preview environment information">
                 <span aria-hidden="true">i</span>
-                <div>This preview saves your setup in this browser. Connect the deployed API for persistent multi-device access.</div>
+                <div>Your workspace is protected by your password plus a one-time code emailed at sign-in, so a stolen password alone cannot open it.</div>
             </aside>
 
             <form class="auth-form" id="auth-form" data-auth-form="signup">
-                <div class="field">
+                <div class="field" data-auth-credential>
                     <label for="full-name">Full name</label>
                     <input id="full-name" name="fullName" type="text" autocomplete="name" placeholder="Your full name" minlength="2" required>
                 </div>
-                <div class="field">
+                <div class="field" data-auth-credential>
                     <label for="email">Email address</label>
                     <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required>
                 </div>
-                <div class="auth-form-row">
+                <div class="auth-form-row" data-auth-credential>
                     <div class="field"><label for="partner-one">Partner one</label><input id="partner-one" name="partnerOne" type="text" placeholder="First name" required></div>
                     <div class="field"><label for="partner-two">Partner two</label><input id="partner-two" name="partnerTwo" type="text" placeholder="First name" required></div>
                 </div>
-                <div class="field"><label for="wedding-date">Wedding date</label><input id="wedding-date" name="weddingDate" type="date" required></div>
-                <div class="field">
+                <div class="field" data-auth-credential><label for="wedding-date">Wedding date</label><input id="wedding-date" name="weddingDate" type="date" required></div>
+                <div class="field" data-auth-credential>
                     <label for="password">Password</label>
-                    <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 6 characters" minlength="6" required aria-describedby="password-hint">
-                    <p class="field-hint" id="password-hint">Used only to complete this local entry form.</p>
+                    <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 10 characters with a number" minlength="10" required aria-describedby="password-hint">
+                    <p class="field-hint" id="password-hint">At least 10 characters, including a letter and a number.</p>
+                </div>
+                <div class="field" data-auth-code hidden>
+                    <label for="signup-code">Verification code</label>
+                    <input id="signup-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" maxlength="6" pattern="[0-9]{6}" aria-describedby="signup-code-hint">
+                    <p class="field-hint" id="signup-code-hint">Enter the 6-digit code from your email. <a href="#" data-auth-resend>Resend code</a></p>
                 </div>
                 <button class="auth-submit" type="submit">Create wedding workspace</button>
             </form>

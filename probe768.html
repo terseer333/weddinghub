@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>card probe</title>
+<body>
+<iframe id="dash" src="pages/dashboard.html#designs" style="width:768px;height:900px;border:0"></iframe>
+<iframe id="ev" src="pages/event.html?preview=admin" style="width:768px;height:900px;border:0"></iframe>
+<pre id="out">pending…</pre>
+<script>
+window.addEventListener('load', () => setTimeout(() => {
+  const out = [];
+  for (const [name, id] of [['DASHBOARD', 'dash'], ['EVENT', 'ev']]) {
+    try {
+      const d = window[id].contentDocument;
+      out.push('===== ' + name + ' doc.scrollWidth=' + d.documentElement.scrollWidth + ' clientWidth=' + d.documentElement.clientWidth);
+      d.querySelectorAll('.luxury-invitation-card').forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const cs = getComputedStyle(c);
+        out.push(`card[${i}] rect=${Math.round(r.width)}x${Math.round(r.height)} container=${cs.containerType} width=${cs.width} parent=${c.parentElement.className || c.parentElement.id}`);
+      });
+      d.querySelectorAll('.card-mount-stage, .preview-stage-container, #liveCardMount, .phone-screen').forEach(el => {
+        const r = el.getBoundingClientRect();
+        out.push(`stage <${el.tagName.toLowerCase()} class="${el.className}"> ${Math.round(r.width)}x${Math.round(r.height)}`);
+      });
+    } catch (err) { out.push(name + ' error: ' + err); }
+  }
+  document.getElementById('out').textContent = out.join('\n') || 'no data';
+}, 4000));
+</script>

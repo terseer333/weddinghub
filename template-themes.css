@@ -1,5 +1,10 @@
-/* WeddingHub invitation themes: local artwork, no external assets. */
+/* WeddingHub invitation themes: local artwork, no external assets.
+   Every themed card is a size container so its inner typography and
+   padding scale with the card (cqw) instead of the viewport; each cqw
+   declaration is preceded by the original vw value as a fallback for
+   browsers without container query support. */
 :where(.invitation-card, .template-preview)[class*="design-"] {
+  container-type: inline-size;
   --theme-bg: #f8f4ed;
   --theme-ink: #3d3934;
   --theme-accent: #a67c62;
@@ -45,6 +50,7 @@
   align-items: center;
   justify-content: center;
   padding: clamp(2rem, 7vw, 5rem) clamp(1.1rem, 5vw, 3.5rem);
+  padding: clamp(2rem, 12cqw, 5rem) clamp(1.1rem, 8cqw, 3.5rem);
 }
 
 :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner :where(h1, h2, h3) {
@@ -57,10 +63,12 @@
 
 .invitation-card[class*="design-"] .template-card-inner :where(h1, h2) {
   font-size: clamp(2.9rem, 9vw, 6.8rem);
+  font-size: clamp(2.9rem, 19.4cqw, 6.8rem);
 }
 
 .template-preview[class*="design-"] .template-card-inner :where(h1, h2, h3) {
   font-size: clamp(1.7rem, 7vw, 3rem);
+  font-size: clamp(1.7rem, 12.5cqw, 3rem);
 }
 
 :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner p {
@@ -338,12 +346,14 @@
 :where(.invitation-card, .template-preview).design-editorial::after { right: 5%; bottom: 5%; width: 1px; height: 38%; background: #211f1d; }
 :where(.invitation-card, .template-preview).design-editorial .template-ornament { display: none; }
 :where(.invitation-card, .template-preview).design-editorial .template-card-inner { width: 61%; margin-left: 30%; align-items: flex-start; text-align: left; }
-:where(.invitation-card, .template-preview).design-editorial .template-card-inner :where(h1,h2,h3) { font-size: clamp(3.3rem, 10vw, 7.4rem); letter-spacing: -.07em; line-height: .78; }
-.template-preview.design-editorial .template-card-inner :where(h1,h2,h3) { font-size: clamp(2rem, 8vw, 3.4rem); }
+:where(.invitation-card, .template-preview).design-editorial .template-card-inner :where(h1,h2,h3) { font-size: clamp(3.3rem, 10vw, 7.4rem); font-size: clamp(3.3rem, 21.1cqw, 7.4rem); letter-spacing: -.07em; line-height: .78; }
+.template-preview.design-editorial .template-card-inner :where(h1,h2,h3) { font-size: clamp(2rem, 8vw, 3.4rem); font-size: clamp(2rem, 14.3cqw, 3.4rem); }
 :where(.invitation-card, .template-preview).design-editorial .template-card-inner p { margin-inline: 0; }
 
 @media (max-width: 700px) {
-  .invitation-card[class*="design-"] { min-height: 680px; }
+  /* Keep the card's 3:4 proportions on phones instead of forcing a fixed
+     tall height that a narrow viewport cannot host without distortion. */
+  .invitation-card[class*="design-"] { min-height: min(680px, 125vw); }
   .template-preview[class*="design-"] { min-height: 290px; }
   :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner { width: min(76%, 560px); min-height: 52%; padding: 2.2rem 1rem; }
   :where(.invitation-card, .template-preview)[class*="design-"] .template-ornament { height: 31%; }
@@ -355,7 +365,7 @@
 }
 
 @media (max-width: 420px) {
-  .invitation-card[class*="design-"] { min-height: 610px; }
+  .invitation-card[class*="design-"] { min-height: min(610px, 132vw); }
   :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner p { font-size: .88rem; line-height: 1.55; }
   :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner small,
   :where(.invitation-card, .template-preview)[class*="design-"] .template-card-inner time { font-size: .62rem; }

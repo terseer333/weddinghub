@@ -25,6 +25,9 @@ const (
 type API struct {
 	repo repository.Repository
 	now  func() time.Time
+	// sender delivers login verification codes; NewMailerFromEnv supplies the
+	// SMTP implementation and tests inject a fake.
+	sender codeSender
 }
 
 func New(repo repository.Repository) http.Handler {
@@ -42,9 +45,24 @@ func NewWithAllowedOrigin(repo repository.Repository, allowedOrigins string) htt
 }
 
 func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback bool) http.Handler {
-	a := &API{repo: repo, now: func() time.Time { return time.Now().UTC() }}
+	a := &API{repo: repo, now: func() time.Time { return time.Now().UTC() }, sender: NewMailerFromEnv()}
+	mux := a.routes()
+	return securityHeaders(corsMiddleware(parseAllowedOrigins(allowedOrigins), allowLoopback, mux))
+}
+
+// routes registers every endpoint. Kept apart from the middleware stack so tests
+// can serve the mux directly with a fake code sender.
+func (a *API) routes() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", a.health)
+	// Account routes. Login is password + emailed code; sessions are Bearer
+	// tokens issued by login/verify, and me and logout are guarded by
+	// requireSession.
+	mux.HandleFunc("POST /api/auth/register", a.registerUser)
+	mux.HandleFunc("POST /api/auth/login/start", a.startLogin)
+	mux.HandleFunc("POST /api/auth/login/verify", a.verifyLogin)
+	mux.HandleFunc("GET /api/auth/me", a.currentUser)
+	mux.HandleFunc("POST /api/auth/logout", a.logout)
 	mux.HandleFunc("GET /api/weddings", a.listWeddings)
 	mux.HandleFunc("POST /api/weddings", a.createWedding)
 	// Admin-authenticated routes. requireAdmin resolves the wedding and verifies the
@@ -85,7 +103,7 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("DELETE /api/weddings/{weddingID}/committee/roles/{roleID}", a.deleteCommitteeRole)
 	mux.HandleFunc("PUT /api/weddings/{weddingID}/committee/members/{memberID}", a.updateCommitteeMember)
 	mux.HandleFunc("DELETE /api/weddings/{weddingID}/committee/members/{memberID}", a.deleteCommitteeMember)
-	return securityHeaders(corsMiddleware(parseAllowedOrigins(allowedOrigins), allowLoopback, mux))
+	return mux
 }
 
 func (a *API) health(w http.ResponseWriter, _ *http.Request) {
@@ -489,17 +507,17 @@ func (a *API) updateRSVP(w http.ResponseWriter, r *http.Request) {
 }
 
 type overviewView struct {
-	WeddingID            string `json:"wedding_id"`
-	InvitationsTotal     int    `json:"invitations_total"`
-	InvitationsPending   int    `json:"invitations_pending"`
-	Accepted             int    `json:"accepted"`
-	Declined             int    `json:"declined"`
-	AttendingPartySize   int    `json:"attending_party_size"`
-	GuestMessages        int    `json:"guest_messages"`
-	CommitteeTotal       int    `json:"committee_total"`
-	CommitteePending     int    `json:"committee_pending"`
-	CommitteeAccepted    int    `json:"committee_accepted"`
-	CommitteeDeclined    int    `json:"committee_declined"`
+	WeddingID          string `json:"wedding_id"`
+	InvitationsTotal   int    `json:"invitations_total"`
+	InvitationsPending int    `json:"invitations_pending"`
+	Accepted           int    `json:"accepted"`
+	Declined           int    `json:"declined"`
+	AttendingPartySize int    `json:"attending_party_size"`
+	GuestMessages      int    `json:"guest_messages"`
+	CommitteeTotal     int    `json:"committee_total"`
+	CommitteePending   int    `json:"committee_pending"`
+	CommitteeAccepted  int    `json:"committee_accepted"`
+	CommitteeDeclined  int    `json:"committee_declined"`
 }
 
 func (a *API) adminOverview(w http.ResponseWriter, r *http.Request) {
@@ -540,11 +558,11 @@ func (a *API) adminOverview(w http.ResponseWriter, r *http.Request) {
 }
 
 type rosterView struct {
-	WeddingID        string                     `json:"wedding_id"`
-	Invitations      []models.Invitation        `json:"invitations"`
-	Guests           []models.Guest             `json:"guests"`
-	CommitteeMembers []models.CommitteeMember   `json:"committee_members"`
-	CommitteeRoles   []models.CommitteeRole     `json:"committee_roles"`
+	WeddingID        string                   `json:"wedding_id"`
+	Invitations      []models.Invitation      `json:"invitations"`
+	Guests           []models.Guest           `json:"guests"`
+	CommitteeMembers []models.CommitteeMember `json:"committee_members"`
+	CommitteeRoles   []models.CommitteeRole   `json:"committee_roles"`
 }
 
 // adminRoster returns the full invitation status of both groups so the admin can
@@ -802,9 +820,9 @@ func parseTaskInput(w http.ResponseWriter, r *http.Request) (planningTaskRequest
 }
 
 type announcementRequest struct {
-	Title    string             `json:"title"`
-	Body     string             `json:"body"`
-	Audience models.Audience    `json:"audience"`
+	Title    string                   `json:"title"`
+	Body     string                   `json:"body"`
+	Audience models.Audience          `json:"audience"`
 	Status   models.PublicationStatus `json:"status"`
 }
 
@@ -1139,7 +1157,7 @@ func publishedWedding(w models.Wedding) publicWedding {
 		Venue: w.Venue, Address: w.Address, City: w.City, State: w.State, Country: w.Country,
 		Message: w.Message, Verse: w.Verse, DressCode: w.DressCode, HeroImage: w.HeroImage, TemplateID: w.TemplateID,
 		CardConfig: w.CardConfig,
-		Events: []models.Event{}, Photos: []models.Photo{}, StorySections: []models.StorySection{}, Announcements: []models.Announcement{},
+		Events:     []models.Event{}, Photos: []models.Photo{}, StorySections: []models.StorySection{}, Announcements: []models.Announcement{},
 	}
 	for _, item := range w.Events {
 		if item.Status == models.StatusPublished {

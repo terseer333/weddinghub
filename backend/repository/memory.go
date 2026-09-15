@@ -11,12 +11,20 @@ import (
 
 // MemoryRepository is concurrency-safe. Returned aggregates are defensive copies.
 type MemoryRepository struct {
-	mu       sync.RWMutex
-	weddings map[string]models.Wedding
+	mu         sync.RWMutex
+	weddings   map[string]models.Wedding
+	users      map[string]models.User
+	loginCodes map[string]models.LoginCode
+	sessions   map[string]models.Session
 }
 
 func NewMemoryRepository() *MemoryRepository {
-	return &MemoryRepository{weddings: make(map[string]models.Wedding)}
+	return &MemoryRepository{
+		weddings:   make(map[string]models.Wedding),
+		users:      make(map[string]models.User),
+		loginCodes: make(map[string]models.LoginCode),
+		sessions:   make(map[string]models.Session),
+	}
 }
 
 func (r *MemoryRepository) CreateWedding(w models.Wedding) (models.Wedding, error) {
@@ -540,4 +548,112 @@ func cloneWedding(w models.Wedding) models.Wedding {
 	w.RSVPs = append([]models.RSVP(nil), w.RSVPs...)
 	w.GuestMessages = append([]models.GuestMessage(nil), w.GuestMessages...)
 	return w
+}
+
+// CreateUser registers a user keyed by normalized email. A duplicate address conflicts.
+func (r *MemoryRepository) CreateUser(user models.User) (models.User, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, exists := r.users[user.Email]; exists {
+		return models.User{}, ErrConflict
+	}
+	r.users[user.Email] = user
+	return user, nil
+}
+
+func (r *MemoryRepository) UserByEmail(email string) (models.User, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	user, ok := r.users[email]
+	if !ok {
+		return models.User{}, ErrNotFound
+	}
+	return user, nil
+}
+
+// UpdateUser persists mutable account state (password, lockout counters) for an
+// existing user. The email key never changes.
+func (r *MemoryRepository) UpdateUser(user models.User) (models.User, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.users[user.Email]; !ok {
+		return models.User{}, ErrNotFound
+	}
+	r.users[user.Email] = user
+	return user, nil
+}
+
+// UserByID locates a user by identifier. The linear scan suits this repository's
+// in-memory scale.
+func (r *MemoryRepository) UserByID(id string) (models.User, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	for _, user := range r.users {
+		if user.ID == id {
+			return user, nil
+		}
+	}
+	return models.User{}, ErrNotFound
+}
+
+// CreateLoginCode stores a fresh code for email, replacing any prior one.
+func (r *MemoryRepository) CreateLoginCode(email string, code models.LoginCode) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.users[email]; !ok {
+		return ErrNotFound
+	}
+	r.loginCodes[email] = code
+	return nil
+}
+
+func (r *MemoryRepository) LoginCode(email string) (models.LoginCode, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	code, ok := r.loginCodes[email]
+	if !ok {
+		return models.LoginCode{}, ErrNotFound
+	}
+	return code, nil
+}
+
+func (r *MemoryRepository) SaveLoginCode(email string, code models.LoginCode) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.loginCodes[email]; !ok {
+		return ErrNotFound
+	}
+	r.loginCodes[email] = code
+	return nil
+}
+
+func (r *MemoryRepository) DeleteLoginCode(email string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.loginCodes, email)
+	return nil
+}
+
+func (r *MemoryRepository) CreateSession(session models.Session) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.sessions[session.TokenHash] = session
+	return nil
+}
+
+func (r *MemoryRepository) SessionByHash(hash string) (models.Session, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	session, ok := r.sessions[hash]
+	if !ok {
+		return models.Session{}, ErrNotFound
+	}
+	return session, nil
+}
+
+func (r *MemoryRepository) DeleteSession(hash string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	delete(r.sessions, hash)
+	return nil
 }

@@ -85,12 +85,8 @@ function startInvitationFlow() {
 }
 
 function renderInvitation() {
-  document.getElementById("inviteHero").style.backgroundImage = `url('${wedding.heroImage}')`;
-  document.getElementById("brideName").textContent = wedding.brideName;
-  document.getElementById("groomName").textContent = wedding.groomName;
-  document.getElementById("inviteMessage").textContent = wedding.message;
-  document.getElementById("date").textContent = WH.formatDate(wedding.date).toUpperCase();
-  document.getElementById("location").textContent = `${wedding.city} · ${wedding.state}`;
+  // The invitation card itself carries the names, date, venue and message —
+  // the page no longer duplicates them in a hero section.
   document.getElementById("verse").textContent = wedding.verse;
   document.getElementById("closingNames").textContent = `${wedding.brideName} & ${wedding.groomName}`;
   const chosen = WH.templates().find(item => item.id === wedding.templateId);

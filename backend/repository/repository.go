@@ -46,4 +46,17 @@ type Repository interface {
 	DeleteCommitteeRole(weddingID, roleID string) error
 	UpdateCommitteeMember(weddingID string, member models.CommitteeMember) (models.CommitteeMember, error)
 	DeleteCommitteeMember(weddingID, memberID string) error
+	// User accounts and passwordless login. Users are keyed by normalized email;
+	// login codes and sessions retain only SHA-256 hashes of the raw values.
+	CreateUser(user models.User) (models.User, error)
+	UserByEmail(email string) (models.User, error)
+	UserByID(id string) (models.User, error)
+	UpdateUser(user models.User) (models.User, error)
+	CreateLoginCode(email string, code models.LoginCode) error
+	LoginCode(email string) (models.LoginCode, error)
+	SaveLoginCode(email string, code models.LoginCode) error
+	DeleteLoginCode(email string) error
+	CreateSession(session models.Session) error
+	SessionByHash(hash string) (models.Session, error)
+	DeleteSession(hash string) error
 }

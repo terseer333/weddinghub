@@ -36,22 +36,27 @@
             <h1 id="login-title">Log in</h1>
             <p class="auth-subtitle">Enter your details to continue to your WeddingHub workspace.</p>
 
-            <aside class="local-notice" aria-label="Preview environment information">
+            <aside class="local-notice" aria-label="Sign-in security information">
                 <span aria-hidden="true">i</span>
-                <div>This hosted preview continues with the wedding saved in this browser. Production authentication is provided by the connected deployment.</div>
+                <div>Sign-in uses your password plus a one-time code sent to your email, so a stolen password alone cannot open your workspace.</div>
             </aside>
 
             <form class="auth-form" id="auth-form" data-auth-form="login">
-                <div class="field">
+                <div class="field" data-auth-credential>
                     <label for="email">Email address</label>
                     <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com" required>
                 </div>
-                <div class="field">
+                <div class="field" data-auth-credential>
                     <label for="password">Password</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="6" required aria-describedby="password-hint">
-                    <p class="field-hint" id="password-hint">Used only to complete this local entry form.</p>
+                    <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="10" required aria-describedby="password-hint">
+                    <p class="field-hint" id="password-hint">After your password, we email a one-time code to verify it's you.</p>
                 </div>
-                <button class="auth-submit" type="submit">Continue to workspace</button>
+                <div class="field" data-auth-code hidden>
+                    <label for="login-code">Verification code</label>
+                    <input id="login-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" maxlength="6" pattern="[0-9]{6}" aria-describedby="code-hint">
+                    <p class="field-hint" id="code-hint">Enter the 6-digit code from your email. <a href="#" data-auth-resend>Resend code</a></p>
+                </div>
+                <button class="auth-submit" type="submit">Continue</button>
             </form>
             <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
             <p class="auth-switch">Planning a new wedding? <a href="signup.html">Create a workspace</a></p>

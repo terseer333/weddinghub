@@ -127,4 +127,14 @@
   }
 
   window.WeddingHub = { getData, saveData, resetData, query, guestByToken, committeeMemberByToken, published, publicAnnouncements, committeeAnnouncements, escape, formatDate, toast, templates, countdown };
+
+  // Sign out is available wherever the page provides the button; ending the
+  // server session also clears the local token before redirecting.
+  const signOutButton = document.getElementById("signOutButton");
+  if (signOutButton) signOutButton.addEventListener("click", async () => {
+    if (window.WeddingHubAPI) {
+      try { await window.WeddingHubAPI.logoutAccount(); } catch (_) {}
+    }
+    window.location.assign("pages/login.html");
+  });
 })();

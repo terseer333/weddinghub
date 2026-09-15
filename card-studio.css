@@ -15,6 +15,13 @@
   --font-heading: 'Playfair Display', serif;
   --font-body: 'Cormorant Garamond', serif;
 
+  /* Every size inside the card is expressed in container query units (cqw), so
+     the card scales as one piece at any width — full-bleed phone, studio
+     preview, or thumbnail. Browsers without container-query support keep the
+     vw fallbacks declared alongside each cqw value. */
+  container-type: inline-size;
+  container-name: invitation-card;
+
   position: relative;
   width: min(100%, 540px);
   aspect-ratio: 3 / 4;
@@ -137,6 +144,7 @@
   align-items: center;
   justify-content: center;
   padding: clamp(1.8rem, 5vw, 3rem) clamp(1rem, 3vw, 2rem);
+  padding: clamp(1.8rem, 9cqw, 3rem) clamp(1rem, 6cqw, 2rem);
   box-sizing: border-box;
 }
 
@@ -144,10 +152,12 @@
 .card-kicker {
   font-family: var(--font-heading);
   font-size: clamp(0.55rem, 1.8vw, 0.72rem);
+  font-size: clamp(0.55rem, 2.1cqw, 0.72rem);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--card-accent);
   margin: 0 0 clamp(0.6rem, 1.8vw, 1.2rem);
+  margin-bottom: clamp(0.6rem, 3.6cqw, 1.2rem);
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
@@ -156,9 +166,11 @@
 .card-couple-names {
   font-family: var(--font-couple);
   font-size: clamp(2.2rem, 6.8vw, 3.8rem);
+  font-size: clamp(2.2rem, 11.2cqw, 3.8rem);
   line-height: 1.05;
   color: var(--card-text);
   margin: 0 0 clamp(0.5rem, 1.6vw, 1.1rem);
+  margin-bottom: clamp(0.5rem, 3.3cqw, 1.1rem);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -177,11 +189,14 @@
 /* Invitation Invitation Message */
 .card-invitation-message {
   font-size: clamp(0.72rem, 2.2vw, 0.92rem);
+  font-size: clamp(0.72rem, 2.7cqw, 0.92rem);
   line-height: 1.45;
   color: var(--card-text);
   opacity: 0.92;
   margin: 0 0 clamp(0.6rem, 2vw, 1.2rem);
+  margin-bottom: clamp(0.6rem, 3.6cqw, 1.2rem);
   max-width: 320px;
+  max-width: 60cqw;
   font-style: italic;
 }
 
@@ -191,7 +206,9 @@
   align-items: center;
   justify-content: center;
   gap: clamp(8px, 2vw, 16px);
+  gap: clamp(8px, 3cqw, 16px);
   margin: clamp(0.4rem, 1.5vw, 0.9rem) 0 0.2rem;
+  margin-top: clamp(0.4rem, 2.7cqw, 0.9rem);
   width: 100%;
 }
 
@@ -205,6 +222,7 @@
 .date-day-name, .date-time {
   font-family: var(--font-heading);
   font-size: clamp(0.58rem, 1.8vw, 0.72rem);
+  font-size: clamp(0.58rem, 2.1cqw, 0.72rem);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--card-text);
@@ -214,6 +232,7 @@
 .date-day-num {
   font-family: var(--font-heading);
   font-size: clamp(1.8rem, 5.5vw, 2.8rem);
+  font-size: clamp(1.6rem, 8.3cqw, 2.8rem);
   line-height: 1;
   color: var(--card-accent);
   font-weight: 400;
@@ -223,17 +242,20 @@
 .date-month-year {
   font-family: var(--font-heading);
   font-size: clamp(0.62rem, 1.9vw, 0.76rem);
+  font-size: clamp(0.62rem, 2.25cqw, 0.76rem);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--card-accent);
   font-weight: 600;
   margin: 0 0 clamp(0.5rem, 1.8vw, 1.1rem);
+  margin-bottom: clamp(0.5rem, 3.3cqw, 1.1rem);
 }
 
 /* Venue Line */
 .card-venue-line {
   font-family: var(--font-heading);
   font-size: clamp(0.74rem, 2.3vw, 0.96rem);
+  font-size: clamp(0.74rem, 2.85cqw, 0.96rem);
   color: var(--card-text);
   margin: 0 0 0.2rem;
   font-weight: 400;
@@ -242,20 +264,25 @@
 
 .card-city-line {
   font-size: clamp(0.65rem, 2vw, 0.82rem);
+  font-size: clamp(0.65rem, 2.4cqw, 0.82rem);
   color: var(--card-text);
   opacity: 0.82;
   margin: 0 0 clamp(0.6rem, 2vw, 1.2rem);
+  margin-bottom: clamp(0.6rem, 3.6cqw, 1.2rem);
 }
 
 /* RSVP Block */
 .card-rsvp-block {
   margin-top: clamp(0.3rem, 1.2vw, 0.8rem);
+  margin-top: clamp(0.3rem, 2.4cqw, 0.8rem);
   font-style: italic;
   font-size: clamp(0.68rem, 2vw, 0.84rem);
+  font-size: clamp(0.68rem, 2.5cqw, 0.84rem);
   color: var(--card-text);
   opacity: 0.9;
   border-top: 1px solid color-mix(in srgb, var(--card-accent) 40%, transparent);
   padding-top: clamp(0.3rem, 1vw, 0.6rem);
+  padding-top: clamp(0.3rem, 1.8cqw, 0.6rem);
   width: 85%;
 }
 
@@ -266,26 +293,50 @@
 }
 
 /* --- 3-PANEL CARD CUSTOMIZATION STUDIO LAYOUT --- */
+/* Mobile-first: one column, natural page scrolling. Wide screens upgrade to
+   the side-by-side panels with their own internal scroll areas. */
 .card-studio-layout {
   display: grid;
-  grid-template-columns: 340px 1fr 360px;
-  gap: 20px;
-  min-height: calc(100vh - 120px);
+  grid-template-columns: 1fr;
+  gap: 16px;
   align-items: start;
 }
 
-@media (max-width: 1200px) {
+/* Grid items must be allowed to shrink below their content size, otherwise a
+   wide preview overflows the track and causes horizontal page scrolling. */
+.studio-panel {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
   .card-studio-layout {
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: minmax(280px, 320px) 1fr;
+    gap: 20px;
+    min-height: calc(100vh - 120px);
   }
   .card-studio-controls-panel {
     grid-column: 1 / -1;
   }
+  .template-gallery-panel {
+    max-height: 820px;
+  }
+  .template-cards-scroll {
+    max-height: 640px;
+  }
+  .customizer-tab-content {
+    max-height: 700px;
+  }
 }
 
-@media (max-width: 900px) {
+/* Three columns only where the viewport can actually host them: the admin
+   shell keeps a 264px sidebar and ~92px of view padding, so below ~1500px the
+   middle preview column would be squeezed to a sliver. */
+@media (min-width: 1500px) {
   .card-studio-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(300px, 340px) minmax(0, 1fr) minmax(320px, 360px);
+  }
+  .card-studio-controls-panel {
+    grid-column: auto;
   }
 }
 
@@ -328,9 +379,6 @@
 }
 
 /* Left Panel: Template Gallery */
-.template-gallery-panel {
-  max-height: 820px;
-}
 
 .gallery-search-box {
   padding: 12px 16px;
@@ -375,11 +423,9 @@
 
 .template-cards-scroll {
   padding: 16px;
-  overflow-y: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(130px, 42vw), 1fr));
   gap: 12px;
-  max-height: 640px;
 }
 
 /* Template Miniature Card */
@@ -535,28 +581,52 @@
   font-weight: bold;
 }
 
-/* Live Stage Canvas Area */
+/* Live Stage Canvas Area — fluid on phones, fixed-height canvas on desktop */
 .preview-stage-container {
   flex: 1;
+  /* Without a definite height the flex-basis-0 stage collapses to nothing on
+     mobile (the panel has no fixed height below 900px), which hid the preview
+     card entirely on phones. */
+  min-height: clamp(420px, 125vw, 620px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
-  min-height: 600px;
+  padding: clamp(16px, 4vw, 40px) clamp(12px, 3vw, 20px);
   overflow: auto;
   position: relative;
   background: radial-gradient(#cbd5e1 1px, transparent 1px);
   background-size: 16px 16px;
 }
 
+@media (min-width: 900px) {
+  .preview-stage-container {
+    min-height: 600px;
+  }
+}
+
 .card-stage-wrapper {
+  /* A definite width lets the card's percentage width resolve; without it the
+     shrink-to-fit chain bottoms out at 0 and the card vanishes. */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  max-width: 100%;
   transform-origin: center center;
   transition: transform 0.2s ease;
 }
 
-/* Phone Bezel Container */
+/* The device container is re-created by the studio script with an id only, so
+   it needs the same definite width for the card inside to resolve against. */
+#cardDeviceContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Phone Bezel Container — never wider than the stage itself */
 .phone-mockup-frame {
-  width: 380px;
+  width: min(380px, 100%);
+  box-sizing: border-box;
   padding: 24px 14px 34px;
   background: #1e293b;
   border-radius: 44px;
@@ -611,8 +681,6 @@
 
 .customizer-tab-content {
   padding: 20px;
-  overflow-y: auto;
-  max-height: 700px;
 }
 
 .customizer-section {
@@ -819,11 +887,46 @@
 
 /* Public & Guest Page Card Showcase */
 .invitation-card-showcase-section {
-  padding: 50px 20px;
+  padding: clamp(28px, 6vw, 50px) clamp(14px, 4vw, 20px);
   background: #1e2b20;
   display: flex;
   justify-content: center;
   position: relative;
+}
+
+/* Slim top bar that replaces the old full-screen hero invitation — the card
+   below is the invitation, so the page no longer shows it twice. */
+.invite-topbar {
+  background: #1e2b20;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+}
+.invite-topbar-nav {
+  display: flex;
+  width: min(1150px, 100% - 2 * clamp(16px, 5vw, 48px));
+  margin-inline: auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  color: #fff;
+}
+.invite-topbar-nav .brand {
+  color: #fff;
+}
+
+/* Guest greeting + RSVP actions under the invitation card */
+.card-showcase-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 0 clamp(14px, 4vw, 20px) 6px;
+  color: #fff;
+  text-align: center;
+}
+.card-showcase-actions .invite-actions {
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .card-showcase-container {
@@ -838,8 +941,10 @@
 .card-showcase-toolbar {
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
 }
 
 .card-showcase-toolbar .card-badge {

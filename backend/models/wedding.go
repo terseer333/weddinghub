@@ -56,15 +56,6 @@ const (
 	RoleGuest           Role = "guest"
 )
 
-type User struct {
-	ID           string    `json:"id"`
-	Email        string    `json:"email"`
-	DisplayName  string    `json:"display_name"`
-	Role         Role      `json:"role"`
-	PasswordHash string    `json:"-"`
-	CreatedAt    time.Time `json:"created_at"`
-}
-
 type Admin struct {
 	UserID string `json:"user_id"`
 	Role   Role   `json:"role"`

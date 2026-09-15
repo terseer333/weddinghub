@@ -1,7 +1,16 @@
 /* ================================================================
    WeddingHub Invitation Card — Layout & Background System
    Layered on top of the base .luxury-invitation-card component.
+   All sizes are container-relative (cqw) so each layout scales with
+   the card itself; vw fallbacks cover browsers without container
+   query support. The container is also declared here because some
+   pages load this file without card-studio.css.
    ================================================================ */
+
+.luxury-invitation-card {
+  container-type: inline-size;
+  container-name: invitation-card;
+}
 
 /* --- Shared auxiliary layers ------------------------------------- */
 .luxury-invitation-card .card-glow-layer,
@@ -81,9 +90,11 @@
   justify-content: flex-end;
   margin: 34% auto 0;
   padding-bottom: clamp(2rem, 6vw, 3.5rem);
+  padding-bottom: clamp(2rem, 10.4cqw, 3.5rem);
 }
 .luxury-invitation-card[data-layout="top-arch"] .card-couple-names {
   margin-top: clamp(0.2rem, 1vw, 0.6rem);
+  margin-top: clamp(0.2rem, 1.8cqw, 0.6rem);
 }
 
 /* --- Layout: Royal Frame ----------------------------------------- */
@@ -101,6 +112,7 @@
 .luxury-invitation-card[data-layout="tropical-fringe"] .card-inner-content {
   margin: auto;
   padding: clamp(1.4rem, 4vw, 2.4rem) clamp(1rem, 3vw, 2rem);
+  padding: clamp(1.4rem, 7.1cqw, 2.4rem) clamp(1rem, 5.9cqw, 2rem);
   border-radius: 6px;
   background: color-mix(in srgb, var(--card-bg) 84%, transparent);
   box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.55);
@@ -120,6 +132,7 @@
   flex-direction: row;
   justify-content: flex-start;
   gap: clamp(8px, 2vw, 14px);
+  gap: clamp(8px, 2.6cqw, 14px);
 }
 .luxury-invitation-card[data-layout="modern-minimal"] .date-divider {
   display: none;
@@ -127,9 +140,11 @@
 .luxury-invitation-card[data-layout="modern-minimal"] .date-day-name,
 .luxury-invitation-card[data-layout="modern-minimal"] .date-time {
   font-size: clamp(0.58rem, 1.8vw, 0.72rem);
+  font-size: clamp(0.58rem, 2.1cqw, 0.72rem);
 }
 .luxury-invitation-card[data-layout="modern-minimal"] .date-day-num {
   font-size: clamp(1.8rem, 5.5vw, 2.6rem);
+  font-size: clamp(1.6rem, 7.7cqw, 2.6rem);
 }
 .luxury-invitation-card[data-layout="modern-minimal"] .card-rsvp-block {
   text-align: left;
@@ -140,6 +155,7 @@
   justify-content: flex-end;
   margin: auto 0 0;
   padding-bottom: clamp(2.2rem, 7vw, 4rem);
+  padding-bottom: clamp(2.2rem, 11.9cqw, 4rem);
 }
 .luxury-invitation-card[data-layout="editorial-top"] .card-couple-names {
   order: 1;
@@ -164,4 +180,5 @@
 .luxury-invitation-card[data-layout="editorial-top"] .card-kicker {
   order: 7;
   margin-top: clamp(0.7rem, 2vw, 1.2rem);
+  margin-top: clamp(0.7rem, 3.6cqw, 1.2rem);
 }

@@ -34,6 +34,37 @@
     return value ? { Authorization: `Bearer ${value}` } : {};
   }
 
+  // User sessions issued by /api/auth/login/verify. Kept apart from the admin
+  // capability token: one browser can hold a session and no wedding admin rights.
+  const SESSION_KEY = "weddinghub_session_token";
+  function sessionToken() { return localStorage.getItem(SESSION_KEY) || ""; }
+  function sessionHeader() {
+    const value = sessionToken();
+    return value ? { Authorization: `Bearer ${value}` } : {};
+  }
+  function storeSession(session) {
+    if (session?.session_token) localStorage.setItem(SESSION_KEY, session.session_token);
+    if (session?.user) localStorage.setItem("weddinghub_user", JSON.stringify({
+      fullName: session.user.full_name, email: session.user.email
+    }));
+  }
+  async function logoutAccount() {
+    if (sessionToken()) {
+      try { await request("/api/auth/logout", { method: "POST", headers: sessionHeader() }); } catch (_) {}
+    }
+    localStorage.removeItem(SESSION_KEY);
+  }
+  function registerAccount(email, fullName, password) {
+    return request("/api/auth/register", { method: "POST", body: JSON.stringify({ email, full_name: fullName, password }) });
+  }
+  function requestLoginCode(email, password) {
+    return request("/api/auth/login/start", { method: "POST", body: JSON.stringify({ email, password }) });
+  }
+  function verifyLoginCode(email, code) {
+    return request("/api/auth/login/verify", { method: "POST", body: JSON.stringify({ email, code }) });
+  }
+  function currentUser() { return request("/api/auth/me", { headers: sessionHeader() }); }
+
   function toAPI(data) {
     const w = data.wedding;
     return {
@@ -275,5 +306,6 @@
     adminOverview, adminRoster, committeeDashboard, committeeChat, sendCommitteeMessage, createTask, updateTask, deleteTask,
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
     saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,
-    isOnline, mergeAPI, toAPI, baseURL, adminToken, storeAdminToken };
+    isOnline, mergeAPI, toAPI, baseURL, adminToken, storeAdminToken,
+    sessionToken, sessionHeader, storeSession, logoutAccount, registerAccount, requestLoginCode, verifyLoginCode, currentUser };
 })();
