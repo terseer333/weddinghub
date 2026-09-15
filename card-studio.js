@@ -371,23 +371,25 @@
   }
 
   function renderLiveCard() {
-    const mount = document.getElementById("liveCardMount");
     const deviceContainer = document.getElementById("cardDeviceContainer");
-    if (!mount || !deviceContainer) return;
+    if (!deviceContainer) return;
 
     const html = WeddingInvitation.card(AdminApp.data, currentTemplateId, "", activeCustomConfig);
 
+    // Keep #liveCardMount inside the rewritten markup: the first render
+    // replaces deviceContainer.innerHTML, so the mount must be re-created or
+    // every later renderLiveCard() call would find no mount and bail out.
     if (currentDevice === "mobile") {
       deviceContainer.className = "phone-mockup-frame";
       deviceContainer.innerHTML = `
         <div class="phone-notch"></div>
         <div class="phone-screen">
-          ${html}
+          <div id="liveCardMount">${html}</div>
         </div>
       `;
     } else {
       deviceContainer.className = "";
-      deviceContainer.innerHTML = html;
+      deviceContainer.innerHTML = `<div id="liveCardMount">${html}</div>`;
     }
   }
 
