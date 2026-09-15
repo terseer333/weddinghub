@@ -1,0 +1,87 @@
+<!doctype html><html><body>
+<iframe id="frame" src="pages/dashboard.html" style="width:1600px;height:1200px"></iframe>
+<pre id="__RESULTS">pending</pre>
+<script>
+const frame = document.getElementById("frame");
+const results = {};
+function q(sel) { return frame.contentDocument.querySelector(sel); }
+function qa(sel) { return [...frame.contentDocument.querySelectorAll(sel)]; }
+function card() { return q("#liveCardMount .luxury-invitation-card"); }
+function vars(el) { const m = {}; (el.getAttribute("style") || "").split(";").forEach(p => { const [k, v] = p.split(":"); if (k && v) m[k.trim()] = v.trim(); }); return m; }
+
+frame.addEventListener("load", () => {
+  setTimeout(() => {
+    try {
+      // open the Card Studio view
+      q('.side-link[data-view="designs"]').click();
+      setTimeout(() => {
+        const before = card();
+        results.initialTemplate = before?.getAttribute("data-template-id");
+        results.initialBg = vars(before || document.createElement("div"))["--card-bg"];
+        results.initialLayout = before?.getAttribute("data-layout");
+
+        // 1. switch template via the gallery
+        const cards = qa(".template-mini-card");
+        results.galleryCount = cards.length;
+        const alt = cards.find(c => c.dataset.templateId !== results.initialTemplate);
+        alt?.click();
+        setTimeout(() => {
+          const afterTpl = card();
+          results.afterTemplateSwitch = afterTpl?.getAttribute("data-template-id");
+          results.afterTplBg = vars(afterTpl)["--card-bg"];
+
+          // 2. colors tab
+          q('.customizer-tab-btn[data-tab="colors"]')?.click();
+          setTimeout(() => {
+            const pick = q("#colorBgPick");
+            const hex = q("#colorBgHex");
+            results.colorPickFound = Boolean(pick);
+            if (pick) {
+              pick.value = "#123456";
+              pick.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+            setTimeout(() => {
+              const afterColor = card();
+              results.afterColorChange = vars(afterColor)["--card-bg"];
+
+              // 3. fonts tab
+              q('.customizer-tab-btn[data-tab="fonts"]')?.click();
+              setTimeout(() => {
+                const fontSel = q("#fontCoupleSelect");
+                results.fontSelFound = Boolean(fontSel);
+                if (fontSel && fontSel.options.length > 1) {
+                  fontSel.value = fontSel.options[1].value;
+                  fontSel.dispatchEvent(new Event("change", { bubbles: true }));
+                }
+                setTimeout(() => {
+                  results.afterFontChange = vars(card())["--font-couple"];
+
+                  // 4. decorations tab — layout change
+                  q('.customizer-tab-btn[data-tab="decorations"]')?.click();
+                  setTimeout(() => {
+                    const layoutSel = q("#layoutSelect");
+                    results.layoutSelFound = Boolean(layoutSel);
+                    if (layoutSel && layoutSel.options.length > 1) {
+                      layoutSel.value = layoutSel.options[1].value;
+                      layoutSel.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
+                    setTimeout(() => {
+                      const fin = card();
+                      results.afterLayoutChange = fin?.getAttribute("data-layout");
+                      results.finalTemplate = fin?.getAttribute("data-template-id");
+                      document.getElementById("__RESULTS").textContent = "RESULTS:" + JSON.stringify(results, null, 1);
+                    }, 200);
+                  }, 150);
+                }, 200);
+              }, 150);
+            }, 200);
+          }, 150);
+        }, 200);
+      }, 300);
+    } catch (err) {
+      document.getElementById("__RESULTS").textContent = "ERROR:" + err.message + "\n" + err.stack;
+    }
+  }, 300);
+});
+</script>
+</body></html>

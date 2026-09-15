@@ -667,4 +667,32 @@ func TestCardConfigAndCommitteeRoles(t *testing.T) {
 	if deleteRoleResp.Code != http.StatusNoContent {
 		t.Fatalf("DELETE committee role status = %d: %s", deleteRoleResp.Code, deleteRoleResp.Body)
 	}
+
+	// 6. The saved card design must reach the invitation view — that payload is
+	// what the guest invitation page merges to render the preview card, so a
+	// studio save has to be visible here for guests to see it.
+	invToken, invHash, err := models.NewOpaqueToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.AddInvitation("w_card_test", models.Invitation{ID: "i_card_test", GuestName: "Taylor", Status: models.InvitationPending, TokenHash: invHash, CreatedAt: now}); err != nil {
+		t.Fatal(err)
+	}
+	invReq := httptest.NewRequest(http.MethodGet, "/api/invitations/"+invToken, nil)
+	invResp := httptest.NewRecorder()
+	handler.ServeHTTP(invResp, invReq)
+	if invResp.Code != http.StatusOK {
+		t.Fatalf("GET invitation status = %d: %s", invResp.Code, invResp.Body)
+	}
+	var invView struct {
+		Wedding struct {
+			CardConfig *models.CardConfig `json:"card_config"`
+		} `json:"wedding"`
+	}
+	if err := json.Unmarshal(invResp.Body.Bytes(), &invView); err != nil {
+		t.Fatal(err)
+	}
+	if invView.Wedding.CardConfig == nil || invView.Wedding.CardConfig.TemplateID != "royal-black-gold" {
+		t.Fatalf("invitation view did not carry the saved card design: %+v", invView.Wedding.CardConfig)
+	}
 }
