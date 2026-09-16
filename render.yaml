@@ -1,0 +1,17 @@
+# Render Blueprint: one web service that serves both the Go API (/api/*)
+# and the static frontend from the repository root.
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: weddinghub
+    runtime: go
+    plan: free
+    buildCommand: cd backend && go build -o app ./cmd
+    startCommand: ./backend/app
+    healthCheckPath: /healthz
+    envVars:
+      # Serve static files from the repo root (the start command runs there,
+      # but pin it so the path never depends on the working directory).
+      # PORT is injected by Render; the server binds 0.0.0.0:$PORT.
+      - key: WEDDINGHUB_STATIC_DIR
+        value: /opt/render/project/src

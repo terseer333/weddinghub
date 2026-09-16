@@ -14,9 +14,15 @@ import (
 )
 
 func main() {
+	// Render and similar PaaS providers inject PORT and require the server
+	// to bind 0.0.0.0 on that port; WEDDINGHUB_ADDR still wins for manual runs.
 	address := os.Getenv("WEDDINGHUB_ADDR")
 	if address == "" {
-		address = ":8080"
+		if port := os.Getenv("PORT"); port != "" {
+			address = "0.0.0.0:" + port
+		} else {
+			address = ":8080"
+		}
 	}
 
 	apiHandler := api.New(repository.NewMemoryRepository())
