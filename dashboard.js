@@ -1,5 +1,19 @@
 const WH = WeddingHub;
 const API = WeddingHubAPI;
+
+// The dashboard is a protected workspace. A signed-out browser must not be
+// able to continue rendering it from a stale page or cached local workspace.
+function enforceAuthenticatedSession() {
+  const hasAuthenticatedSession = Boolean(
+    API.sessionToken() ||
+    localStorage.getItem("weddinghub_user") ||
+    localStorage.getItem("weddinghub_local_profile")
+  );
+  if (!hasAuthenticatedSession) window.location.replace("pages/login.html");
+}
+enforceAuthenticatedSession();
+window.addEventListener("pageshow", enforceAuthenticatedSession);
+
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
 let data = WH.getData() || {};

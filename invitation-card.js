@@ -95,6 +95,8 @@
     if (!nameOne && nameTwo) { nameOne = nameTwo; nameTwo = ""; }
 
     const venue = wedding.venue || "";
+    const receptionEvent = (data?.events || []).find(event => /reception/i.test(event.name || "") && event.venue);
+    const receptionVenue = wedding.receptionVenue || receptionEvent?.venue || "";
     const address = wedding.address || "";
     const city = wedding.city || "";
     const state = wedding.state || "";
@@ -149,8 +151,9 @@
           </div>
           <p class="date-month-year">${dateData.monthYear}</p>` : "";
 
-    const venueBlock = venue ? `
-          <p class="card-venue-line">${WH.escape(venue)}</p>
+    const venueBlock = (venue || receptionVenue) ? `
+          ${venue ? `<p class="card-venue-line">${WH.escape(venue)}</p>` : ''}
+          ${receptionVenue ? `<p class="card-reception-venue-line">Reception: ${WH.escape(receptionVenue)}</p>` : ''}
           ${fullLocation ? `<p class="card-city-line">${WH.escape(fullLocation)}</p>` : ''}` : "";
 
     const messageBlock = message ? `
@@ -374,15 +377,24 @@
     }
 
     // Venue & Location
-    if (wedding.venue) {
+    const receptionEvent = (data?.events || []).find(event => /reception/i.test(event.name || "") && event.venue);
+    const receptionVenue = wedding.receptionVenue || receptionEvent?.venue || "";
+    if (wedding.venue || receptionVenue) {
       ctx.fillStyle = text;
       ctx.font = `34px ${resolveFont(config.fonts?.heading, "serif")}`;
-      ctx.fillText(wedding.venue, W / 2, 960);
+      if (wedding.venue) ctx.fillText(wedding.venue, W / 2, 960);
+
+      let locationY = wedding.venue ? 1010 : 960;
+      if (receptionVenue) {
+        ctx.font = `26px ${resolveFont(config.fonts?.body, "serif")}`;
+        ctx.fillText(`Reception: ${receptionVenue}`, W / 2, locationY);
+        locationY += 45;
+      }
 
       const cityState = [wedding.address, wedding.city, wedding.state].filter(Boolean).join(", ");
       if (cityState) {
         ctx.font = `26px ${resolveFont(config.fonts?.body, "serif")}`;
-        ctx.fillText(cityState, W / 2, 1010);
+        ctx.fillText(cityState, W / 2, locationY);
       }
     }
 

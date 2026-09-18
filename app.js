@@ -132,9 +132,16 @@
   // server session also clears the local token before redirecting.
   const signOutButton = document.getElementById("signOutButton");
   if (signOutButton) signOutButton.addEventListener("click", async () => {
-    if (window.WeddingHubAPI) {
-      try { await window.WeddingHubAPI.logoutAccount(); } catch (_) {}
+    signOutButton.disabled = true;
+    try {
+      if (window.WeddingHubAPI) await window.WeddingHubAPI.logoutAccount();
+    } finally {
+      localStorage.removeItem("weddinghub_session_token");
+      localStorage.removeItem("weddinghub_user");
+      localStorage.removeItem("weddinghub_local_profile");
+      localStorage.removeItem("weddinghub_admin_token");
+      sessionStorage.removeItem("weddinghub_invitation_token");
+      window.location.assign("pages/login.html");
     }
-    window.location.assign("pages/login.html");
   });
 })();

@@ -53,6 +53,10 @@
       try { await request("/api/auth/logout", { method: "POST", headers: sessionHeader() }); } catch (_) {}
     }
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem("weddinghub_user");
+    localStorage.removeItem("weddinghub_local_profile");
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+    sessionStorage.removeItem("weddinghub_invitation_token");
   }
   function registerAccount(email, fullName, password) {
     return request("/api/auth/register", { method: "POST", body: JSON.stringify({ email, full_name: fullName, password }) });

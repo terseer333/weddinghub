@@ -98,7 +98,7 @@ function renderInvitation() {
     document.getElementById("inviteActions").innerHTML = '<a class="button ivory" href="../index.html">Return to WeddingHub</a>';
   } else if (adminPreview) {
     document.getElementById("personalGreeting").textContent = "Guest preview · this is how your invitation currently appears.";
-    document.getElementById("inviteActions").innerHTML = '<a class="button ivory" href="dashboard.html">Return to editor</a>';
+    document.getElementById("inviteActions").innerHTML = '<a class="button ivory" href="dashboard.html#designs">Return to editor</a>';
     document.getElementById("bottomAccept").hidden = true;
   } else if (member) {
     document.getElementById("personalGreeting").textContent = `Dear ${member.name.split(" ")[0]}, you're invited to help plan and organize this wedding.`;
