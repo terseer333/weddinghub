@@ -865,6 +865,22 @@
   justify-content: center;
 }
 
+/* Admin Preview Card focus mode: show only the designed card */
+body.invite-preview-mode .invite-hero,
+body.invite-preview-mode .invitation-main {
+  display: none;
+}
+body.invite-preview-mode .invitation-card-showcase-section {
+  min-height: 100vh;
+  align-items: center;
+  padding: 60px 20px;
+}
+.card-showcase-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 
 /* --- Card Studio Gallery layout tag & effect toggles --- */
 .template-mini-card {

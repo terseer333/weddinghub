@@ -96,6 +96,14 @@ function renderInvitation() {
   const chosen = WH.templates().find(item => item.id === wedding.templateId);
   document.body.classList.add(`invite-tone-${chosen?.tone || 0}`);
 
+  // Admin "Preview Card" focuses on the designed card only: it drops the generic
+  // hero/cover and the guest sections, and exposes the return-to-editor control.
+  if (adminPreview) {
+    document.body.classList.add("invite-preview-mode");
+    const returnBtn = document.getElementById("previewReturnBtn");
+    if (returnBtn) returnBtn.hidden = false;
+  }
+
   const inviteePerson = invitee();
   if (!guest && !member) {
     document.getElementById("personalGreeting").textContent = "This invitation link is invalid or has expired.";
