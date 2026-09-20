@@ -51,3 +51,15 @@ html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}body{f
 .template-preview-modal .button,.share-layout .button{justify-self:center}
 .share-layout{display:grid;gap:16px}
 .share-heading{text-align:center}
+/* Admin sidebar: vertical scrolling + collapsible menu (desktop) */
+.desktop-menu-toggle{display:none}
+.admin-sidebar::-webkit-scrollbar{width:8px}
+.admin-sidebar::-webkit-scrollbar-thumb{background:rgba(120,140,130,.35);border-radius:8px}
+@media(min-width:1001px){
+.admin-sidebar{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;transition:transform .25s ease}
+.admin-main{transition:margin-left .25s ease}
+.desktop-menu-toggle{display:grid;place-items:center;width:40px;height:40px;margin-right:14px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font-size:16px;line-height:1;cursor:pointer}
+.desktop-menu-toggle:hover{border-color:var(--gold)}
+.admin-layout.sidebar-collapsed .admin-sidebar{transform:translateX(-105%)}
+.admin-layout.sidebar-collapsed .admin-main{margin-left:0}
+}

@@ -204,8 +204,35 @@ $$('[data-jump]').forEach(button => {
   };
 });
 
+function setupSidebarToggle() {
+  const layout = document.querySelector('.admin-layout');
+  const topbar = document.querySelector('.admin-topbar');
+  if (!layout || !topbar) return;
+  const button = document.createElement('button');
+  button.id = 'desktopMenuToggle';
+  button.type = 'button';
+  button.className = 'desktop-menu-toggle';
+  button.setAttribute('aria-label', 'Toggle navigation menu');
+  button.textContent = '\u2630';
+  const mobileBtn = document.getElementById('menuButton');
+  topbar.insertBefore(button, mobileBtn ? mobileBtn.nextSibling : topbar.firstChild);
+  const KEY = 'weddinghub_sidebar_collapsed';
+  const apply = collapsed => {
+    layout.classList.toggle('sidebar-collapsed', collapsed);
+    button.setAttribute('aria-expanded', String(!collapsed));
+  };
+  let collapsed = false;
+  try { collapsed = localStorage.getItem(KEY) === '1'; } catch (_) {}
+  apply(collapsed);
+  button.onclick = () => {
+    collapsed = !layout.classList.contains('sidebar-collapsed');
+    apply(collapsed);
+    try { localStorage.setItem(KEY, collapsed ? '1' : '0'); } catch (_) {}
+  };
+}
 const menuBtn = $('#menuButton');
 if (menuBtn) menuBtn.onclick = openSidebar;
+setupSidebarToggle();
 const sideClose = $('#sidebarClose');
 if (sideClose) sideClose.onclick = closeSidebar;
 const sideBackdrop = $('#sidebarBackdrop');
