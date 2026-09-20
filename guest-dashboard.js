@@ -55,7 +55,7 @@ function renderGuestDashboard() {
 
   document.getElementById("storyTimeline").innerHTML = WH.published(data.stories).sort((a,b) => a.order - b.order).map((story, index) => `
     <article class="${index % 2 ? "right" : ""}"><div class="story-year">${story.year}</div><span></span><div class="story-copy">
-    <small>CHAPTER ${String(index + 1).padStart(2, "0")}</small><h3>${WH.escape(story.title)}</h3><p>${WH.escape(story.content)}</p></div></article>`).join("");
+    ${story.image ? `<img class="story-image" src="${story.image}" alt="${WH.escape(story.title)}" style="width:100%;border-radius:14px;margin-bottom:14px;display:block">` : ''}<small>CHAPTER ${String(index + 1).padStart(2, "0")}</small><h3>${WH.escape(story.title)}</h3><p>${WH.escape(story.content)}</p></div></article>`).join("");
   renderGallery();
   document.getElementById("guestEventList").innerHTML = WH.published(data.events).map((event, index) => {
     const date = new Date(`${event.date}T12:00`);

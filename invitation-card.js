@@ -100,6 +100,9 @@
     const state = wedding.state || "";
     const fullLocation = [address, city, state].filter(Boolean).join(", ");
     const message = wedding.message || "";
+    // Reception venue: prefer the value entered in Wedding information, otherwise fall
+    // back to the venue of the wedding's "reception" event. Never rendered when empty.
+    const receptionVenue = wedding.receptionVenue || ((data.events || []).find(event => /reception/i.test(event.name || "")) || {}).venue || "";
 
     const dateData = parseWeddingDate(wedding.date);
     const timeString = wedding.ceremonyTime ? `AT ${wedding.ceremonyTime}` : "";
@@ -149,9 +152,10 @@
           </div>
           <p class="date-month-year">${dateData.monthYear}</p>` : "";
 
-    const venueBlock = venue ? `
-          <p class="card-venue-line">${WH.escape(venue)}</p>
-          ${fullLocation ? `<p class="card-city-line">${WH.escape(fullLocation)}</p>` : ''}` : "";
+    const venueBlock = (venue || receptionVenue) ? `
+          ${venue ? `<p class="card-venue-line">${WH.escape(venue)}</p>` : ''}
+          ${fullLocation ? `<p class="card-city-line">${WH.escape(fullLocation)}</p>` : ''}
+          ${receptionVenue ? `<p class="card-reception-line">Reception · ${WH.escape(receptionVenue)}</p>` : ''}` : "";
 
     const messageBlock = message ? `
           <p class="card-invitation-message">${WH.escape(message)}</p>` : "";
@@ -374,6 +378,7 @@
     }
 
     // Venue & Location
+    const canvasReceptionVenue = wedding.receptionVenue || ((data.events || []).find(event => /reception/i.test(event.name || "")) || {}).venue || "";
     if (wedding.venue) {
       ctx.fillStyle = text;
       ctx.font = `34px ${resolveFont(config.fonts?.heading, "serif")}`;
@@ -384,6 +389,12 @@
         ctx.font = `26px ${resolveFont(config.fonts?.body, "serif")}`;
         ctx.fillText(cityState, W / 2, 1010);
       }
+    }
+
+    if (canvasReceptionVenue) {
+      ctx.fillStyle = accent;
+      ctx.font = `26px ${resolveFont(config.fonts?.body, "serif")}`;
+      ctx.fillText(`Reception · ${canvasReceptionVenue}`, W / 2, 1055);
     }
 
     // Invitation Message

@@ -206,6 +206,13 @@
       };
     }
 
+    // Persist the in-progress selection before opening the full preview, so the preview
+    // reflects it and the return trip to Card Studio → Templates keeps it selected.
+    const previewBtn = document.getElementById("studioOpenPreviewBtn");
+    if (previewBtn) {
+      previewBtn.onclick = () => applyDesignToData();
+    }
+
     // Customizer tabs
     document.querySelectorAll(".customizer-tab-btn").forEach(btn => {
       btn.onclick = () => {
@@ -650,10 +657,8 @@
     };
   }
 
-  async function saveCustomDesign() {
-    const wedding = AdminApp.data.wedding;
-    wedding.templateId = currentTemplateId;
-    const config = {
+  function buildCardConfig() {
+    return {
       template_id: currentTemplateId,
       fonts: {
         couple: activeCustomConfig.fonts.couple,
@@ -676,14 +681,27 @@
         background: activeCustomConfig.background.style || "solid"
       }
     };
-    wedding.cardConfig = config;
+  }
+
+  // Writes the studio's current template and customizations into the shared wedding
+  // record and persists locally, so the selection survives the Preview Card round trip.
+  function applyDesignToData() {
+    const wedding = AdminApp.data.wedding;
+    wedding.templateId = currentTemplateId;
+    wedding.cardConfig = buildCardConfig();
+    WeddingHub.saveData(AdminApp.data);
+  }
+
+  async function saveCustomDesign() {
+    applyDesignToData();
+    const wedding = AdminApp.data.wedding;
 
     await AdminApp.persist("Invitation card design saved");
 
     // Also push the design through the dedicated card config endpoint
     try {
       if (window.WeddingHubAPI) {
-        const res = await WeddingHubAPI.saveCardConfig(wedding.id, config);
+        const res = await WeddingHubAPI.saveCardConfig(wedding.id, wedding.cardConfig);
         if (res) WeddingHub.toast("Card design published to all invitation links!");
       }
     } catch (err) {

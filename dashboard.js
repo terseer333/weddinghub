@@ -1,3 +1,10 @@
+// Protected page: without an authenticated profile, send the visitor to log in.
+(() => {
+  let signedIn = false;
+  try { signedIn = Boolean(localStorage.getItem("weddinghub_user") || localStorage.getItem("weddinghub_local_profile")); } catch (_) {}
+  if (!signedIn) location.replace("login.html");
+})();
+
 const WH = WeddingHub;
 const API = WeddingHubAPI;
 const $ = selector => document.querySelector(selector);
@@ -149,7 +156,7 @@ function renderContent() {
   $('#photoAdminPreview').innerHTML = data.photos.length ? `<div class="admin-gallery-stage">${data.photos.map((photo,index)=>`<img src="${photo.url}" alt="${WH.escape(photo.caption)}" class="${index===0?'active':''}">`).join('')}</div><p class="admin-gallery-caption">Guest view · ${data.photos.length} ${data.photos.length===1?'photo':'photos'} · transitions automatically</p>` : emptyState('Slideshow preview','Your guest gallery preview will appear here after you add photos.');
   clearInterval(window.adminGalleryTimer);
   if(data.photos.length>1){let previewIndex=0;window.adminGalleryTimer=setInterval(()=>{const slides=document.querySelectorAll('#photoAdminPreview .admin-gallery-stage img');if(!slides.length)return;slides[previewIndex].classList.remove('active');previewIndex=(previewIndex+1)%slides.length;slides[previewIndex].classList.add('active')},4200)}
-  $('#storyAdminList').innerHTML = data.stories.length ? [...data.stories].sort((a,b)=>a.order-b.order).map(story => `<article><span>☷</span><div><small>${WH.escape(story.year)}</small><strong>${WH.escape(story.title)}</strong><p>${WH.escape(story.content)}</p></div><b class="status ${story.status}">${story.status}</b><div class="row-menu"><button data-action="edit-story" data-id="${story.id}">Edit</button><button data-action="delete-story" data-id="${story.id}">Delete</button></div></article>`).join('') : emptyState('No story chapters yet','Tell guests how your journey began.');
+  $('#storyAdminList').innerHTML = data.stories.length ? [...data.stories].sort((a,b)=>a.order-b.order).map(story => `<article>${story.image?`<img class="story-admin-thumb" src="${story.image}" alt="" style="width:54px;height:54px;object-fit:cover;border-radius:8px">`:'<span>☷</span>'}<div><small>${WH.escape(story.year)}</small><strong>${WH.escape(story.title)}</strong><p>${WH.escape(story.content)}</p></div><b class="status ${story.status}">${story.status}</b><div class="row-menu"><button data-action="edit-story" data-id="${story.id}">Edit</button><button data-action="delete-story" data-id="${story.id}">Delete</button></div></article>`).join('') : emptyState('No story chapters yet','Tell guests how your journey began.');
 }
 function renderAnnouncements() {
   $('#announcementList').innerHTML = data.announcements.length ? data.announcements.map(item => `<article class="manage-card"><span class="manage-icon">◉</span><div class="manage-copy"><h3>${WH.escape(item.title)} <i class="status ${item.status}">${item.status}</i> ${item.audience === 'committee' ? '<b class="audience-badge committee">Committee only</b>' : ''}</h3><p>${WH.escape(item.message)}</p><small>${WH.formatDate(item.date)}</small></div><div class="row-menu"><button data-action="edit-announcement" data-id="${item.id}">Edit</button><button data-action="delete-announcement" data-id="${item.id}">Delete</button></div></article>`).join('') : emptyState('No announcements','Publish an update when guests need to know something.');

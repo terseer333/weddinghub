@@ -247,6 +247,15 @@
   margin: 0 0 clamp(0.6rem, 2vw, 1.2rem);
 }
 
+/* Reception venue line (shown only when a reception venue is provided) */
+.card-reception-line {
+  font-size: clamp(0.65rem, 2vw, 0.82rem);
+  color: var(--card-accent);
+  opacity: 0.92;
+  margin: 0 0 clamp(0.6rem, 2vw, 1.2rem);
+  letter-spacing: 0.02em;
+}
+
 /* RSVP Block */
 .card-rsvp-block {
   margin-top: clamp(0.3rem, 1.2vw, 0.8rem);
