@@ -18,13 +18,13 @@ function openMailto(href) {
   link.remove();
 }
 
-// WeddingHub's own delivery is attempted first. When the API is offline or has no
-// provider configured, delivery falls back to the admin's own mail app or WhatsApp.
-// The result is cached so later sends skip a backend that already reported unavailable.
+// WeddingHub's own delivery is attempted first. When the API has no provider
+// configured, delivery falls back to the admin's own mail app or WhatsApp. The
+// result is cached so later sends skip a backend that already reported unavailable.
 let backendDeliveryReady = null;
 
 function canUseBackend(guest) {
-  return Boolean(window.WeddingHubAPI && WeddingHubAPI.isOnline() && guest && guest.apiInvitationId && guest.token);
+  return Boolean(window.WeddingHubAPI && guest && guest.apiInvitationId && guest.token);
 }
 
 async function tryBackendSend(guest, channels) {
@@ -150,7 +150,7 @@ function openAddCommitteeMemberModal() {
       try {
         const res = await API.createCommitteeRole(null, newRole);
         if (res && res.id) newRole.id = res.id;
-      } catch (_) {}
+      } catch (error) { WH.toast(error.message || 'Could not create the role'); return; }
       AdminApp.data.committeeRoles = AdminApp.data.committeeRoles || [];
       AdminApp.data.committeeRoles.push(newRole);
       roleId = newRole.id;
@@ -175,17 +175,19 @@ function openAddCommitteeMemberModal() {
     };
     try {
       const created = await API.addGuest(member);
-      if (created) {
-        member.token = created.token;
-        member.apiInvitationId = created.invitation.id;
-      }
-    } catch (err) { console.warn(err); }
+      if (!created) throw new Error('The API did not create an invitation for this committee member.');
+      member.token = created.token;
+      member.apiInvitationId = created.invitation.id;
+    } catch (err) {
+      WH.toast(err.message || 'Could not create the committee invitation');
+      return;
+    }
     AdminApp.data.committeeMembers = AdminApp.data.committeeMembers || [];
     AdminApp.data.committeeMembers.unshift(member);
     WH.saveData(AdminApp.data);
     AdminApp.renderAll();
     AdminModal.close();
-    WH.toast(API.isOnline() ? 'Committee member invited securely' : 'Member saved in offline mode');
+    WH.toast('Committee member invited securely');
   };
 }
 
@@ -211,7 +213,7 @@ function openAddRoleModal() {
     try {
       const res = await API.createCommitteeRole(null, role);
       if (res && res.id) role.id = res.id;
-    } catch (_) {}
+    } catch (error) { WH.toast(error.message || 'Could not create the role'); return; }
     AdminApp.data.committeeRoles = AdminApp.data.committeeRoles || [];
     AdminApp.data.committeeRoles.push(role);
     await AdminApp.persist(`Added role: ${name}`);
@@ -237,11 +239,11 @@ document.getElementById('addGuest').onclick=()=>{
     }
     const roleObj = roles.find(r => r.id === roleId);
     const roleTitle = roleObj ? roleObj.name : 'Committee member';
-    const member=Object.assign({name:invite.name,email:invite.email||'',phone:invite.phone||'',roleId,role_id:roleId,title:roleTitle,committeeTitle:roleTitle,type:'committee',partySize:1},invite);Object.assign(member,{id:`cm_${Date.now()}`,token:`invite-${crypto.randomUUID()}`,invitationStatus:'pending'});try{const created=await API.addGuest(member);if(created){member.token=created.token;member.apiInvitationId=created.invitation.id}}catch(error){console.warn(error)}AdminApp.data.committeeMembers=AdminApp.data.committeeMembers||[];AdminApp.data.committeeMembers.unshift(member);WH.saveData(AdminApp.data);AdminApp.renderAll();AdminModal.close();WH.toast(API.isOnline()?'Committee invitation created securely':'Member saved in offline mode');return}const guest=Object.fromEntries(new FormData(event.target));guest.partySize=Number(guest.partySize);guest.whatsapp=Boolean(guest.whatsapp);Object.assign(guest,{id:`guest_${Date.now()}`,token:`invite-${crypto.randomUUID()}`,invitationStatus:'pending',rsvp:'pending',type:'guest'});try{const created=await API.addGuest(guest);if(created){guest.token=created.token;guest.apiInvitationId=created.invitation.id}}catch(error){console.warn(error)}AdminApp.data.guests.unshift(guest);WH.saveData(AdminApp.data);AdminApp.renderAll();AdminModal.close();WH.toast(API.isOnline()?'Guest invitation created securely':'Guest saved in offline mode');openShare(guest)}};
+    const member=Object.assign({name:invite.name,email:invite.email||'',phone:invite.phone||'',roleId,role_id:roleId,title:roleTitle,committeeTitle:roleTitle,type:'committee',partySize:1},invite);Object.assign(member,{id:`cm_${Date.now()}`,token:`invite-${crypto.randomUUID()}`,invitationStatus:'pending'});try{const created=await API.addGuest(member);if(!created)throw new Error('The API did not create an invitation for this committee member.');member.token=created.token;member.apiInvitationId=created.invitation.id}catch(error){WH.toast(error.message||'Could not create the committee invitation');return}AdminApp.data.committeeMembers=AdminApp.data.committeeMembers||[];AdminApp.data.committeeMembers.unshift(member);WH.saveData(AdminApp.data);AdminApp.renderAll();AdminModal.close();WH.toast('Committee invitation created securely');return}const guest=Object.fromEntries(new FormData(event.target));guest.partySize=Number(guest.partySize);guest.whatsapp=Boolean(guest.whatsapp);Object.assign(guest,{id:`guest_${Date.now()}`,token:`invite-${crypto.randomUUID()}`,invitationStatus:'pending',rsvp:'pending',type:'guest'});try{const created=await API.addGuest(guest);if(!created)throw new Error('The API did not create an invitation for this guest.');guest.token=created.token;guest.apiInvitationId=created.invitation.id}catch(error){WH.toast(error.message||'Could not create the invitation');return}AdminApp.data.guests.unshift(guest);WH.saveData(AdminApp.data);AdminApp.renderAll();AdminModal.close();WH.toast('Guest invitation created securely');openShare(guest)}};
 
 document.addEventListener('click',async event=>{const share=event.target.closest('[data-share-guest]');if(share){const guest=AdminApp.data.guests.find(item=>item.id===share.dataset.shareGuest);if(guest)return openShare(guest)}const copy=event.target.closest('[data-copy]');if(copy)return copyInvitation(copy.dataset.copy);const button=event.target.closest('[data-action="delete-guest"]');if(button){if(confirm('Remove this guest from your local list?')){AdminApp.data.guests=AdminApp.data.guests.filter(item=>item.id!==button.dataset.id);await AdminApp.persist('Guest removed')}return}
-const memberButton=event.target.closest('[data-action="delete-member"]');if(memberButton){if(confirm('Remove this committee member from the planning team?')){const mid=memberButton.dataset.id;const member=(AdminApp.data.committeeMembers||[]).find(item=>item.id===mid);const apiMemberId = member?.apiMembershipId || member?.apiInvitationId || mid;try{await API.deleteCommitteeMember(null,apiMemberId);}catch(_){}AdminApp.data.committeeMembers=(AdminApp.data.committeeMembers||[]).filter(item=>item.id!==mid);await AdminApp.persist('Member removed')}return}
-const roleDeleteButton=event.target.closest('[data-action="delete-role"]');if(roleDeleteButton){const roleId=roleDeleteButton.dataset.id;if(confirm('Delete this committee role? Assigned members will become unassigned.')){try{await API.deleteCommitteeRole(null,roleId);}catch(_){}AdminApp.data.committeeRoles=(AdminApp.data.committeeRoles||[]).filter(r=>r.id!==roleId);(AdminApp.data.committeeMembers||[]).forEach(m=>{if((m.roleId||m.role_id)===roleId){m.roleId='';m.role_id='';m.title='Committee member'}});await AdminApp.persist('Role deleted')}}
+const memberButton=event.target.closest('[data-action="delete-member"]');if(memberButton){if(confirm('Remove this committee member from the planning team?')){const mid=memberButton.dataset.id;const member=(AdminApp.data.committeeMembers||[]).find(item=>item.id===mid);const apiMemberId = member?.apiMembershipId || member?.apiInvitationId || mid;try{await API.deleteCommitteeMember(null,apiMemberId);}catch(error){WH.toast(error.message||'Could not remove this committee member');return}AdminApp.data.committeeMembers=(AdminApp.data.committeeMembers||[]).filter(item=>item.id!==mid);await AdminApp.persist('Member removed')}return}
+const roleDeleteButton=event.target.closest('[data-action="delete-role"]');if(roleDeleteButton){const roleId=roleDeleteButton.dataset.id;if(confirm('Delete this committee role? Assigned members will become unassigned.')){try{await API.deleteCommitteeRole(null,roleId);}catch(error){WH.toast(error.message||'Could not delete this committee role');return}AdminApp.data.committeeRoles=(AdminApp.data.committeeRoles||[]).filter(r=>r.id!==roleId);(AdminApp.data.committeeMembers||[]).forEach(m=>{if((m.roleId||m.role_id)===roleId){m.roleId='';m.role_id='';m.title='Committee member'}});await AdminApp.persist('Role deleted')}}
 });
 
 document.addEventListener('click', async event => {

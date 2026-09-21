@@ -6,45 +6,48 @@ let wedding = data.wedding;
 const token = WH.query("token");
 
 // Resolve this guest from the API by their invitation token. An accepted guest can
-// open their private space directly; an unaccepted link stays behind the gate.
+// open their private space directly; an unaccepted link stays behind the gate. Any
+// API failure propagates so the page can show a blocking error instead of falling
+// back to local data.
 async function resolveGuestFromAPI() {
   if (!token) return;
-  try {
-    const invitationView = await API.invitation(token);
-    const invitation = invitationView?.invitation;
-    if (!invitation || invitation.type === "committee") return;
-    data = API.mergeAPI(data, invitationView);
+  const invitationView = await API.invitation(token);
+  const invitation = invitationView?.invitation;
+  if (!invitation || invitation.type === "committee") return;
+  data = API.mergeAPI(data, invitationView);
+  wedding = data.wedding;
+  guest = WH.guestByToken(data) || guest;
+  if (!guest) {
+    guest = {
+      id: invitation.id, name: invitation.guest_name, type: "guest",
+      email: invitation.guest_email || "", category: "Guest",
+      invitationStatus: invitation.status, token,
+      rsvp: invitation.status === "accepted" ? "attending" : invitation.status === "declined" ? "declined" : "pending",
+      partySize: invitation.max_party_size > 0 ? invitation.max_party_size : 1
+    };
+    data.guests.push(guest);
+  } else if (invitation.status !== "pending") {
+    guest.invitationStatus = invitation.status;
+    if (invitation.status === "accepted") guest.rsvp = "attending";
+    if (invitation.status === "declined") guest.rsvp = "declined";
+  }
+  WH.saveData(data);
+  if (guest.rsvp === "attending") {
+    const view = await API.dashboard(token);
+    data = API.mergeAPI(data, view);
     wedding = data.wedding;
-    guest = WH.guestByToken(data) || guest;
-    if (!guest) {
-      guest = {
-        id: invitation.id, name: invitation.guest_name, type: "guest",
-        email: invitation.guest_email || "", category: "Guest",
-        invitationStatus: invitation.status, token,
-        rsvp: invitation.status === "accepted" ? "attending" : invitation.status === "declined" ? "declined" : "pending",
-        partySize: invitation.max_party_size > 0 ? invitation.max_party_size : 1
-      };
-      data.guests.push(guest);
-    } else if (invitation.status !== "pending") {
-      guest.invitationStatus = invitation.status;
-      if (invitation.status === "accepted") guest.rsvp = "attending";
-      if (invitation.status === "declined") guest.rsvp = "declined";
-    }
+    if (view.rsvp) guest.partySize = view.rsvp.party_size;
     WH.saveData(data);
-    if (guest.rsvp === "attending") {
-      const view = await API.dashboard(token);
-      data = API.mergeAPI(data, view);
-      wedding = data.wedding;
-      if (view.rsvp) guest.partySize = view.rsvp.party_size;
-      WH.saveData(data);
-    }
-  } catch (error) {
-    console.warn("Using local guest-dashboard fallback:", error);
   }
 }
 
 async function initializeGuestDashboard() {
-  if (token && await API.connect()) await resolveGuestFromAPI();
+  try {
+    await resolveGuestFromAPI();
+  } catch (error) {
+    API.showFatalError(error.status === 404 ? "This invitation link is invalid or has expired." : error.message);
+    return;
+  }
   if (!guest || guest.rsvp !== "attending") return showAccessGate();
   document.getElementById("accessGate").style.display = "none";
   renderGuestDashboard();
@@ -144,8 +147,13 @@ document.getElementById("rsvpPill").onclick = () => location.href = `event.html?
 document.getElementById("wishForm").onsubmit = async event => {
   event.preventDefault();
   const message = document.getElementById("wishMessage").value.trim();
-  try { if (API.isOnline()) await API.sendMessage(token, message); }
-  catch (error) { console.warn("Message API sync failed; message remains local:", error); }
+  if (!message) return;
+  try { await API.sendMessage(token, message); }
+  catch (error) {
+    console.warn("Message send failed:", error);
+    WH.toast("We couldn't send your message. Please try again.");
+    return;
+  }
   data.messages.unshift({ id: `msg_${Date.now()}`, guestId: guest.id, name: guest.name, message, status: "pending", date: new Date().toISOString().slice(0, 10) });
   WH.saveData(data);
   event.target.reset();

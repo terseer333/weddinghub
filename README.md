@@ -4,12 +4,16 @@ WeddingHub is a connected digital wedding experience: couples manage one central
 
 ## Run the connected application
 
-Start the API in one terminal:
+Create a PostgreSQL database and point the API at it, then start it in one terminal:
 
 ```sh
+createdb weddinghub   # or use any PostgreSQL database you already run
 cd backend
+export WEDDINGHUB_DATABASE_URL="postgres://localhost:5432/weddinghub?sslmode=disable"
 go run ./cmd
 ```
+
+The API pings the database and applies its embedded schema migrations at startup. It exits with a fatal error when `WEDDINGHUB_DATABASE_URL` is missing or the database is unreachable; there is no in-memory fallback.
 
 Serve the frontend from a loopback origin in another terminal:
 
@@ -17,7 +21,7 @@ Serve the frontend from a loopback origin in another terminal:
 python3 -m http.server 5500
 ```
 
-Then open `http://localhost:5500`. The Admin Dashboard shows **API connected** when the Go service is available. On its first connection it creates the wedding aggregate and cryptographically secure invitation tokens. If the API is unavailable, the UI explicitly falls back to **Offline mode** and continues using the browser workspace.
+Then open `http://localhost:5500`. The Admin Dashboard shows **API connected** when the Go service is available. On its first connection it creates the wedding aggregate and cryptographically secure invitation tokens in PostgreSQL. The API is mandatory: when it is unavailable, the UI blocks with an explicit error instead of falling back to a local browser workspace.
 
 Recommended product journey:
 
@@ -31,11 +35,11 @@ Recommended product journey:
 
 On a browser that has never completed the guided tour, the admin dashboard opens with a step-by-step walkthrough of every feature: each step highlights a sidebar section, switches to it, and explains what it does. It can be skipped at any point and replayed from **Settings → Getting started**.
 
-`api-client.js` maps the browser view model to the Go API and keeps a local cache for resilient offline behavior. Browser storage is not treated as a production database or security boundary; the API remains authoritative whenever it is connected.
+`api-client.js` maps the browser view model to the Go API, which is the only source of truth. The browser keeps just the current working copy used to render a page; it is refreshed from the API and is never used as an offline data store.
 
 ### Hosted frontend
 
-A static host runs in Offline mode until an API URL is configured. Open **Dashboard → Settings → API connection** and enter the deployed HTTPS API URL, or define `window.WEDDINGHUB_API_URL` before loading `api-client.js`. Do not point an HTTPS website at an HTTP API; browsers block that as mixed content.
+A static host must be pointed at a deployed API before it can load a wedding. Open **Dashboard → Settings → API connection** and enter the deployed HTTPS API URL, or define `window.WEDDINGHUB_API_URL` before loading `api-client.js`. A static host with no reachable API shows the blocking API-unavailable error. Do not point an HTTPS website at an HTTP API; browsers block that as mixed content.
 
 ## Backend API
 
@@ -45,7 +49,7 @@ The Go backend is a standard-library API foundation with:
 - Wedding admin, guest, invitation, event, photo, love story, announcement, RSVP, and message models
 - Cryptographically random invitation tokens with only SHA-256 hashes retained
 - Published-content projection for guest dashboards
-- Thread-safe repository abstraction and in-memory implementation
+- Thread-safe repository abstraction with the PostgreSQL implementation used in production and an in-memory double used only by tests
 - Strict JSON handling, server timeouts, and focused API/domain tests
 
 Run it with:
@@ -63,7 +67,7 @@ go test ./...
 go vet ./...
 ```
 
-See [`backend/README.md`](backend/README.md) for endpoints, security boundaries, and the PostgreSQL migration path.
+See [`backend/README.md`](backend/README.md) for endpoints, the database schema and migrations, security boundaries, and deployment notes.
 
 ## Architecture boundary
 
@@ -82,4 +86,4 @@ Wedding Admin ──writes──▶ Wedding aggregate / repository
 
 ## Production follow-up
 
-Before deployment, replace the in-memory repository with PostgreSQL and make the API mandatory instead of retaining the local demo fallback. Then add real sessions, password hashing, wedding-scoped role authorization, private object storage, rate limiting, audit logs, email/WhatsApp delivery, and token revocation/expiry. The backend intentionally does not claim production authentication is complete.
+Storage is PostgreSQL-backed and the API is mandatory. Before deployment, add real per-user sessions bound to wedding roles, a maintained password-hashing implementation, private object storage, rate limiting, audit logs, email/WhatsApp delivery, and token revocation/expiry. The backend intentionally does not claim production authentication is complete.

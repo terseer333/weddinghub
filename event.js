@@ -19,52 +19,55 @@ function inviteeType() {
 function invitee() { return member || guest; }
 
 async function loadInvitation() {
-  if (token && await API.connect()) {
-    try {
-      const view = await API.invitation(token);
-      data = API.mergeAPI(data, view);
-      wedding = data.wedding;
-      const invitationType = view.invitation?.type === "committee" ? "committee" : (view.invitation?.type || "guest");
-      if (invitationType === "committee") {
-        member = data.committeeMembers.find(item => item.token === token);
-        if (!member) {
-          member = {
-            id: view.invitation.id, name: view.invitation.guest_name, title: view.invitation.committee_title || "",
-            email: view.invitation.guest_email || "", invitationStatus: view.invitation.status, token, type: "committee",
-            apiInvitationId: view.invitation.id
-          };
-          data.committeeMembers = data.committeeMembers || [];
-          data.committeeMembers.push(member);
-        } else {
-          if (view.invitation.status !== "pending") member.invitationStatus = view.invitation.status;
-        }
+  if (!token) return startInvitationFlow();
+  try {
+    await API.requireAPI();
+  } catch (error) {
+    API.showFatalError(error.message);
+    return;
+  }
+  try {
+    const view = await API.invitation(token);
+    data = API.mergeAPI(data, view);
+    wedding = data.wedding;
+    const invitationType = view.invitation?.type === "committee" ? "committee" : (view.invitation?.type || "guest");
+    if (invitationType === "committee") {
+      member = data.committeeMembers.find(item => item.token === token);
+      if (!member) {
+        member = {
+          id: view.invitation.id, name: view.invitation.guest_name, title: view.invitation.committee_title || "",
+          email: view.invitation.guest_email || "", invitationStatus: view.invitation.status, token, type: "committee",
+          apiInvitationId: view.invitation.id
+        };
+        data.committeeMembers = data.committeeMembers || [];
+        data.committeeMembers.push(member);
       } else {
-        guest = data.guests.find(item => item.token === token);
-        if (!guest) {
-          guest = {
-            id: view.invitation.id, name: view.invitation.guest_name, type: "guest",
-            email: view.invitation.guest_email || "", category: "Guest",
-            invitationStatus: view.invitation.status, token,
-            rsvp: view.invitation.status === "accepted" ? "attending" : view.invitation.status === "declined" ? "declined" : "pending",
-            partySize: view.invitation.max_party_size > 0 ? view.invitation.max_party_size : 1
-          };
-          data.guests.push(guest);
-        } else if (view.invitation.status !== "pending") {
-          guest.invitationStatus = view.invitation.status;
-        }
+        if (view.invitation.status !== "pending") member.invitationStatus = view.invitation.status;
       }
-      if ((guest || member)?.invitationStatus === "sent") {
-        (guest || member).invitationStatus = "opened";
-        (guest || member).openedAt = new Date().toISOString();
+    } else {
+      guest = data.guests.find(item => item.token === token);
+      if (!guest) {
+        guest = {
+          id: view.invitation.id, name: view.invitation.guest_name, type: "guest",
+          email: view.invitation.guest_email || "", category: "Guest",
+          invitationStatus: view.invitation.status, token,
+          rsvp: view.invitation.status === "accepted" ? "attending" : view.invitation.status === "declined" ? "declined" : "pending",
+          partySize: view.invitation.max_party_size > 0 ? view.invitation.max_party_size : 1
+        };
+        data.guests.push(guest);
+      } else if (view.invitation.status !== "pending") {
+        guest.invitationStatus = view.invitation.status;
       }
-      WH.saveData(data);
-    } catch (error) {
-      console.warn("Using local invitation fallback:", error);
     }
-  } else if ((guest || member)?.invitationStatus === "sent") {
-    (guest || member).invitationStatus = "opened";
-    (guest || member).openedAt = new Date().toISOString();
+    if ((guest || member)?.invitationStatus === "sent") {
+      (guest || member).invitationStatus = "opened";
+      (guest || member).openedAt = new Date().toISOString();
+    }
     WH.saveData(data);
+  } catch (error) {
+    console.warn("Invitation lookup failed:", error);
+    API.showFatalError(error.status === 404 ? "This invitation link is invalid or has expired." : error.message);
+    return;
   }
   startInvitationFlow();
 }
@@ -188,18 +191,18 @@ async function submitResponse(event, mode, role = WeddingRoleSelector.selectedRo
   const partySize = mode === "attending" && role === "guest" ? Number(form.get("partySize") || 1) : 0;
   const message = String(form.get("message") || "").trim();
   try {
-    if (API.isOnline()) {
-      await API.respond(token, mode === "attending" ? "accept" : "decline", role);
-      if (mode === "attending" && role === "guest") {
-        await API.updateRSVP(token, "attending", partySize);
-        if (message) await API.sendMessage(token, message);
-      }
-      if (mode === "attending" && role === "committee") {
-        if (message) await API.sendCommitteeMessage(remoteWeddingID(), message, token);
-      }
+    await API.respond(token, mode === "attending" ? "accept" : "decline", role);
+    if (mode === "attending" && role === "guest") {
+      await API.updateRSVP(token, "attending", partySize);
+      if (message) await API.sendMessage(token, message);
+    }
+    if (mode === "attending" && role === "committee") {
+      if (message) await API.sendCommitteeMessage(remoteWeddingID(), message, token);
     }
   } catch (error) {
-    console.warn("API response sync failed; response remains local:", error);
+    console.warn("Invitation response failed:", error);
+    WH.toast("We couldn't reach WeddingHub to save your response. Please try again.");
+    return;
   }
   if (role === "committee" && member) {
     member.invitationStatus = mode === "attending" ? "accepted" : "declined";

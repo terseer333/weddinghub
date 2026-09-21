@@ -11,23 +11,86 @@
       if (configured) return configured.replace(/\/$/, "");
       return LOOPBACK_HOST.test(location.hostname || "") ? "http://localhost:8080" : "";
     };
-  let online = false;
+
+  // The API is mandatory: WeddingHub stores every wedding in PostgreSQL behind this
+  // API, so there is no offline mode and no local demo fallback. Every failure here
+  // is surfaced to the user instead of being swallowed.
+  const ERROR_STYLE_ID = "weddinghub-api-error-style";
+  const ERROR_ID = "weddinghub-api-error";
+  let fatalShown = false;
+
+  function ensureErrorStyles() {
+    if (document.getElementById(ERROR_STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = ERROR_STYLE_ID;
+    style.textContent = [
+      "#" + ERROR_ID + "{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:1.5rem;background:rgba(24,19,14,.82);backdrop-filter:blur(5px)}",
+      "#" + ERROR_ID + ".show{display:flex}",
+      "#" + ERROR_ID + " .weddinghub-api-error__card{max-width:32rem;width:100%;background:#fbf7ef;color:#2c2418;border:1px solid rgba(180,150,90,.5);border-radius:18px;padding:2rem;box-shadow:0 30px 80px rgba(0,0,0,.35);font-family:inherit;text-align:center}",
+      "#" + ERROR_ID + " h1{font-size:1.4rem;margin:0 0 .75rem}",
+      "#" + ERROR_ID + " p{margin:.5rem 0;line-height:1.5}",
+      "#" + ERROR_ID + " .weddinghub-api-error__hint{opacity:.75;font-size:.9rem}",
+      "#" + ERROR_ID + " button{margin-top:1.25rem;cursor:pointer;border:0;border-radius:999px;padding:.75rem 1.5rem;background:#2d4030;color:#f7f4ed;font:inherit}"
+    ].join("");
+    document.head.appendChild(style);
+  }
+
+  // showFatalError covers the page with a blocking explanation when the API cannot be
+  // reached. It is the only "degraded" state: the app never falls back to local data.
+  function showFatalError(message) {
+    if (fatalShown) return;
+    fatalShown = true;
+    const build = () => {
+      ensureErrorStyles();
+      let overlay = document.getElementById(ERROR_ID);
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = ERROR_ID;
+        overlay.setAttribute("role", "alertdialog");
+        overlay.setAttribute("aria-modal", "true");
+        overlay.innerHTML = '<div class="weddinghub-api-error__card">' +
+          "<h1>WeddingHub can\u2019t reach its API</h1>" +
+          '<p class="weddinghub-api-error__message"></p>' +
+          '<p class="weddinghub-api-error__hint">All wedding data lives in PostgreSQL behind the API, so WeddingHub cannot work offline.</p>' +
+          '<button type="button" class="weddinghub-api-error__retry">Reload</button></div>';
+        document.body.appendChild(overlay);
+        overlay.querySelector(".weddinghub-api-error__retry").addEventListener("click", () => location.reload());
+      }
+      overlay.querySelector(".weddinghub-api-error__message").textContent = message || "The API is unavailable.";
+      overlay.classList.add("show");
+    };
+    if (document.body) build();
+    else document.addEventListener("DOMContentLoaded", build);
+  }
 
   async function request(path, options = {}) {
     const endpoint = baseURL();
     if (!endpoint) throw new Error("No API URL is configured for this page. Open WeddingHub through its server, or set an API URL in Settings.");
-    const response = await fetch(endpoint + path, {
-      ...options,
-      headers: { "Content-Type": "application/json", ...(options.headers || {}) }
-    });
+    let response;
+    try {
+      response = await fetch(endpoint + path, {
+        ...options,
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) }
+      });
+    } catch (_) {
+      const error = new Error("WeddingHub API is unreachable at " + endpoint + ". Start the API server and reload.");
+      error.status = 0;
+      throw error;
+    }
     const body = response.status === 204 ? null : await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body?.error || `API request failed (${response.status})`);
+    if (!response.ok) {
+      const error = new Error(body?.error || `API request failed (${response.status})`);
+      error.status = response.status;
+      throw error;
+    }
     return body;
   }
 
-  async function connect() {
-    try { await request("/healthz"); online = true; return true; }
-    catch (_) { online = false; return false; }
+  // requireAPI verifies the backend is reachable before a page renders or acts. It
+  // throws so callers can show showFatalError rather than silently degrade.
+  async function requireAPI() {
+    await request("/healthz");
+    return true;
   }
 
   // Admin capability token issued once when the wedding is created.
@@ -167,52 +230,52 @@
     return data;
   }
 
+  // bootstrap loads the wedding from the API and seeds it on first run. It throws when
+  // the API is unreachable; there is no local demo fallback.
   async function bootstrap(data) {
-    if (!await connect()) return { online: false, data };
+    await requireAPI();
     let weddingID = localStorage.getItem(API_ID_KEY);
     const adminHeaders = authHeader();
-    try {
-      if (weddingID && adminToken()) {
-        try {
-          const remote = await request(`/api/weddings/${weddingID}`, { headers: adminHeaders });
-          return { online: true, data: mergeAPI(data, remote), weddingID };
-        } catch (error) {
-          console.info("Stored API wedding is no longer available; re-bootstrapping.", error);
-          localStorage.removeItem(API_ID_KEY);
-          weddingID = null;
-        }
+    if (weddingID && adminToken()) {
+      try {
+        const remote = await request(`/api/weddings/${weddingID}`, { headers: adminHeaders });
+        return { data: mergeAPI(data, remote), weddingID };
+      } catch (error) {
+        if (error.status !== 404) throw error;
+        console.info("Stored API wedding is no longer available; re-bootstrapping.", error);
+        localStorage.removeItem(API_ID_KEY);
+        weddingID = null;
       }
-      const weddings = await request("/api/weddings");
-      let remote = weddings.find(w => w.slug === data.wedding.slug);
-      if (!remote) {
-        const created = await request("/api/weddings", { method: "POST", body: JSON.stringify(toAPI(data)) });
-        storeAdminToken(created.admin_token);
-        remote = created.wedding;
-      }
-      weddingID = remote.id; localStorage.setItem(API_ID_KEY, weddingID);
-      for (const guest of data.guests) {
-        const created = await createInvitation(weddingID, guest);
-        guest.token = created.token;
-        guest.apiInvitationId = created.invitation.id;
-        if (guest.rsvp === "attending") {
-          await respond(guest.token, "accept", "guest");
-          await updateRSVP(guest.token, "attending", guest.partySize);
-        } else if (guest.rsvp === "declined") await respond(guest.token, "decline");
-      }
-      for (const member of data.committeeMembers || []) {
-        const created = await createInvitation(weddingID, { ...member, type: "committee", committeeTitle: member.title });
-        member.token = created.token;
-        member.apiInvitationId = created.invitation.id;
-        if (member.invitationStatus === "accepted") await respond(member.token, "accept", "committee");
-        else if (member.invitationStatus === "declined") await respond(member.token, "decline");
-      }
-      WeddingHub.saveData(data);
-      return { online: true, data: mergeAPI(data, remote), weddingID };
-    } catch (error) { console.warn("WeddingHub API bootstrap failed:", error); return { online: false, data, error }; }
+    }
+    const weddings = await request("/api/weddings");
+    let remote = weddings.find(w => w.slug === data.wedding.slug);
+    if (!remote) {
+      const created = await request("/api/weddings", { method: "POST", body: JSON.stringify(toAPI(data)) });
+      storeAdminToken(created.admin_token);
+      remote = created.wedding;
+    }
+    weddingID = remote.id; localStorage.setItem(API_ID_KEY, weddingID);
+    for (const guest of data.guests) {
+      const created = await createInvitation(weddingID, guest);
+      guest.token = created.token;
+      guest.apiInvitationId = created.invitation.id;
+      if (guest.rsvp === "attending") {
+        await respond(guest.token, "accept", "guest");
+        await updateRSVP(guest.token, "attending", guest.partySize);
+      } else if (guest.rsvp === "declined") await respond(guest.token, "decline");
+    }
+    for (const member of data.committeeMembers || []) {
+      const created = await createInvitation(weddingID, { ...member, type: "committee", committeeTitle: member.title });
+      member.token = created.token;
+      member.apiInvitationId = created.invitation.id;
+      if (member.invitationStatus === "accepted") await respond(member.token, "accept", "committee");
+      else if (member.invitationStatus === "declined") await respond(member.token, "decline");
+    }
+    WeddingHub.saveData(data);
+    return { data: mergeAPI(data, remote), weddingID };
   }
 
   async function saveWedding(data) {
-    if (!online && !await connect()) return null;
     const id = localStorage.getItem(API_ID_KEY);
     if (!id) return (await bootstrap(data)).data;
     const remote = await request(`/api/weddings/${id}`, { method: "PUT", body: JSON.stringify(toAPI(data)), headers: authHeader() });
@@ -228,10 +291,10 @@
       max_party_size: Math.max(1, guest.partySize || 1)
     }) });
   }
-  async function addGuest(guest) { const id = localStorage.getItem(API_ID_KEY); if (!online || !id) return null; return createInvitation(id, guest); }
+  async function addGuest(guest) { const id = localStorage.getItem(API_ID_KEY); if (!id) return null; return createInvitation(id, guest); }
   async function sendInvitation(weddingID, invitationID, token, channels) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
-    if (!online || !id || !invitationID || !token) return null;
+    if (!id || !invitationID || !token) return null;
     return request(`/api/weddings/${encodeURIComponent(id)}/invitations/${encodeURIComponent(invitationID)}/send`, {
       method: "POST", headers: authHeader(), body: JSON.stringify({ token, channels: channels || [] })
     });
@@ -247,12 +310,12 @@
 
   async function adminOverview() {
     const id = localStorage.getItem(API_ID_KEY);
-    if (!online || !id || !adminToken()) return null;
+    if (!id || !adminToken()) return null;
     return request(`/api/weddings/${id}/admin/overview`, { headers: authHeader() });
   }
   async function adminRoster() {
     const id = localStorage.getItem(API_ID_KEY);
-    if (!online || !id || !adminToken()) return null;
+    if (!id || !adminToken()) return null;
     return request(`/api/weddings/${id}/admin/roster`, { headers: authHeader() });
   }
 
@@ -287,40 +350,39 @@
   }
   async function saveCardConfig(weddingID, config) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
-    if (!online || !id) return null;
+    if (!id) return null;
     return request(`/api/weddings/${encodeURIComponent(id)}/card`, { method: "PUT", headers: authHeader(), body: JSON.stringify(config) });
   }
   async function getCardConfig(weddingID) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
-    if (!online || !id) return null;
+    if (!id) return null;
     return request(`/api/weddings/${encodeURIComponent(id)}/card`);
   }
   async function createCommitteeRole(weddingID, role) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
-    if (!online || !id) return null;
+    if (!id) return null;
     return request(`/api/weddings/${encodeURIComponent(id)}/committee/roles`, { method: "POST", headers: authHeader(), body: JSON.stringify(role) });
   }
   async function deleteCommitteeRole(weddingID, roleID) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
-    if (!online || !id) return null;
+    if (!id) return null;
     return request(`/api/weddings/${encodeURIComponent(id)}/committee/roles/${encodeURIComponent(roleID)}`, { method: "DELETE", headers: authHeader() });
   }
   async function updateCommitteeMember(weddingID, memberID, member) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
-    if (!online || !id) return null;
+    if (!id) return null;
     return request(`/api/weddings/${encodeURIComponent(id)}/committee/members/${encodeURIComponent(memberID)}`, { method: "PUT", headers: authHeader(), body: JSON.stringify(member) });
   }
   async function deleteCommitteeMember(weddingID, memberID) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
-    if (!online || !id) return null;
+    if (!id) return null;
     return request(`/api/weddings/${encodeURIComponent(id)}/committee/members/${encodeURIComponent(memberID)}`, { method: "DELETE", headers: authHeader() });
   }
-  function isOnline() { return online; }
 
-  window.WeddingHubAPI = { connect, bootstrap, saveWedding, addGuest, sendInvitation, respond, updateRSVP, invitation, dashboard, sendMessage,
+  window.WeddingHubAPI = { requireAPI, showFatalError, bootstrap, saveWedding, addGuest, sendInvitation, respond, updateRSVP, invitation, dashboard, sendMessage,
     signup, login, logout, currentUser, sessionToken, clearSession,
     adminOverview, adminRoster, committeeDashboard, committeeChat, sendCommitteeMessage, createTask, updateTask, deleteTask,
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
     saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,
-    isOnline, mergeAPI, toAPI, baseURL, adminToken, storeAdminToken };
+    mergeAPI, toAPI, baseURL, adminToken, storeAdminToken };
 })();

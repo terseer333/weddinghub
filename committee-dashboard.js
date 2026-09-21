@@ -45,19 +45,23 @@
     $("committeeAccessGate").innerHTML = `<div><span class="brand-mark">W</span><p class="eyebrow">Private planning workspace</p><h1>Committee access required</h1><p>${message || "Only the wedding admin and invited committee members can open this workspace."}</p><a class="button primary" href="event.html?token=${encodeURIComponent(token || "")}">Return to invitation</a></div>`;
   }
 
+  // reportAPIError surfaces a failed write instead of pretending it saved locally.
+  function reportAPIError(error) {
+    console.warn("Committee API request failed:", error);
+    WH.toast((error && error.message) || "WeddingHub API request failed. Your change was not saved.");
+  }
+
   async function resolveWeddingID() {
     if (token && (!weddingID || weddingID === data.wedding?.id)) {
-      try {
-        const view = await API.invitation(token);
-        if (view?.wedding?.id) weddingID = view.wedding.id;
-      } catch (_) { /* offline fallback below */ }
+      const view = await API.invitation(token);
+      if (view?.wedding?.id) weddingID = view.wedding.id;
     }
     if (!weddingID) weddingID = data.wedding?.id || "";
     return weddingID;
   }
 
   async function syncFromServer() {
-    if (!API.isOnline() || !weddingID) return null;
+    if (!weddingID) return null;
     try {
       const view = await API.committeeDashboard(weddingID, token);
       data = API.mergeAPI(data, view);
@@ -71,28 +75,31 @@
     const person = actor();
     if (!person) return showGate();
     setupIdentity(person);
-    const online = await API.connect();
-    if (online) {
-      $("committeeApiStatus").textContent = "● API connected";
-      $("committeeApiStatus").classList.add("online");
+    try {
+      await API.requireAPI();
+    } catch (error) {
+      API.showFatalError(error.message);
+      return;
+    }
+    $("committeeApiStatus").textContent = "● API connected";
+    $("committeeApiStatus").classList.add("online");
+    try {
       await resolveWeddingID();
-      if (!weddingID) return showGate("We could not find this wedding. Reopen it from your invitation link.");
-      try {
-        const view = await API.committeeDashboard(weddingID, token);
-        data = API.mergeAPI(data, view);
-        WH.saveData(data);
-        guestStats = view.guest_stats || computeGuestStats();
-        sessionStorage.setItem("weddinghub_wedding_id", weddingID);
-        WeddingRoleSelectorClear();
-        startChatPolling();
-      } catch (error) {
-        console.warn("Committee authorization failed:", error);
-        return showGate("Your committee invitation is not yet accepted, or this link does not belong to this wedding's committee.");
-      }
-    } else {
-      if (member && member.invitationStatus !== "accepted" && !isAdmin) return showGate("Accept your committee invitation to open the planning workspace.");
-      guestStats = computeGuestStats();
-      $("committeeApiStatus").textContent = "● Offline mode";
+    } catch (_) {
+      return showGate("We could not verify this invitation link. Reopen it from your invitation email.");
+    }
+    if (!weddingID) return showGate("We could not find this wedding. Reopen it from your invitation link.");
+    try {
+      const view = await API.committeeDashboard(weddingID, token);
+      data = API.mergeAPI(data, view);
+      WH.saveData(data);
+      guestStats = view.guest_stats || computeGuestStats();
+      sessionStorage.setItem("weddinghub_wedding_id", weddingID);
+      WeddingRoleSelectorClear();
+      startChatPolling();
+    } catch (error) {
+      console.warn("Committee authorization failed:", error);
+      return showGate("Your committee invitation is not yet accepted, or this link does not belong to this wedding's committee.");
     }
     renderAll();
   }
@@ -247,7 +254,7 @@
   function startChatPolling() {
     if (chatTimer) clearInterval(chatTimer);
     chatTimer = setInterval(async () => {
-      if (!API.isOnline() || !weddingID) return;
+      if (!weddingID) return;
       try { const incoming = await API.committeeChat(weddingID, chatSince || undefined, token); appendMessages(incoming); }
       catch (_) { /* transient */ }
     }, 5000);
@@ -259,51 +266,64 @@
   function field(value) { return WH.escape(value || ""); }
 
   function editTask(id) {
-    const item = data.planningTasks.find(t => t.id === id) || { id: `task_${Date.now()}`, title: "", details: "", assignedTo: "", dueOn: "", status: "todo" };
+    const existing = id ? data.planningTasks.find(t => t.id === id) : null;
+    const item = existing || { title: "", details: "", assignedTo: "", dueOn: "", status: "todo" };
     openModal(`<p class="eyebrow">Internal planning</p><h2>${id ? "Edit" : "Add"} task</h2><form id="committeeTaskForm" class="modal-form"><label>Title<input name="title" value="${field(item.title)}" required></label><label>Details<textarea name="details" rows="3">${field(item.details)}</textarea></label><div class="form-grid"><label>Assigned to<input name="assignedTo" value="${field(item.assignedTo)}"></label><label>Due date<input name="dueOn" type="date" value="${field(item.dueOn)}"></label></div><label>Status<select name="status">${["todo", "in_progress", "done"].map(s => `<option ${s === item.status ? "selected" : ""}>${s}</option>`).join("")}</select></label><button class="button primary" type="submit">Save task</button></form>`);
     $("committeeTaskForm").onsubmit = async event => {
       event.preventDefault();
-      Object.assign(item, Object.fromEntries(new FormData(event.target)));
-      if (!data.planningTasks.find(t => t.id === item.id)) data.planningTasks.push(item);
-      const payload = { title: item.title, details: item.details, assigned_to: item.assignedTo, due_on: item.dueOn, status: item.status };
-      try { if (API.isOnline() && weddingID) await API.updateTask(weddingID, item.id, payload, token); }
-      catch (_) {}
+      const form = Object.fromEntries(new FormData(event.target));
+      const payload = { title: form.title, details: form.details, assigned_to: form.assignedTo, due_on: form.dueOn, status: form.status };
+      try {
+        if (existing) {
+          const saved = await API.updateTask(weddingID, existing.id, payload, token);
+          Object.assign(existing, form);
+          if (saved) existing.id = saved.id;
+        } else {
+          const created = await API.createTask(weddingID, payload, token);
+          data.planningTasks.push({ id: created.id, title: created.title, details: created.details || "", assignedTo: created.assigned_to || "", dueOn: created.due_on || "", status: created.status, createdBy: created.created_by || "" });
+        }
+      } catch (error) { reportAPIError(error); return; }
       await persistLocal();
       closeModal();
     };
   }
 
-  function deleteTask(id) {
+  async function deleteTask(id) {
     if (!confirm("Remove this planning task?")) return;
+    try { await API.deleteTask(weddingID, id, token); }
+    catch (error) { reportAPIError(error); return; }
     data.planningTasks = data.planningTasks.filter(t => t.id !== id);
-    if (API.isOnline() && weddingID) API.deleteTask(weddingID, id, token).catch(() => {});
     persistLocal();
   }
 
   function editAnnouncement(id) {
-    const item = data.announcements.find(a => a.id === id) || { id: `ann_${Date.now()}`, title: "", message: "", date: new Date().toISOString().slice(0, 10), status: "draft", audience: "public" };
+    const existing = id ? data.announcements.find(a => a.id === id) : null;
+    const item = existing || { title: "", message: "", date: new Date().toISOString().slice(0, 10), status: "draft", audience: "public" };
     openModal(`<p class="eyebrow">Wedding update</p><h2>${id ? "Edit" : "New"} announcement</h2><form id="committeeAnnouncementForm" class="modal-form"><label>Title<input name="title" value="${field(item.title)}" required></label><label>Message<textarea name="message" rows="5" required>${field(item.message)}</textarea></label><label>Audience<select name="audience"><option value="public" ${item.audience !== "committee" ? "selected" : ""}>Public — shown to guests</option><option value="committee" ${item.audience === "committee" ? "selected" : ""}>Committee only — hidden from guests</option></select></label><label>Visibility<select name="status"><option value="draft" ${item.status === "draft" ? "selected" : ""}>Draft</option><option value="published" ${item.status === "published" ? "selected" : ""}>Published</option><option value="hidden" ${item.status === "hidden" ? "selected" : ""}>Hidden</option></select></label><button class="button primary" type="submit">Save announcement</button></form>`);
     $("committeeAnnouncementForm").onsubmit = async event => {
       event.preventDefault();
       const form = Object.fromEntries(new FormData(event.target));
       Object.assign(item, form);
-      if (!data.announcements.find(a => a.id === item.id)) { if (item.authorName === undefined) item.authorName = actor()?.name || ""; data.announcements.unshift(item); }
       const payload = { title: item.title, body: item.message, audience: item.audience, status: item.status };
       try {
-        if (API.isOnline() && weddingID) {
-          if (id) await API.updateAnnouncement(weddingID, item.id, payload, token);
-          else { const created = await API.createAnnouncement(weddingID, payload, token); if (created) item.id = created.id; }
+        if (existing) {
+          await API.updateAnnouncement(weddingID, existing.id, payload, token);
+        } else {
+          const created = await API.createAnnouncement(weddingID, payload, token);
+          item.id = created.id;
         }
-      } catch (_) {}
+      } catch (error) { reportAPIError(error); return; }
+      if (!existing) { if (item.authorName === undefined) item.authorName = actor()?.name || ""; data.announcements.unshift(item); }
       await persistLocal();
       closeModal();
     };
   }
 
-  function deleteAnnouncement(id) {
+  async function deleteAnnouncement(id) {
     if (!confirm("Delete this announcement?")) return;
+    try { await API.deleteAnnouncement(weddingID, id, token); }
+    catch (error) { reportAPIError(error); return; }
     data.announcements = data.announcements.filter(a => a.id !== id);
-    if (API.isOnline() && weddingID) API.deleteAnnouncement(weddingID, id, token).catch(() => {});
     persistLocal();
   }
 
@@ -347,16 +367,14 @@
     const input = $("committeeChatInput");
     const body = input.value.trim();
     if (!body) return;
+    try { await API.sendCommitteeMessage(weddingID, body, token); }
+    catch (error) { reportAPIError(error); return; }
     input.value = "";
     const message = { id: `cc_${Date.now()}`, authorName: actor()?.name || "Committee", authorRole: actor()?.role || "committee_member", body, createdAt: new Date().toISOString() };
     data.committeeChat = data.committeeChat || [];
     data.committeeChat.push(message);
     WH.saveData(data);
     renderChat();
-    if (API.isOnline() && weddingID) {
-      try { await API.sendCommitteeMessage(weddingID, body, token); }
-      catch (_) { WH.toast("Message kept locally — API unavailable"); }
-    }
   };
 
   initialize();

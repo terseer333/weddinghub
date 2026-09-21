@@ -705,7 +705,8 @@
         if (res) WeddingHub.toast("Card design published to all invitation links!");
       }
     } catch (err) {
-      console.warn("Card config endpoint sync failed (local save still applied):", err);
+      console.warn("Card config endpoint sync failed after the wedding was saved:", err);
+      WeddingHub.toast("Card design saved, but the published copy could not be refreshed. Try again.");
     }
   }
 

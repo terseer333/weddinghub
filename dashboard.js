@@ -195,10 +195,15 @@ function renderAll() {
   try { renderMessages(); } catch (e) { console.warn("renderMessages:", e); }
 }
 async function persist(message = 'Changes saved') {
+  try {
+    await API.saveWedding(data);
+  } catch (error) {
+    API.showFatalError(error.message);
+    return;
+  }
   WH.saveData(data);
   renderAll();
-  try { await API.saveWedding(data); WH.toast(API.isOnline() ? `${message} · synced` : `${message} locally`); }
-  catch (error) { WH.toast(`${message} locally · API unavailable`); }
+  WH.toast(`${message} · synced`);
 }
 window.AdminApp = { get data(){return data}, set data(value){data=value}, openView, renderAll, renderTemplates, renderGuests, persist, initials };
 
@@ -261,18 +266,25 @@ if ($('#guestSearch')) $('#guestSearch').oninput = event => renderGuests(event.t
 renderAll();
 if (location.hash) openView(location.hash.slice(1));
 
+function setAPIStatus(connected) {
+  const status = $('#apiStatus');
+  if (!status) return;
+  status.textContent = connected ? '● API connected' : '● API unavailable';
+  status.classList.toggle('online', connected);
+}
+
 async function syncFromAPI() {
   try {
     const result = await API.bootstrap(data);
     if (result && result.data) {
       data = result.data;
-      $('#apiStatus').textContent = result.online ? '● API connected' : '● Offline mode';
-      $('#apiStatus').classList.toggle('online', Boolean(result.online));
+      setAPIStatus(true);
       renderAll();
     }
   } catch (err) {
     console.warn("syncFromAPI error:", err);
-    $('#apiStatus').textContent = '● Offline mode';
+    setAPIStatus(false);
+    API.showFatalError(err.message);
   }
 }
 syncFromAPI();
