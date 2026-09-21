@@ -207,7 +207,7 @@ body.auth-page button { cursor: pointer; }
 }
 
 /* Hero typewriter: landing.js masks the headline before first paint, then
-   types it out, so the copy is never shown and then rewritten. */
+   types it out and loops, so the copy is never shown and then rewritten. */
 .hero-typing .hero h1 .hero-type-seg { visibility: hidden; }
 
 .hero-typing .hero h1.is-typing .hero-type-seg { visibility: visible; }
@@ -229,11 +229,6 @@ body.auth-page button { cursor: pointer; }
     margin-left: 0.07em;
     opacity: 1;
     animation: hero-type-caret 1s step-end infinite;
-}
-
-.hero h1.is-typing.type-complete .hero-type-caret {
-    opacity: 0;
-    animation: none;
 }
 
 @keyframes hero-type-caret {
