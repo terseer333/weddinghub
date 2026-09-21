@@ -866,8 +866,8 @@
 }
 
 /* Admin Preview Card focus mode: show only the designed card */
-body.invite-preview-mode .invite-hero,
-body.invite-preview-mode .invitation-main {
+body.invite-preview-mode .invite-mini-nav,
+body.invite-preview-mode .invite-guest-panel {
   display: none;
 }
 body.invite-preview-mode .invitation-card-showcase-section {
@@ -879,6 +879,86 @@ body.invite-preview-mode .invitation-card-showcase-section {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+/* Guest invitation link: minimal chrome around the designed card + acceptance */
+.invite-mini-nav {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 6vw;
+  background: #1e2b20;
+  color: #f7f4ed;
+}
+.invite-mini-nav .brand {
+  color: #f7f4ed;
+}
+.invite-mini-nav .invite-nav-link {
+  color: #e7dcc4;
+}
+.invite-guest-panel {
+  width: 100%;
+  max-width: 580px;
+  padding: 30px 26px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.045);
+  text-align: center;
+}
+.invite-guest-panel .invite-personal {
+  margin-bottom: 18px;
+  color: #eeddb9;
+}
+.invite-guest-panel .invite-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.invite-guest-panel .accepted-note {
+  color: #eddbb8;
+}
+
+/* Sharing controls used by the admin share panel */
+.access-link-row {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+.access-link-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #dfe4e0;
+  border-radius: 9px;
+  font-size: 12px;
+}
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.share-actions .button {
+  min-height: 40px;
+}
+.button.whatsapp {
+  color: #fff;
+  background: #25d366;
+}
+.button.whatsapp:hover {
+  background: #1eb457;
+}
+.modal-form .check-line {
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+}
+.modal-form .check-line input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  accent-color: #3c5e50;
 }
 
 

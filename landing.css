@@ -206,6 +206,41 @@ body.auth-page button { cursor: pointer; }
     font-weight: 500;
 }
 
+/* Hero typewriter: landing.js masks the headline before first paint, then
+   types it out, so the copy is never shown and then rewritten. */
+.hero-typing .hero h1 .hero-type-seg { visibility: hidden; }
+
+.hero-typing .hero h1.is-typing .hero-type-seg { visibility: visible; }
+
+.hero h1 .hero-type-caret {
+    display: inline-block;
+    width: 0;
+    height: 0.84em;
+    margin-left: 0;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0;
+    vertical-align: -0.07em;
+    transition: opacity 0.35s ease;
+}
+
+.hero h1.is-typing .hero-type-caret {
+    width: 0.05em;
+    margin-left: 0.07em;
+    opacity: 1;
+    animation: hero-type-caret 1s step-end infinite;
+}
+
+.hero h1.is-typing.type-complete .hero-type-caret {
+    opacity: 0;
+    animation: none;
+}
+
+@keyframes hero-type-caret {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
 .hero-lead {
     max-width: 565px;
     margin: 27px 0 0;

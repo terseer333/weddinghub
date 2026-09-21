@@ -436,19 +436,44 @@
     lines.forEach((val, idx) => ctx.fillText(val.trim(), x, y + idx * lineHeight));
   }
 
-  function accessPanel(guest, url) {
+  // Builds the delivery links for one guest: a mailto: compose to their registered
+  // email, and a WhatsApp chat to their registered number when it is on WhatsApp.
+  function shareLinks(guest, url, wedding = {}) {
+    const couple = [wedding.brideName, wedding.groomName].filter(Boolean).join(" & ") || "our wedding";
+    const subject = `You're invited to ${couple}'s wedding`;
+    const text = `You're warmly invited to celebrate the wedding of ${couple}. ❤️\n\nOpen your personal invitation and accept here:\n${url}`;
+    const email = String(guest?.email || "").trim();
+    const digits = guest?.whatsapp === false ? "" : String(guest?.phone || "").replace(/\D/g, "");
+    return {
+      couple,
+      subject,
+      text,
+      email,
+      emailHref: email ? `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}` : "",
+      whatsappHref: `https://wa.me/${digits}?text=${encodeURIComponent(text)}`,
+      hasEmail: Boolean(email),
+      hasWhatsApp: Boolean(digits)
+    };
+  }
+
+  function accessPanel(guest, url, wedding = {}) {
+    const links = shareLinks(guest, url, wedding);
+    const emailButton = links.hasEmail
+      ? `<a class="button primary" data-email-share href="${links.emailHref}">✉ Email invitation</a>`
+      : `<button class="button primary" data-email-missing type="button">✉ Email invitation</button>`;
     return `
       <section class="guest-access-panel">
         <p class="eyebrow">Guest access</p>
-        <h3>${WH.escape(guest.name)}'s personal invitation link</h3>
-        <p>This private link opens the invitation card, wedding details, and RSVP experience.</p>
+        <h3>${WH.escape(guest.name)}'s personal invitation</h3>
+        <p>Send this private link straight to the guest's registered email${links.hasWhatsApp ? " and WhatsApp number" : ""}. Guests accept it before entering their guest space.</p>
         <div class="access-link-row">
           <input value="${WH.escape(url)}" readonly aria-label="Personal guest access link">
           <button class="button secondary" data-share-copy="${WH.escape(url)}">Copy link</button>
         </div>
         <div class="share-actions">
-          <button class="button primary" data-native-share>Share invitation</button>
-          <a class="button whatsapp" data-whatsapp-share target="_blank" rel="noopener">WhatsApp</a>
+          ${emailButton}
+          <a class="button whatsapp" data-whatsapp-share href="${links.whatsappHref}" target="_blank" rel="noopener">WhatsApp</a>
+          <button class="button secondary" data-native-share>Share</button>
           <button class="button secondary" data-download-card>Download card (PNG)</button>
         </div>
       </section>
@@ -460,6 +485,7 @@
     resolveCardConfig,
     card,
     accessPanel,
+    shareLinks,
     imageBlob
   };
 })();

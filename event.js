@@ -85,55 +85,30 @@ function startInvitationFlow() {
 }
 
 function renderInvitation() {
-  document.getElementById("inviteHero").style.backgroundImage = `url('${wedding.heroImage}')`;
-  document.getElementById("brideName").textContent = wedding.brideName;
-  document.getElementById("groomName").textContent = wedding.groomName;
-  document.getElementById("inviteMessage").textContent = wedding.message;
-  document.getElementById("date").textContent = WH.formatDate(wedding.date).toUpperCase();
-  document.getElementById("location").textContent = `${wedding.city} · ${wedding.state}`;
-  document.getElementById("verse").textContent = wedding.verse;
-  document.getElementById("closingNames").textContent = `${wedding.brideName} & ${wedding.groomName}`;
-  const chosen = WH.templates().find(item => item.id === wedding.templateId);
-  document.body.classList.add(`invite-tone-${chosen?.tone || 0}`);
+  const greeting = document.getElementById("personalGreeting");
+  const actions = document.getElementById("inviteActions");
+  const note = document.getElementById("acceptedNote");
+  const guestPanel = document.getElementById("guestPanel");
 
-  // Admin "Preview Card" focuses on the designed card only: it drops the generic
-  // hero/cover and the guest sections, and exposes the return-to-editor control.
+  // The guest link presents only the designed invitation card plus the acceptance
+  // actions. Wedding details, schedule and countdown live in the guest space that
+  // opens once the invitation is accepted.
   if (adminPreview) {
     document.body.classList.add("invite-preview-mode");
     const returnBtn = document.getElementById("previewReturnBtn");
     if (returnBtn) returnBtn.hidden = false;
-  }
-
-  const inviteePerson = invitee();
-  if (!guest && !member) {
-    document.getElementById("personalGreeting").textContent = "This invitation link is invalid or has expired.";
-    document.getElementById("inviteActions").innerHTML = '<a class="button ivory" href="../index.html">Return to WeddingHub</a>';
-  } else if (adminPreview) {
-    document.getElementById("personalGreeting").textContent = "Guest preview · this is how your invitation currently appears.";
-    document.getElementById("inviteActions").innerHTML = '<a class="button ivory" href="dashboard.html#designs">Return to editor</a>';
-    document.getElementById("bottomAccept").hidden = true;
+    if (guestPanel) guestPanel.hidden = true;
+  } else if (!guest && !member) {
+    if (greeting) greeting.textContent = "This invitation link is invalid or has expired.";
+    if (actions) actions.innerHTML = '<a class="button primary" href="../index.html">Return to WeddingHub</a>';
+    if (note) note.textContent = "";
   } else if (member) {
-    document.getElementById("personalGreeting").textContent = `Dear ${member.name.split(" ")[0]}, you're invited to help plan and organize this wedding.`;
-    document.getElementById("bottomAccept").hidden = false;
+    if (greeting) greeting.textContent = `Dear ${member.name.split(" ")[0]}, you're invited to help plan and organize this wedding.`;
     updateResponseState();
   } else {
-    document.getElementById("personalGreeting").textContent = `Dear ${guest.name.split(" ")[0]}, this celebration would not be complete without you.`;
+    if (greeting) greeting.textContent = `Dear ${guest.name.split(" ")[0]}, this celebration would not be complete without you.`;
     updateResponseState();
   }
-
-  WH.countdown(wedding.date, value => {
-    document.getElementById("countdown").innerHTML = value.passed
-      ? "<h3>Today we celebrate love</h3>"
-      : [["Days", value.days], ["Hours", value.hours], ["Minutes", value.minutes], ["Seconds", value.seconds]]
-          .map(([label, number]) => `<div><strong>${String(number).padStart(2, "0")}</strong><span>${label}</span></div>`).join("");
-  });
-
-  const publishedEvents = WH.published(data.events);
-  document.getElementById("eventCards").innerHTML = publishedEvents.length ? publishedEvents.map((event, index) => `
-    <article><p class="eyebrow">${index === 0 ? "Ceremony" : "Celebration"}</p><span class="event-number">0${index + 1}</span>
-    <h2>${WH.escape(event.name)}</h2><p><strong>${WH.formatDate(event.date)} · ${event.time}</strong></p>
-    <p>${WH.escape(event.venue)}<br>${WH.escape(event.address)}</p><small>${WH.escape(event.description)}</small>
-    <a href="https://maps.google.com/?q=${encodeURIComponent(event.address)}" target="_blank">View location ↗</a></article>`).join("") : '<div class="invitation-empty"><span>✦</span><h2>Celebration details are coming soon</h2><p>The couple will publish the event schedule here.</p></div>';
 
   const cardMount = document.getElementById("invitationCardMount");
   if (cardMount && window.WeddingInvitation) {
@@ -166,22 +141,21 @@ function renderInvitation() {
 function updateResponseState() {
   if (!member && !guest) return;
   const note = document.getElementById("acceptedNote");
+  const actions = document.getElementById("inviteActions");
   if (member) {
     if (member.invitationStatus === "accepted") {
-      document.getElementById("inviteActions").innerHTML = `<a class="button ivory" href="committee-dashboard.html?token=${member.token}">Open committee workspace</a>`;
-      note.textContent = "You've joined the wedding committee — your planning workspace is unlocked.";
-      document.getElementById("bottomAccept").hidden = true;
+      if (actions) actions.innerHTML = `<a class="button ivory" href="committee-dashboard.html?token=${member.token}">Open committee workspace</a>`;
+      if (note) note.textContent = "You've joined the wedding committee — your planning workspace is unlocked.";
     } else if (member.invitationStatus === "declined") {
-      note.textContent = "Thank you for letting the couple know.";
+      if (note) note.textContent = "Thank you for letting the couple know.";
     }
     return;
   }
   if (guest.rsvp === "attending") {
-    document.getElementById("inviteActions").innerHTML = `<a class="button ivory" href="guest-dashboard.html?token=${guest.token}">Open your guest dashboard</a>`;
-    note.textContent = `Your RSVP is confirmed for ${guest.partySize} ${guest.partySize === 1 ? "guest" : "guests"}.`;
-    document.getElementById("bottomAccept").hidden = true;
+    if (actions) actions.innerHTML = `<a class="button ivory" href="guest-dashboard.html?token=${guest.token}">Open your guest dashboard</a>`;
+    if (note) note.textContent = `Your RSVP is confirmed for ${guest.partySize} ${guest.partySize === 1 ? "guest" : "guests"}.`;
   } else if (guest.rsvp === "declined") {
-    note.textContent = "Thank you for letting the couple know. You can change your response anytime.";
+    if (note) note.textContent = "Thank you for letting the couple know. You can change your response anytime.";
   }
 }
 
@@ -253,7 +227,6 @@ function remoteWeddingID() {
 
 document.getElementById("acceptButton").addEventListener("click", () => { if (!adminPreview) openRSVP("attending"); });
 document.getElementById("declineButton").addEventListener("click", () => { if (!adminPreview) openRSVP("declined"); });
-document.getElementById("bottomAccept").addEventListener("click", () => openRSVP("attending"));
 document.getElementById("closeModal").addEventListener("click", () => modal.classList.remove("open"));
 modal.addEventListener("click", event => { if (event.target === modal) modal.classList.remove("open"); });
 loadInvitation();

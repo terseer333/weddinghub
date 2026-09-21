@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"weddinghub/delivery"
 	"weddinghub/models"
 	"weddinghub/repository"
 )
@@ -23,8 +25,9 @@ const (
 )
 
 type API struct {
-	repo repository.Repository
-	now  func() time.Time
+	repo   repository.Repository
+	sender delivery.Sender
+	now    func() time.Time
 }
 
 func New(repo repository.Repository) http.Handler {
@@ -32,19 +35,29 @@ func New(repo repository.Repository) http.Handler {
 	if configured == "" {
 		configured = strings.TrimSpace(os.Getenv("WEDDINGHUB_ALLOWED_ORIGIN"))
 	}
-	return newHandler(repo, configured, configured == "")
+	return newHandler(repo, configured, configured == "", delivery.FromEnv())
 }
 
 // NewWithAllowedOrigin builds a handler with an exact comma-separated origin allowlist.
 // An empty allowlist retains the development default of permitting loopback origins.
 func NewWithAllowedOrigin(repo repository.Repository, allowedOrigins string) http.Handler {
-	return newHandler(repo, allowedOrigins, strings.TrimSpace(allowedOrigins) == "")
+	return newHandler(repo, allowedOrigins, strings.TrimSpace(allowedOrigins) == "", delivery.FromEnv())
 }
 
-func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback bool) http.Handler {
-	a := &API{repo: repo, now: func() time.Time { return time.Now().UTC() }}
+// NewWithSender builds a handler with an explicit delivery sender. Production callers
+// use delivery.FromEnv; tests inject a recording sender.
+func NewWithSender(repo repository.Repository, allowedOrigins string, sender delivery.Sender) http.Handler {
+	return newHandler(repo, allowedOrigins, strings.TrimSpace(allowedOrigins) == "", sender)
+}
+
+func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback bool, sender delivery.Sender) http.Handler {
+	a := &API{repo: repo, sender: sender, now: func() time.Time { return time.Now().UTC() }}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", a.health)
+	mux.HandleFunc("POST /api/auth/signup", a.signup)
+	mux.HandleFunc("POST /api/auth/login", a.login)
+	mux.HandleFunc("POST /api/auth/logout", a.logout)
+	mux.HandleFunc("GET /api/auth/me", a.currentUser)
 	mux.HandleFunc("GET /api/weddings", a.listWeddings)
 	mux.HandleFunc("POST /api/weddings", a.createWedding)
 	// Admin-authenticated routes. requireAdmin resolves the wedding and verifies the
@@ -53,6 +66,7 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("PUT /api/weddings/{weddingID}", a.updateWedding)
 	mux.HandleFunc("DELETE /api/weddings/{weddingID}", a.deleteWedding)
 	mux.HandleFunc("POST /api/weddings/{weddingID}/invitations", a.createInvitation)
+	mux.HandleFunc("POST /api/weddings/{weddingID}/invitations/{invitationID}/send", a.sendInvitation)
 	mux.HandleFunc("GET /api/weddings/{weddingID}/admin/overview", a.adminOverview)
 	mux.HandleFunc("GET /api/weddings/{weddingID}/admin/roster", a.adminRoster)
 	// Invitation capability-token routes, open to the invitee who holds the link.
@@ -266,6 +280,139 @@ func (a *API) createInvitation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusCreated, invitationCreated{Invitation: created, Token: token})
+}
+
+// sendInvitationRequest delivers an existing invitation to its recipient. The raw
+// token is supplied by the caller because only its hash is stored; it must match the
+// invitation's hash before any message is sent.
+type sendInvitationRequest struct {
+	Token    string   `json:"token"`
+	Channels []string `json:"channels"`
+}
+
+type deliveryResult struct {
+	Channel string `json:"channel"`
+	To      string `json:"to,omitempty"`
+	Status  string `json:"status"`
+	Error   string `json:"error,omitempty"`
+}
+
+type sendInvitationResponse struct {
+	WeddingID    string           `json:"wedding_id"`
+	InvitationID string           `json:"invitation_id"`
+	Results      []deliveryResult `json:"results"`
+}
+
+func (a *API) sendInvitation(w http.ResponseWriter, r *http.Request) {
+	wedding, ok := a.requireAdmin(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	var input sendInvitationRequest
+	if err := decodeJSON(w, r, &input); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	input.Token = strings.TrimSpace(input.Token)
+	if input.Token == "" {
+		writeError(w, http.StatusBadRequest, "token is required")
+		return
+	}
+	var invitation *models.Invitation
+	for i := range wedding.Invitations {
+		if wedding.Invitations[i].ID == r.PathValue("invitationID") {
+			invitation = &wedding.Invitations[i]
+			break
+		}
+	}
+	if invitation == nil {
+		writeError(w, http.StatusNotFound, "resource not found")
+		return
+	}
+	if !constantTimeMatch(invitation.TokenHash, models.HashToken(input.Token)) {
+		writeError(w, http.StatusForbidden, "the supplied token does not match this invitation")
+		return
+	}
+	channels, valid := normalizeDeliveryChannels(input.Channels)
+	if !valid {
+		writeError(w, http.StatusBadRequest, "channels must contain email or whatsapp")
+		return
+	}
+	if a.sender == nil || len(a.sender.Channels()) == 0 {
+		writeError(w, http.StatusServiceUnavailable, "no delivery channel is configured")
+		return
+	}
+	link := a.sender.Link(input.Token)
+	if link == "" {
+		writeError(w, http.StatusServiceUnavailable, "WEDDINGHUB_PUBLIC_BASE_URL is required to build invitation links")
+		return
+	}
+	active := make(map[string]bool)
+	for _, channel := range a.sender.Channels() {
+		active[channel] = true
+	}
+	results := make([]deliveryResult, 0, len(channels))
+	for _, channel := range channels {
+		result := deliveryResult{Channel: channel}
+		switch channel {
+		case delivery.ChannelEmail:
+			result.To = invitation.GuestEmail
+		case delivery.ChannelWhatsApp:
+			result.To = invitation.GuestPhone
+		}
+		switch {
+		case !active[channel]:
+			result.Status, result.Error = "skipped", "channel is not configured"
+		case strings.TrimSpace(result.To) == "":
+			result.Status, result.Error = "skipped", "no recipient on file"
+		default:
+			sendErr := a.sender.Send(r.Context(), delivery.Invitation{
+				Channel: channel, To: result.To, Name: invitation.GuestName, Couple: weddingCouple(wedding), Link: link,
+			})
+			if sendErr != nil {
+				result.Status, result.Error = "failed", sendErr.Error()
+			} else {
+				result.Status = "sent"
+			}
+		}
+		results = append(results, result)
+	}
+	writeJSON(w, http.StatusOK, sendInvitationResponse{WeddingID: wedding.ID, InvitationID: invitation.ID, Results: results})
+}
+
+// normalizeDeliveryChannels trims, lowercases, and de-duplicates requested channels,
+// defaulting to every known channel when none are listed.
+func normalizeDeliveryChannels(values []string) ([]string, bool) {
+	if len(values) == 0 {
+		return []string{delivery.ChannelEmail, delivery.ChannelWhatsApp}, true
+	}
+	seen := make(map[string]bool)
+	channels := make([]string, 0, len(values))
+	for _, value := range values {
+		channel := strings.ToLower(strings.TrimSpace(value))
+		switch channel {
+		case delivery.ChannelEmail, delivery.ChannelWhatsApp:
+		default:
+			return nil, false
+		}
+		if !seen[channel] {
+			seen[channel] = true
+			channels = append(channels, channel)
+		}
+	}
+	return channels, true
+}
+
+// weddingCouple renders the couple's names for delivery copy.
+func weddingCouple(wedding models.Wedding) string {
+	couple := strings.TrimSpace(wedding.PartnerOne + " & " + wedding.PartnerTwo)
+	if couple == "" || couple == "&" {
+		if title := strings.TrimSpace(wedding.Title); title != "" {
+			return title
+		}
+		return "the couple"
+	}
+	return couple
 }
 
 type invitationView struct {
@@ -489,17 +636,17 @@ func (a *API) updateRSVP(w http.ResponseWriter, r *http.Request) {
 }
 
 type overviewView struct {
-	WeddingID            string `json:"wedding_id"`
-	InvitationsTotal     int    `json:"invitations_total"`
-	InvitationsPending   int    `json:"invitations_pending"`
-	Accepted             int    `json:"accepted"`
-	Declined             int    `json:"declined"`
-	AttendingPartySize   int    `json:"attending_party_size"`
-	GuestMessages        int    `json:"guest_messages"`
-	CommitteeTotal       int    `json:"committee_total"`
-	CommitteePending     int    `json:"committee_pending"`
-	CommitteeAccepted    int    `json:"committee_accepted"`
-	CommitteeDeclined    int    `json:"committee_declined"`
+	WeddingID          string `json:"wedding_id"`
+	InvitationsTotal   int    `json:"invitations_total"`
+	InvitationsPending int    `json:"invitations_pending"`
+	Accepted           int    `json:"accepted"`
+	Declined           int    `json:"declined"`
+	AttendingPartySize int    `json:"attending_party_size"`
+	GuestMessages      int    `json:"guest_messages"`
+	CommitteeTotal     int    `json:"committee_total"`
+	CommitteePending   int    `json:"committee_pending"`
+	CommitteeAccepted  int    `json:"committee_accepted"`
+	CommitteeDeclined  int    `json:"committee_declined"`
 }
 
 func (a *API) adminOverview(w http.ResponseWriter, r *http.Request) {
@@ -540,11 +687,11 @@ func (a *API) adminOverview(w http.ResponseWriter, r *http.Request) {
 }
 
 type rosterView struct {
-	WeddingID        string                     `json:"wedding_id"`
-	Invitations      []models.Invitation        `json:"invitations"`
-	Guests           []models.Guest             `json:"guests"`
-	CommitteeMembers []models.CommitteeMember   `json:"committee_members"`
-	CommitteeRoles   []models.CommitteeRole     `json:"committee_roles"`
+	WeddingID        string                   `json:"wedding_id"`
+	Invitations      []models.Invitation      `json:"invitations"`
+	Guests           []models.Guest           `json:"guests"`
+	CommitteeMembers []models.CommitteeMember `json:"committee_members"`
+	CommitteeRoles   []models.CommitteeRole   `json:"committee_roles"`
 }
 
 // adminRoster returns the full invitation status of both groups so the admin can
@@ -802,9 +949,9 @@ func parseTaskInput(w http.ResponseWriter, r *http.Request) (planningTaskRequest
 }
 
 type announcementRequest struct {
-	Title    string             `json:"title"`
-	Body     string             `json:"body"`
-	Audience models.Audience    `json:"audience"`
+	Title    string                   `json:"title"`
+	Body     string                   `json:"body"`
+	Audience models.Audience          `json:"audience"`
 	Status   models.PublicationStatus `json:"status"`
 }
 
@@ -1139,7 +1286,7 @@ func publishedWedding(w models.Wedding) publicWedding {
 		Venue: w.Venue, Address: w.Address, City: w.City, State: w.State, Country: w.Country,
 		Message: w.Message, Verse: w.Verse, DressCode: w.DressCode, HeroImage: w.HeroImage, TemplateID: w.TemplateID,
 		CardConfig: w.CardConfig,
-		Events: []models.Event{}, Photos: []models.Photo{}, StorySections: []models.StorySection{}, Announcements: []models.Announcement{},
+		Events:     []models.Event{}, Photos: []models.Photo{}, StorySections: []models.StorySection{}, Announcements: []models.Announcement{},
 	}
 	for _, item := range w.Events {
 		if item.Status == models.StatusPublished {
@@ -1229,7 +1376,9 @@ func decodeJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(dst); err != nil {
-		return errors.New("invalid JSON body")
+		// The decoder error names the offending field, which makes a client-side
+		// contract mismatch debuggable without reading server logs.
+		return fmt.Errorf("invalid JSON body: %w", err)
 	}
 	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
 		return errors.New("body must contain one JSON object")

@@ -13,10 +13,18 @@ import (
 type MemoryRepository struct {
 	mu       sync.RWMutex
 	weddings map[string]models.Wedding
+	users    map[string]models.User
+	emails   map[string]string
+	sessions map[string]models.Session
 }
 
 func NewMemoryRepository() *MemoryRepository {
-	return &MemoryRepository{weddings: make(map[string]models.Wedding)}
+	return &MemoryRepository{
+		weddings: make(map[string]models.Wedding),
+		users:    make(map[string]models.User),
+		emails:   make(map[string]string),
+		sessions: make(map[string]models.Session),
+	}
 }
 
 func (r *MemoryRepository) CreateWedding(w models.Wedding) (models.Wedding, error) {
@@ -471,6 +479,84 @@ func (r *MemoryRepository) DeleteCommitteeMember(weddingID, memberID string) err
 		return nil
 	}
 	return ErrNotFound
+}
+
+func (r *MemoryRepository) CreateUser(user models.User) (models.User, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	email := models.NormalizeEmail(user.Email)
+	if user.ID == "" || email == "" {
+		return models.User{}, ErrConflict
+	}
+	if _, exists := r.users[user.ID]; exists {
+		return models.User{}, ErrConflict
+	}
+	if _, exists := r.emails[email]; exists {
+		return models.User{}, ErrConflict
+	}
+	user.Email = email
+	r.users[user.ID] = user
+	r.emails[email] = user.ID
+	return user, nil
+}
+
+func (r *MemoryRepository) UserByEmail(email string) (models.User, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	id, ok := r.emails[models.NormalizeEmail(email)]
+	if !ok {
+		return models.User{}, ErrNotFound
+	}
+	user, ok := r.users[id]
+	if !ok {
+		return models.User{}, ErrNotFound
+	}
+	return user, nil
+}
+
+func (r *MemoryRepository) UserByID(id string) (models.User, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	user, ok := r.users[id]
+	if !ok {
+		return models.User{}, ErrNotFound
+	}
+	return user, nil
+}
+
+func (r *MemoryRepository) AddSession(session models.Session) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if session.TokenHash == "" || session.UserID == "" {
+		return ErrConflict
+	}
+	r.sessions[session.TokenHash] = session
+	return nil
+}
+
+// SessionByHash treats an expired session as missing and drops it.
+func (r *MemoryRepository) SessionByHash(hash string) (models.Session, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	session, ok := r.sessions[hash]
+	if !ok {
+		return models.Session{}, ErrNotFound
+	}
+	if !session.ExpiresAt.IsZero() && time.Now().UTC().After(session.ExpiresAt) {
+		delete(r.sessions, hash)
+		return models.Session{}, ErrNotFound
+	}
+	return session, nil
+}
+
+func (r *MemoryRepository) DeleteSession(hash string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.sessions[hash]; !ok {
+		return ErrNotFound
+	}
+	delete(r.sessions, hash)
+	return nil
 }
 
 func (r *MemoryRepository) findInvitation(hash string) (models.Wedding, models.Invitation, bool) {

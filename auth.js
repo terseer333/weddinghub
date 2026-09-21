@@ -4,74 +4,101 @@
     const form = document.querySelector("[data-auth-form]");
     if (!form) return;
 
+    const API = window.WeddingHubAPI;
     const message = document.getElementById("form-message");
     const submitButton = form.querySelector('button[type="submit"]');
-    const mode = form.dataset.authForm;
+    const mode = form.dataset.authForm; // "login" or "signup"
     const profileKey = "weddinghub_local_profile";
-        const weddingDate = form.elements.weddingDate;
-        if (weddingDate) weddingDate.min = new Date().toISOString().slice(0, 10);
+    const weddingDate = form.elements.weddingDate;
+    if (weddingDate) weddingDate.min = new Date().toISOString().slice(0, 10);
 
-    form.addEventListener("submit", (event) => {
+    // Credentials are verified by the API, so an unreachable backend is reported as an
+    // error rather than silently letting the visitor through.
+    function describeError(error) {
+        const text = String((error && error.message) || "").trim();
+        if (!text || error instanceof TypeError || /failed to fetch|network ?error|load failed/i.test(text)) {
+            return "Cannot reach WeddingHub to verify your sign-in. Start the server and try again.";
+        }
+        return text;
+    }
+
+    function storeProfile(profile) {
+        localStorage.setItem(profileKey, JSON.stringify(profile));
+        localStorage.setItem("weddinghub_user", JSON.stringify(profile));
+    }
+
+    function openWorkspace() {
+        window.setTimeout(() => window.location.assign("dashboard.html"), 450);
+    }
+
+    // Signing up starts a fresh wedding for this account.
+    function initializeWedding(response) {
+        storeProfile({
+            fullName: response.user.display_name || form.elements.fullName.value.trim() || "Wedding Admin",
+            email: response.user.email
+        });
+        if (!window.WeddingHub) return;
+        const data = window.WeddingHub.resetData();
+        const partnerOne = form.elements.partnerOne.value.trim();
+        const partnerTwo = form.elements.partnerTwo.value.trim();
+        data.wedding.brideName = partnerOne;
+        data.wedding.groomName = partnerTwo;
+        data.wedding.date = `${form.elements.weddingDate.value}T10:00:00`;
+        data.wedding.slug = `${partnerOne}-and-${partnerTwo}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        data.wedding.message = `${partnerOne} & ${partnerTwo} invite you to share in the joy of their wedding celebration.`;
+        data.wedding.venue = "";
+        data.wedding.address = "";
+        data.wedding.city = "";
+        data.wedding.state = "";
+        data.wedding.verse = "";
+        data.wedding.dressCode = "";
+        data.wedding.heroImage = "";
+        data.events = [];
+        data.photos = [];
+        data.stories = [];
+        data.announcements = [];
+        data.guests = [];
+        data.messages = [];
+        window.WeddingHub.saveData(data);
+        localStorage.removeItem("weddinghub_api_wedding_id");
+    }
+
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
-
         if (!form.reportValidity()) return;
 
-        submitButton.disabled = true;
-        message.textContent = mode === "signup"
-            ? "Local profile created. Opening your workspace…"
-            : "Opening your local workspace…";
-
-        if (mode === "signup") {
-            const profile = {
-                fullName: form.elements.fullName.value.trim(),
-                email: form.elements.email.value.trim()
-            };
-            localStorage.setItem(profileKey, JSON.stringify(profile));
-            localStorage.setItem("weddinghub_user", JSON.stringify(profile));
-            if (window.WeddingHub) {
-                const data = window.WeddingHub.resetData();
-                const partnerOne = form.elements.partnerOne.value.trim();
-                const partnerTwo = form.elements.partnerTwo.value.trim();
-                data.wedding.brideName = partnerOne;
-                data.wedding.groomName = partnerTwo;
-                data.wedding.date = `${form.elements.weddingDate.value}T10:00:00`;
-                data.wedding.slug = `${partnerOne}-and-${partnerTwo}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-                data.wedding.message = `${partnerOne} & ${partnerTwo} invite you to share in the joy of their wedding celebration.`;
-                data.wedding.venue = "";
-                data.wedding.address = "";
-                data.wedding.city = "";
-                data.wedding.state = "";
-                data.wedding.verse = "";
-                data.wedding.dressCode = "";
-                data.wedding.heroImage = "";
-                data.events = [];
-                data.photos = [];
-                data.stories = [];
-                data.announcements = [];
-                data.guests = [];
-                data.messages = [];
-                window.WeddingHub.saveData(data);
-                localStorage.removeItem("weddinghub_api_wedding_id");
-            }
-        } else {
-            let profile = null;
-            try {
-                profile = JSON.parse(localStorage.getItem(profileKey) || localStorage.getItem("weddinghub_user") || "null");
-            } catch (_) {}
-            if (!profile) {
-                const emailVal = form.elements.email.value.trim();
-                const defaultName = emailVal.split("@")[0].replace(/[._-]/g, " ") || "Wedding Admin";
-                profile = {
-                    fullName: defaultName.charAt(0).toUpperCase() + defaultName.slice(1),
-                    email: emailVal
-                };
-                localStorage.setItem(profileKey, JSON.stringify(profile));
-                localStorage.setItem("weddinghub_user", JSON.stringify(profile));
-            }
+        if (!API) {
+            message.textContent = "WeddingHub could not load its API client. Reload the page and try again.";
+            return;
         }
 
-        window.setTimeout(() => {
-            window.location.assign("dashboard.html");
-        }, 450);
+        submitButton.disabled = true;
+        message.textContent = mode === "signup" ? "Creating your account\u2026" : "Checking your credentials\u2026";
+
+        const email = form.elements.email.value.trim();
+        const password = form.elements.password.value;
+
+        try {
+            if (mode === "signup") {
+                const response = await API.signup({
+                    email,
+                    password,
+                    display_name: form.elements.fullName.value.trim()
+                });
+                initializeWedding(response);
+                message.textContent = "Account created. Opening your workspace\u2026";
+            } else {
+                const response = await API.login({ email, password });
+                storeProfile({
+                    fullName: response.user.display_name || email,
+                    email: response.user.email
+                });
+                message.textContent = "Welcome back. Opening your workspace\u2026";
+            }
+            openWorkspace();
+        } catch (error) {
+            message.textContent = describeError(error);
+            submitButton.disabled = false;
+        }
     });
 })();

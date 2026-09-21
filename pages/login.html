@@ -38,7 +38,7 @@
 
             <aside class="local-notice" aria-label="Preview environment information">
                 <span aria-hidden="true">i</span>
-                <div>This hosted preview continues with the wedding saved in this browser. Production authentication is provided by the connected deployment.</div>
+                <div>Your email and password are verified by the WeddingHub API. A wrong password is rejected, and the wedding content itself stays saved in this browser.</div>
             </aside>
 
             <form class="auth-form" id="auth-form" data-auth-form="login">
@@ -48,8 +48,8 @@
                 </div>
                 <div class="field">
                     <label for="password">Password</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="6" required aria-describedby="password-hint">
-                    <p class="field-hint" id="password-hint">Used only to complete this local entry form.</p>
+                    <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required aria-describedby="password-hint">
+                    <p class="field-hint" id="password-hint">At least 8 characters. Verified by the WeddingHub API.</p>
                 </div>
                 <button class="auth-submit" type="submit">Continue to workspace</button>
             </form>

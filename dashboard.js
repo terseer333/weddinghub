@@ -1,12 +1,23 @@
-// Protected page: without an authenticated profile, send the visitor to log in.
+// Protected page: entry needs a stored profile and a session issued by the API.
 (() => {
   let signedIn = false;
-  try { signedIn = Boolean(localStorage.getItem("weddinghub_user") || localStorage.getItem("weddinghub_local_profile")); } catch (_) {}
-  if (!signedIn) location.replace("login.html");
+  let session = "";
+  try {
+    signedIn = Boolean(localStorage.getItem("weddinghub_user") || localStorage.getItem("weddinghub_local_profile"));
+    session = localStorage.getItem("weddinghub_session_token") || "";
+  } catch (_) {}
+  if (!signedIn || !session) location.replace("login.html");
 })();
 
 const WH = WeddingHub;
 const API = WeddingHubAPI;
+
+// The stored session must still be valid server-side; an expired or revoked one returns
+// the visitor to the sign-in page.
+(async () => {
+  const user = await API.currentUser();
+  if (!user) location.replace("login.html");
+})();
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
 let data = WH.getData() || {};
@@ -112,7 +123,7 @@ function renderEvents() {
 }
 function renderGuests(filter = '') {
   const guests = data.guests.filter(guest => `${guest.name} ${guest.email}`.toLowerCase().includes(filter.toLowerCase()));
-  $('#guestTable').innerHTML = '<div class="table-row table-head"><span>Guest</span><span>Category</span><span>Invitation</span><span>RSVP</span><span>Party</span><span>Actions</span></div>' + guests.map(guest => `<div class="table-row"><span class="guest-cell"><i>${initials(guest.name)}</i><span><strong>${WH.escape(guest.name)}</strong><small>${WH.escape(guest.email)}</small></span></span><span>${WH.escape(guest.category)}</span><span><b class="status ${guest.invitationStatus}">${guest.invitationStatus}</b></span><span>${guest.rsvp}</span><span>${guest.partySize}</span><span class="row-menu"><button data-share-guest="${guest.id}">Share</button><button data-copy="${guest.token}">Copy</button><button data-action="delete-guest" data-id="${guest.id}">Delete</button></span></div>`).join('');
+  $('#guestTable').innerHTML = '<div class="table-row table-head"><span>Guest</span><span>Category</span><span>Invitation</span><span>RSVP</span><span>Party</span><span>Actions</span></div>' + guests.map(guest => `<div class="table-row"><span class="guest-cell"><i>${initials(guest.name)}</i><span><strong>${WH.escape(guest.name)}</strong><small>${WH.escape(guest.email)}</small></span></span><span>${WH.escape(guest.category)}</span><span><b class="status ${guest.invitationStatus}">${guest.invitationStatus}</b></span><span>${guest.rsvp}</span><span>${guest.partySize}</span><span class="row-menu"><button data-share-guest="${guest.id}">Share</button><button data-email-guest="${guest.id}">Email</button><button data-whatsapp-guest="${guest.id}">WhatsApp</button><button data-copy="${guest.token}">Copy</button><button data-action="delete-guest" data-id="${guest.id}">Delete</button></span></div>`).join('');
 }
 function renderCommittee() {
   const committee = data.committeeMembers || [];

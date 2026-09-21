@@ -46,4 +46,12 @@ type Repository interface {
 	DeleteCommitteeRole(weddingID, roleID string) error
 	UpdateCommitteeMember(weddingID string, member models.CommitteeMember) (models.CommitteeMember, error)
 	DeleteCommitteeMember(weddingID, memberID string) error
+	// User accounts and browser sessions. Emails are normalized before storage and lookup.
+	CreateUser(user models.User) (models.User, error)
+	UserByEmail(email string) (models.User, error)
+	UserByID(id string) (models.User, error)
+	// AddSession stores a session; SessionByHash returns ErrNotFound for unknown or expired sessions.
+	AddSession(session models.Session) error
+	SessionByHash(hash string) (models.Session, error)
+	DeleteSession(hash string) error
 }

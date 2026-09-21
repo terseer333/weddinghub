@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -150,5 +151,60 @@ func TestCardConfigAndCommitteeRoleRepository(t *testing.T) {
 	wAfter, _ := repo.GetWedding("w2")
 	if len(wAfter.CommitteeRoles) != 0 {
 		t.Fatalf("expected 0 committee roles, got %d", len(wAfter.CommitteeRoles))
+	}
+}
+
+func TestMemoryRepositoryUsersAndSessions(t *testing.T) {
+	repo := NewMemoryRepository()
+	created, err := repo.CreateUser(models.User{ID: "u1", Email: "  Admin@Example.COM ", DisplayName: "Ada", PasswordHash: "stored", CreatedAt: time.Now().UTC()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if created.Email != "admin@example.com" {
+		t.Fatalf("stored email = %q, want a normalized address", created.Email)
+	}
+
+	if _, err := repo.CreateUser(models.User{ID: "u2", Email: "ADMIN@example.com"}); !errors.Is(err, ErrConflict) {
+		t.Fatalf("duplicate email error = %v, want ErrConflict", err)
+	}
+	if _, err := repo.CreateUser(models.User{ID: "u1", Email: "other@example.com"}); !errors.Is(err, ErrConflict) {
+		t.Fatalf("duplicate id error = %v, want ErrConflict", err)
+	}
+
+	lookedUp, err := repo.UserByEmail("admin@EXAMPLE.com")
+	if err != nil || lookedUp.ID != "u1" {
+		t.Fatalf("UserByEmail = %#v, %v", lookedUp, err)
+	}
+	if _, err := repo.UserByEmail("nobody@example.com"); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("unknown email error = %v, want ErrNotFound", err)
+	}
+	if _, err := repo.UserByID("u1"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.UserByID("missing"); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("unknown id error = %v, want ErrNotFound", err)
+	}
+
+	expired := models.Session{TokenHash: "expired-hash", UserID: "u1", ExpiresAt: time.Now().UTC().Add(-time.Minute)}
+	if err := repo.AddSession(expired); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.SessionByHash("expired-hash"); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("expired session error = %v, want ErrNotFound", err)
+	}
+
+	live := models.Session{TokenHash: "live-hash", UserID: "u1", ExpiresAt: time.Now().UTC().Add(time.Hour)}
+	if err := repo.AddSession(live); err != nil {
+		t.Fatal(err)
+	}
+	session, err := repo.SessionByHash("live-hash")
+	if err != nil || session.UserID != "u1" {
+		t.Fatalf("SessionByHash = %#v, %v", session, err)
+	}
+	if err := repo.DeleteSession("live-hash"); err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.DeleteSession("live-hash"); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("second delete error = %v, want ErrNotFound", err)
 	}
 }

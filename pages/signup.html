@@ -38,7 +38,7 @@
 
             <aside class="local-notice" aria-label="Preview environment information">
                 <span aria-hidden="true">i</span>
-                <div>This preview saves your setup in this browser. Connect the deployed API for persistent multi-device access.</div>
+                <div>Your account is created on the WeddingHub API with a hashed password. The wedding content itself is still saved in this browser.</div>
             </aside>
 
             <form class="auth-form" id="auth-form" data-auth-form="signup">
@@ -57,8 +57,8 @@
                 <div class="field"><label for="wedding-date">Wedding date</label><input id="wedding-date" name="weddingDate" type="date" required></div>
                 <div class="field">
                     <label for="password">Password</label>
-                    <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 6 characters" minlength="6" required aria-describedby="password-hint">
-                    <p class="field-hint" id="password-hint">Used only to complete this local entry form.</p>
+                    <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8" required aria-describedby="password-hint">
+                    <p class="field-hint" id="password-hint">At least 8 characters. Your password is hashed by the WeddingHub API and never stored in the browser.</p>
                 </div>
                 <button class="auth-submit" type="submit">Create account</button>
             </form>

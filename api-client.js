@@ -2,6 +2,7 @@
   const API_URL_KEY = "weddinghub_api_url";
   const API_ID_KEY = "weddinghub_api_wedding_id";
   const ADMIN_TOKEN_KEY = "weddinghub_admin_token";
+  const SESSION_KEY = "weddinghub_session_token";
   const baseURL = () => {
       const configured = window.WEDDINGHUB_API_URL || localStorage.getItem(API_URL_KEY);
       if (configured) return configured.replace(/\/$/, "");
@@ -29,6 +30,41 @@
   // Admin capability token issued once when the wedding is created.
   function adminToken() { return localStorage.getItem(ADMIN_TOKEN_KEY) || ""; }
   function storeAdminToken(token) { if (token) localStorage.setItem(ADMIN_TOKEN_KEY, token); }
+
+  // Browser session issued by /api/auth/login or /api/auth/signup. Session tokens are
+  // deliberately kept separate from the wedding admin capability token.
+  function sessionToken() { return localStorage.getItem(SESSION_KEY) || ""; }
+  function storeSession(token) { if (token) localStorage.setItem(SESSION_KEY, token); }
+  function clearSession() { localStorage.removeItem(SESSION_KEY); }
+  function sessionHeader() { const value = sessionToken(); return value ? { Authorization: `Bearer ${value}` } : {}; }
+
+  async function signup(credentials) {
+    const response = await request("/api/auth/signup", { method: "POST", body: JSON.stringify(credentials) });
+    storeSession(response && response.session_token);
+    return response;
+  }
+
+  async function login(credentials) {
+    const response = await request("/api/auth/login", { method: "POST", body: JSON.stringify(credentials) });
+    storeSession(response && response.session_token);
+    return response;
+  }
+
+  async function logout() {
+    try {
+      if (sessionToken()) await request("/api/auth/logout", { method: "POST", headers: sessionHeader() });
+    } finally {
+      clearSession();
+    }
+  }
+
+  // Resolves the stored session to its account, or null when it is missing, expired, or
+  // rejected. A null result means the visitor must sign in again.
+  async function currentUser() {
+    if (!sessionToken()) return null;
+    try { return await request("/api/auth/me", { headers: sessionHeader() }); }
+    catch (_) { return null; }
+  }
   function authHeader(token) {
     const value = token || adminToken();
     return value ? { Authorization: `Bearer ${value}` } : {};
@@ -190,6 +226,13 @@
     }) });
   }
   async function addGuest(guest) { const id = localStorage.getItem(API_ID_KEY); if (!online || !id) return null; return createInvitation(id, guest); }
+  async function sendInvitation(weddingID, invitationID, token, channels) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!online || !id || !invitationID || !token) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/invitations/${encodeURIComponent(invitationID)}/send`, {
+      method: "POST", headers: authHeader(), body: JSON.stringify({ token, channels: channels || [] })
+    });
+  }
   async function respond(token, decision, role) {
     const body = decision === "accept" && role ? JSON.stringify({ role }) : undefined;
     return request(`/api/invitations/${encodeURIComponent(token)}/${decision}`, { method: "POST", body });
@@ -271,7 +314,8 @@
   }
   function isOnline() { return online; }
 
-  window.WeddingHubAPI = { connect, bootstrap, saveWedding, addGuest, respond, updateRSVP, invitation, dashboard, sendMessage,
+  window.WeddingHubAPI = { connect, bootstrap, saveWedding, addGuest, sendInvitation, respond, updateRSVP, invitation, dashboard, sendMessage,
+    signup, login, logout, currentUser, sessionToken, clearSession,
     adminOverview, adminRoster, committeeDashboard, committeeChat, sendCommitteeMessage, createTask, updateTask, deleteTask,
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
     saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,

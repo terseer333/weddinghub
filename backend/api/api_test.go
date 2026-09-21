@@ -2,13 +2,17 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"weddinghub/delivery"
 	"weddinghub/models"
 	"weddinghub/repository"
 )
@@ -666,5 +670,325 @@ func TestCardConfigAndCommitteeRoles(t *testing.T) {
 	handler.ServeHTTP(deleteRoleResp, deleteRoleReq)
 	if deleteRoleResp.Code != http.StatusNoContent {
 		t.Fatalf("DELETE committee role status = %d: %s", deleteRoleResp.Code, deleteRoleResp.Body)
+	}
+}
+
+// recordingSender is a delivery.Sender that records what the API asked it to send.
+type recordingSender struct {
+	channels []string
+	link     string
+	err      error
+	sent     []delivery.Invitation
+}
+
+func (s *recordingSender) Channels() []string { return s.channels }
+
+func (s *recordingSender) Link(string) string { return s.link }
+
+func (s *recordingSender) Send(_ context.Context, invitation delivery.Invitation) error {
+	if s.err != nil {
+		return s.err
+	}
+	s.sent = append(s.sent, invitation)
+	return nil
+}
+
+// newSendTestWedding creates a wedding and one invitation through the admin API so the
+// test has both an admin capability token and the invitation's one-time raw token.
+func newSendTestWedding(t *testing.T, handler http.Handler, invitationPayload string) (weddingCreated, invitationCreated) {
+	t.Helper()
+	create := httptest.NewRecorder()
+	handler.ServeHTTP(create, httptest.NewRequest(http.MethodPost, "/api/weddings", bytes.NewBufferString(`{"slug":"send-wed","title":"A & B","status":"published"}`)))
+	if create.Code != http.StatusCreated {
+		t.Fatalf("create wedding status = %d: %s", create.Code, create.Body)
+	}
+	var wedding weddingCreated
+	if err := json.Unmarshal(create.Body.Bytes(), &wedding); err != nil {
+		t.Fatal(err)
+	}
+	invite := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding.Wedding.ID+"/invitations", bytes.NewBufferString(invitationPayload))
+	request.Header.Set("Authorization", "Bearer "+wedding.AdminToken)
+	handler.ServeHTTP(invite, request)
+	if invite.Code != http.StatusCreated {
+		t.Fatalf("create invitation status = %d: %s", invite.Code, invite.Body)
+	}
+	var invitation invitationCreated
+	if err := json.Unmarshal(invite.Body.Bytes(), &invitation); err != nil {
+		t.Fatal(err)
+	}
+	return wedding, invitation
+}
+
+func TestSendInvitationDeliversAndValidatesToken(t *testing.T) {
+	repo := repository.NewMemoryRepository()
+	sender := &recordingSender{channels: []string{delivery.ChannelEmail, delivery.ChannelWhatsApp}}
+	handler := NewWithSender(repo, "", sender)
+	wedding, invitation := newSendTestWedding(t, handler,
+		`{"type":"guest","guest_name":"Taylor","guest_email":"taylor@example.com","guest_phone":"+15551234567","max_party_size":2}`)
+	path := "/api/weddings/" + wedding.Wedding.ID + "/invitations/" + invitation.Invitation.ID + "/send"
+
+	call := func(body string, admin bool) *httptest.ResponseRecorder {
+		response := httptest.NewRecorder()
+		request := httptest.NewRequest(http.MethodPost, path, bytes.NewBufferString(body))
+		if admin {
+			request.Header.Set("Authorization", "Bearer "+wedding.AdminToken)
+		}
+		handler.ServeHTTP(response, request)
+		return response
+	}
+
+	if response := call(`{"token":"`+invitation.Token+`"}`, false); response.Code != http.StatusUnauthorized {
+		t.Fatalf("unauthenticated status = %d: %s", response.Code, response.Body)
+	}
+	if response := call(`{"token":"`+invitation.Token+`","channels":["carrier-pigeon"]}`, true); response.Code != http.StatusBadRequest {
+		t.Fatalf("unknown channel status = %d: %s", response.Code, response.Body)
+	}
+	if response := call(`{"token":"   ","channels":["email"]}`, true); response.Code != http.StatusBadRequest {
+		t.Fatalf("blank token status = %d: %s", response.Code, response.Body)
+	}
+	otherToken, _, err := models.NewOpaqueToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if response := call(`{"token":"`+otherToken+`","channels":["email"]}`, true); response.Code != http.StatusForbidden {
+		t.Fatalf("mismatched token status = %d: %s", response.Code, response.Body)
+	}
+	missing := httptest.NewRecorder()
+	missingRequest := httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding.Wedding.ID+"/invitations/missing/send",
+		bytes.NewBufferString(`{"token":"`+invitation.Token+`","channels":["email"]}`))
+	missingRequest.Header.Set("Authorization", "Bearer "+wedding.AdminToken)
+	handler.ServeHTTP(missing, missingRequest)
+	if missing.Code != http.StatusNotFound {
+		t.Fatalf("missing invitation status = %d: %s", missing.Code, missing.Body)
+	}
+
+	if response := call(`{"token":"`+invitation.Token+`","channels":["email"]}`, true); response.Code != http.StatusServiceUnavailable {
+		t.Fatalf("missing base url status = %d: %s", response.Code, response.Body)
+	}
+	sender.link = "https://wedding.example/pages/event.html?token="
+
+	response := call(`{"token":"`+invitation.Token+`","channels":["email","whatsapp"]}`, true)
+	if response.Code != http.StatusOK {
+		t.Fatalf("send status = %d: %s", response.Code, response.Body)
+	}
+	var view sendInvitationResponse
+	if err := json.Unmarshal(response.Body.Bytes(), &view); err != nil {
+		t.Fatal(err)
+	}
+	if len(view.Results) != 2 || view.Results[0].Status != "sent" || view.Results[1].Status != "sent" {
+		t.Fatalf("results = %#v", view.Results)
+	}
+	if len(sender.sent) != 2 {
+		t.Fatalf("sender delivered %d messages, want 2", len(sender.sent))
+	}
+	if sender.sent[0].Channel != delivery.ChannelEmail || sender.sent[0].To != "taylor@example.com" || sender.sent[0].Name != "Taylor" || sender.sent[0].Couple != "A & B" {
+		t.Fatalf("email copy = %#v", sender.sent[0])
+	}
+	if sender.sent[1].Channel != delivery.ChannelWhatsApp || sender.sent[1].To != "+15551234567" {
+		t.Fatalf("whatsapp copy = %#v", sender.sent[1])
+	}
+}
+
+func TestSendInvitationReportsSkippedAndFailedChannels(t *testing.T) {
+	repo := repository.NewMemoryRepository()
+	sender := &recordingSender{channels: []string{delivery.ChannelEmail}, link: "https://wedding.example/e"}
+	handler := NewWithSender(repo, "", sender)
+	// No guest_email, so the email channel has no recipient on file.
+	wedding, invitation := newSendTestWedding(t, handler,
+		`{"type":"guest","guest_name":"Taylor","guest_phone":"+15551234567","max_party_size":2}`)
+	path := "/api/weddings/" + wedding.Wedding.ID + "/invitations/" + invitation.Invitation.ID + "/send"
+	call := func() *httptest.ResponseRecorder {
+		response := httptest.NewRecorder()
+		request := httptest.NewRequest(http.MethodPost, path,
+			bytes.NewBufferString(`{"token":"`+invitation.Token+`","channels":["email","whatsapp"]}`))
+		request.Header.Set("Authorization", "Bearer "+wedding.AdminToken)
+		handler.ServeHTTP(response, request)
+		return response
+	}
+
+	response := call()
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d: %s", response.Code, response.Body)
+	}
+	var view sendInvitationResponse
+	if err := json.Unmarshal(response.Body.Bytes(), &view); err != nil {
+		t.Fatal(err)
+	}
+	if view.Results[0].Status != "skipped" || view.Results[0].Error != "no recipient on file" {
+		t.Fatalf("email result = %#v", view.Results[0])
+	}
+	if view.Results[1].Status != "skipped" || view.Results[1].Error != "channel is not configured" {
+		t.Fatalf("whatsapp result = %#v", view.Results[1])
+	}
+	if len(sender.sent) != 0 {
+		t.Fatalf("sender should not receive skipped messages: %#v", sender.sent)
+	}
+
+	sender.err = errors.New("smtp is down")
+	sender.channels = []string{delivery.ChannelEmail}
+	withEmailRepo := repository.NewMemoryRepository()
+	withEmailHandler := NewWithSender(withEmailRepo, "", sender)
+	wedding2, invitation2 := newSendTestWedding(t, withEmailHandler,
+		`{"type":"guest","guest_name":"Jordan","guest_email":"jordan@example.com","max_party_size":1}`)
+	request := httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding2.Wedding.ID+"/invitations/"+invitation2.Invitation.ID+"/send",
+		bytes.NewBufferString(`{"token":"`+invitation2.Token+`","channels":["email"]}`))
+	request.Header.Set("Authorization", "Bearer "+wedding2.AdminToken)
+	failed := httptest.NewRecorder()
+	withEmailHandler.ServeHTTP(failed, request)
+	if failed.Code != http.StatusOK {
+		t.Fatalf("failed send status = %d: %s", failed.Code, failed.Body)
+	}
+	if err := json.Unmarshal(failed.Body.Bytes(), &view); err != nil {
+		t.Fatal(err)
+	}
+	if view.Results[0].Status != "failed" || !strings.Contains(view.Results[0].Error, "smtp is down") {
+		t.Fatalf("failed result = %#v", view.Results[0])
+	}
+}
+
+func TestSendInvitationWithoutSenderIsUnavailable(t *testing.T) {
+	repo := repository.NewMemoryRepository()
+	seeded := NewWithSender(repo, "", &recordingSender{channels: []string{delivery.ChannelEmail}, link: "https://wedding.example/e"})
+	wedding, invitation := newSendTestWedding(t, seeded,
+		`{"type":"guest","guest_name":"Taylor","guest_email":"taylor@example.com","max_party_size":1}`)
+
+	handler := NewWithSender(repo, "", nil)
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/api/weddings/"+wedding.Wedding.ID+"/invitations/"+invitation.Invitation.ID+"/send",
+		bytes.NewBufferString(`{"token":"`+invitation.Token+`","channels":["email"]}`))
+	request.Header.Set("Authorization", "Bearer "+wedding.AdminToken)
+	handler.ServeHTTP(response, request)
+	if response.Code != http.StatusServiceUnavailable {
+		t.Fatalf("status = %d: %s", response.Code, response.Body)
+	}
+}
+
+// TestMain lowers the PBKDF2 work factor so the suite stays fast; the algorithm and its
+// encoded format are covered by the models package tests at their own cost.
+func TestMain(m *testing.M) {
+	models.PasswordIterations = 1500
+	os.Exit(m.Run())
+}
+
+func postJSON(handler http.Handler, path, body string) *httptest.ResponseRecorder {
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest(http.MethodPost, path, bytes.NewBufferString(body)))
+	return response
+}
+
+func TestSignupRejectsWeakCredentialsAndDuplicateEmail(t *testing.T) {
+	handler := New(repository.NewMemoryRepository())
+
+	if response := postJSON(handler, "/api/auth/signup", `{"email":"admin@example.com","password":"supersecret","display_name":"Ada"}); ;`); response.Code != http.StatusBadRequest {
+		t.Fatalf("malformed body status = %d: %s", response.Code, response.Body)
+	}
+	for name, payload := range map[string]string{
+		"short password":  `{"email":"short@example.com","password":"short"}`,
+		"missing email":   `{"email":"","password":"supersecret"}`,
+		"email no domain": `{"email":"admin@localhost","password":"supersecret"}`,
+		"email spaces":    `{"email":"ad min@example.com","password":"supersecret"}`,
+		"unknown field":   `{"email":"extra@example.com","password":"supersecret","role":"owner"}`,
+	} {
+		t.Run(name, func(t *testing.T) {
+			response := postJSON(handler, "/api/auth/signup", payload)
+			if response.Code != http.StatusBadRequest {
+				t.Fatalf("status = %d: %s", response.Code, response.Body)
+			}
+		})
+	}
+
+	if response := postJSON(handler, "/api/auth/signup", `{"email":"admin@example.com","password":"supersecret"}`); response.Code != http.StatusCreated {
+		t.Fatalf("first signup status = %d: %s", response.Code, response.Body)
+	}
+	duplicate := postJSON(handler, "/api/auth/signup", `{"email":"ADMIN@example.com","password":"anothersecret"}`)
+	if duplicate.Code != http.StatusConflict {
+		t.Fatalf("duplicate signup status = %d: %s", duplicate.Code, duplicate.Body)
+	}
+}
+
+func TestLoginRejectsWrongPasswordAndIssuesSessions(t *testing.T) {
+	handler := New(repository.NewMemoryRepository())
+
+	signup := postJSON(handler, "/api/auth/signup", `{"email":"Admin@Example.com","password":"supersecret","display_name":"Ada Admin"}`)
+	if signup.Code != http.StatusCreated {
+		t.Fatalf("signup status = %d: %s", signup.Code, signup.Body)
+	}
+	if body := signup.Body.String(); strings.Contains(body, "pbkdf2") || strings.Contains(body, "password_hash") || strings.Contains(body, "supersecret") {
+		t.Fatalf("signup response leaked password material: %s", body)
+	}
+	var created sessionResponse
+	if err := json.Unmarshal(signup.Body.Bytes(), &created); err != nil {
+		t.Fatal(err)
+	}
+	if created.SessionToken == "" || created.ExpiresAt.IsZero() {
+		t.Fatalf("signup did not issue a session: %#v", created)
+	}
+	if created.User.Email != "admin@example.com" || created.User.DisplayName != "Ada Admin" || created.User.Role != models.RoleOwner {
+		t.Fatalf("unexpected account: %#v", created.User)
+	}
+
+	// Wrong password and unknown email must both be rejected identically.
+	for name, payload := range map[string]string{
+		"wrong password": `{"email":"admin@example.com","password":"not-the-password"}`,
+		"unknown email":  `{"email":"nobody@example.com","password":"supersecret"}`,
+		"empty password": `{"email":"admin@example.com","password":""}`,
+	} {
+		t.Run(name, func(t *testing.T) {
+			response := postJSON(handler, "/api/auth/login", payload)
+			if response.Code != http.StatusUnauthorized {
+				t.Fatalf("status = %d: %s", response.Code, response.Body)
+			}
+			if strings.Contains(response.Body.String(), "supersecret") || strings.Contains(response.Body.String(), "pbkdf2") {
+				t.Fatalf("login error leaked credential material: %s", response.Body)
+			}
+		})
+	}
+
+	// The gate must open for the right password, and the email is case-insensitive.
+	login := postJSON(handler, "/api/auth/login", `{"email":"ADMIN@example.com","password":"supersecret"}`)
+	if login.Code != http.StatusOK {
+		t.Fatalf("login status = %d: %s", login.Code, login.Body)
+	}
+	var logged sessionResponse
+	if err := json.Unmarshal(login.Body.Bytes(), &logged); err != nil {
+		t.Fatal(err)
+	}
+	if logged.SessionToken == "" || logged.SessionToken == created.SessionToken {
+		t.Fatal("each login must mint a new session token")
+	}
+
+	me := func(token string) *httptest.ResponseRecorder {
+		response := httptest.NewRecorder()
+		request := httptest.NewRequest(http.MethodGet, "/api/auth/me", nil)
+		if token != "" {
+			request.Header.Set("Authorization", "Bearer "+token)
+		}
+		handler.ServeHTTP(response, request)
+		return response
+	}
+	if response := me(logged.SessionToken); response.Code != http.StatusOK {
+		t.Fatalf("me status = %d: %s", response.Code, response.Body)
+	}
+	if response := me(""); response.Code != http.StatusUnauthorized {
+		t.Fatalf("me without a token status = %d", response.Code)
+	}
+	if response := me("not-a-valid-token"); response.Code != http.StatusUnauthorized {
+		t.Fatalf("me with a malformed token status = %d", response.Code)
+	}
+
+	// Logout invalidates only the session it was called with.
+	logout := httptest.NewRecorder()
+	logoutRequest := httptest.NewRequest(http.MethodPost, "/api/auth/logout", nil)
+	logoutRequest.Header.Set("Authorization", "Bearer "+logged.SessionToken)
+	handler.ServeHTTP(logout, logoutRequest)
+	if logout.Code != http.StatusNoContent {
+		t.Fatalf("logout status = %d: %s", logout.Code, logout.Body)
+	}
+	if response := me(logged.SessionToken); response.Code != http.StatusUnauthorized {
+		t.Fatalf("logged-out session still works: %d", response.Code)
+	}
+	if response := me(created.SessionToken); response.Code != http.StatusOK {
+		t.Fatalf("the other session should survive, status = %d", response.Code)
 	}
 }

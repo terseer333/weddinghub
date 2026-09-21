@@ -5,18 +5,46 @@ let guest = WH.guestByToken(data);
 let wedding = data.wedding;
 const token = WH.query("token");
 
-async function initializeGuestDashboard() {
-  if (guest?.rsvp === "attending" && token && await API.connect()) {
-    try {
+// Resolve this guest from the API by their invitation token. An accepted guest can
+// open their private space directly; an unaccepted link stays behind the gate.
+async function resolveGuestFromAPI() {
+  if (!token) return;
+  try {
+    const invitationView = await API.invitation(token);
+    const invitation = invitationView?.invitation;
+    if (!invitation || invitation.type === "committee") return;
+    data = API.mergeAPI(data, invitationView);
+    wedding = data.wedding;
+    guest = WH.guestByToken(data) || guest;
+    if (!guest) {
+      guest = {
+        id: invitation.id, name: invitation.guest_name, type: "guest",
+        email: invitation.guest_email || "", category: "Guest",
+        invitationStatus: invitation.status, token,
+        rsvp: invitation.status === "accepted" ? "attending" : invitation.status === "declined" ? "declined" : "pending",
+        partySize: invitation.max_party_size > 0 ? invitation.max_party_size : 1
+      };
+      data.guests.push(guest);
+    } else if (invitation.status !== "pending") {
+      guest.invitationStatus = invitation.status;
+      if (invitation.status === "accepted") guest.rsvp = "attending";
+      if (invitation.status === "declined") guest.rsvp = "declined";
+    }
+    WH.saveData(data);
+    if (guest.rsvp === "attending") {
       const view = await API.dashboard(token);
       data = API.mergeAPI(data, view);
       wedding = data.wedding;
       if (view.rsvp) guest.partySize = view.rsvp.party_size;
       WH.saveData(data);
-    } catch (error) {
-      console.warn("Using local guest-dashboard fallback:", error);
     }
+  } catch (error) {
+    console.warn("Using local guest-dashboard fallback:", error);
   }
+}
+
+async function initializeGuestDashboard() {
+  if (token && await API.connect()) await resolveGuestFromAPI();
   if (!guest || guest.rsvp !== "attending") return showAccessGate();
   document.getElementById("accessGate").style.display = "none";
   renderGuestDashboard();
