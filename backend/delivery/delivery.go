@@ -1,8 +1,8 @@
 // Package delivery sends wedding invitations over opt-in delivery channels.
 //
 // Email uses SMTP and WhatsApp uses the WhatsApp Cloud API. A channel only
-// becomes active when its environment configuration is present, so the API can
-// keep running the in-memory demo without any provider credentials.
+// becomes active when its environment configuration is present, so the API and
+// its PostgreSQL-backed weddings run without any provider credentials.
 package delivery
 
 import (

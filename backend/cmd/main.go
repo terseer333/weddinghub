@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log"
 	"net/http"
@@ -19,7 +20,22 @@ func main() {
 		address = ":8080"
 	}
 
-	apiHandler := api.New(repository.NewMemoryRepository())
+	// PostgreSQL is the only supported store. There is no in-memory fallback, so a
+	// missing or unreachable database is a fatal startup error rather than a
+	// silently degraded demo.
+	dsn := strings.TrimSpace(os.Getenv("WEDDINGHUB_DATABASE_URL"))
+	if dsn == "" {
+		log.Fatal("WEDDINGHUB_DATABASE_URL is required: WeddingHub stores its data in PostgreSQL and no longer runs on an in-memory repository")
+	}
+	connectCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	repo, err := repository.NewPostgresRepository(connectCtx, dsn)
+	if err != nil {
+		log.Fatalf("connect to PostgreSQL: %v", err)
+	}
+	defer repo.Close()
+
+	apiHandler := api.New(repo)
 
 	// Static files directory (weddinghub root directory)
 	staticDir := os.Getenv("WEDDINGHUB_STATIC_DIR")
