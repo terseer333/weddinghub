@@ -19,6 +19,9 @@
         if (!text || error instanceof TypeError || /failed to fetch|network ?error|load failed/i.test(text)) {
             return "Cannot reach WeddingHub to verify your sign-in. Start the server and try again.";
         }
+        if (/no api url|api url is not configured/i.test(text)) {
+            return "This page is not running on the WeddingHub server, so sign-in cannot be verified. Start the backend and open http://localhost:8080 instead.";
+        }
         return text;
     }
 
@@ -29,6 +32,16 @@
 
     function openWorkspace() {
         window.setTimeout(() => window.location.assign("dashboard.html"), 450);
+    }
+
+    // The dashboard offers its guided tour to anyone who has never completed it, so a
+    // first sign-in on this browser queues it up.
+    function markTourPending() {
+        try {
+            if (localStorage.getItem("weddinghub_tour_done") !== "1") {
+                localStorage.setItem("weddinghub_tour_pending", "1");
+            }
+        } catch (_) {}
     }
 
     // Signing up starts a fresh wedding for this account.
@@ -95,6 +108,7 @@
                 });
                 message.textContent = "Welcome back. Opening your workspace\u2026";
             }
+            markTourPending();
             openWorkspace();
         } catch (error) {
             message.textContent = describeError(error);

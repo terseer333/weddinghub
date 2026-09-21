@@ -257,12 +257,14 @@ type CardColors struct {
 	Secondary  string `json:"secondary,omitempty"`
 }
 
+// CardDecorations uses camelCase JSON keys to match the card studio, the template
+// catalog, and the guest invitation card, which all read and write this shape.
 type CardDecorations struct {
-	FloralStyle string `json:"floral_style,omitempty"`
-	BorderStyle string `json:"border_style,omitempty"`
+	FloralStyle string `json:"floralStyle,omitempty"`
+	BorderStyle string `json:"borderStyle,omitempty"`
 	Layout      string `json:"layout,omitempty"`
-	FrameGlow   bool   `json:"frame_glow,omitempty"`
-	DatePill    bool   `json:"date_pill,omitempty"`
+	FrameGlow   bool   `json:"frameGlow,omitempty"`
+	DatePill    bool   `json:"datePill,omitempty"`
 	Background  string `json:"background,omitempty"`
 }
 

@@ -120,9 +120,11 @@
   }
 
   async function loadTemplates() {
-    // Prefer the server-side catalog when the backend is reachable
+    // Prefer the server-side catalog when the backend is reachable. The API is not
+    // always on the origin serving these pages, so resolve it the same way the client does.
     try {
-      const resp = await fetchWithTimeout("/api/templates", 2500);
+      const apiBase = (window.WeddingHubAPI && window.WeddingHubAPI.baseURL && window.WeddingHubAPI.baseURL()) || "";
+      const resp = await fetchWithTimeout(apiBase + "/api/templates", 2500);
       if (resp.ok) {
         const list = await resp.json();
         if (Array.isArray(list) && list.length > 0) {

@@ -29,6 +29,8 @@ Recommended product journey:
 6. Confirm that wedding details and published announcements use the same updated API record.
 7. To test invitation acceptance, open **Guests & RSVP**, copy a pending guest's generated invitation link, accept it, and enter the newly unlocked guest dashboard.
 
+On a browser that has never completed the guided tour, the admin dashboard opens with a step-by-step walkthrough of every feature: each step highlights a sidebar section, switches to it, and explains what it does. It can be skipped at any point and replayed from **Settings → Getting started**.
+
 `api-client.js` maps the browser view model to the Go API and keeps a local cache for resilient offline behavior. Browser storage is not treated as a production database or security boundary; the API remains authoritative whenever it is connected.
 
 ### Hosted frontend

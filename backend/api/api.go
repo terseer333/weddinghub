@@ -1227,7 +1227,7 @@ func getFontsCatalog() []models.FontItem {
 
 func getTemplatesCatalog() []models.Template {
 	// Try loading templates from JSON file paths
-	paths := []string{"templates/templates.json", "../templates/templates.json", "/home/student/weddinghub/templates/templates.json"}
+	paths := []string{"templates/templates.json", "../templates/templates.json"}
 	for _, p := range paths {
 		if data, err := os.ReadFile(p); err == nil {
 			var list []models.Template

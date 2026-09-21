@@ -1,0 +1,142 @@
+/* WeddingHub first-time guided tour.
+   The dimming is painted by the spotlight's oversized box-shadow, which leaves the
+   highlighted control visible through the transparent centre. */
+
+.tour-overlay {
+  position: fixed;
+  z-index: 5000;
+  inset: 0;
+  background: transparent;
+}
+
+/* Steps with no target use the overlay itself to dim the page. */
+.tour-overlay.tour-dim { background: rgba(15, 23, 19, 0.72); }
+
+.tour-spotlight {
+  position: fixed;
+  z-index: 5001;
+  pointer-events: none;
+  border-radius: 10px;
+  outline: 2px solid var(--gold);
+  box-shadow: 0 0 0 9999px rgba(15, 23, 19, 0.72);
+  transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.tour-popover {
+  position: fixed;
+  z-index: 5002;
+  width: min(340px, calc(100vw - 28px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  padding: 20px 20px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 24px 60px rgba(15, 23, 19, 0.32);
+}
+
+.tour-step {
+  margin: 0 0 7px;
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.tour-popover h2 {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 400;
+}
+
+.tour-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.tour-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line);
+}
+
+.tour-dots i.on { background: var(--gold); }
+
+.tour-body {
+  margin: 0 0 16px;
+  color: #5f6964;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.tour-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tour-actions .tour-skip {
+  margin-right: auto;
+  padding: 0;
+  border: 0;
+  color: var(--muted);
+  background: none;
+  font-size: 10px;
+  text-decoration: underline;
+}
+
+.tour-actions .tour-back,
+.tour-actions .tour-next {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tour-actions .tour-back {
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: #fff;
+}
+
+.tour-actions .tour-back[hidden] { display: none; }
+
+.tour-actions .tour-next {
+  color: #fff;
+  background: var(--forest);
+}
+
+html[data-theme="dark"] .tour-popover {
+  border-color: var(--dk-line);
+  background: var(--dk-surface);
+  color: var(--dk-text);
+}
+
+html[data-theme="dark"] .tour-body { color: var(--dk-muted); }
+
+html[data-theme="dark"] .tour-actions .tour-back {
+  border-color: var(--dk-line);
+  background: var(--dk-surface-2);
+  color: var(--dk-text);
+}
+
+html[data-theme="dark"] .tour-actions .tour-next {
+  background: linear-gradient(135deg, #3d5c4f, #2b4239);
+}
+
+html[data-theme="dark"] .tour-dots i { background: var(--dk-line); }
+html[data-theme="dark"] .tour-dots i.on { background: var(--dk-gold); }
+
+/* The tour drives the sidebar, so keep it uncluttered on small screens. */
+@media (max-width: 700px) {
+  .tour-popover { padding: 17px; }
+  .tour-popover h2 { font-size: 19px; }
+}

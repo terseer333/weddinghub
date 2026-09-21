@@ -3,16 +3,19 @@
   const API_ID_KEY = "weddinghub_api_wedding_id";
   const ADMIN_TOKEN_KEY = "weddinghub_admin_token";
   const SESSION_KEY = "weddinghub_session_token";
+  // A page opened over file:// has no hostname, and a page on a non-loopback host
+  // cannot guess where the API lives, so those need an explicit URL in Settings.
+  const LOOPBACK_HOST = /^(localhost|0\.0\.0\.0|::1|\[::1\]|127(?:\.\d{1,3}){3})$/i;
   const baseURL = () => {
       const configured = window.WEDDINGHUB_API_URL || localStorage.getItem(API_URL_KEY);
       if (configured) return configured.replace(/\/$/, "");
-      return ["localhost", "127.0.0.1"].includes(location.hostname) ? "http://localhost:8080" : "";
+      return LOOPBACK_HOST.test(location.hostname || "") ? "http://localhost:8080" : "";
     };
   let online = false;
 
   async function request(path, options = {}) {
     const endpoint = baseURL();
-    if (!endpoint) throw new Error("API URL is not configured");
+    if (!endpoint) throw new Error("No API URL is configured for this page. Open WeddingHub through its server, or set an API URL in Settings.");
     const response = await fetch(endpoint + path, {
       ...options,
       headers: { "Content-Type": "application/json", ...(options.headers || {}) }
