@@ -3,13 +3,18 @@
   const API_ID_KEY = "weddinghub_api_wedding_id";
   const ADMIN_TOKEN_KEY = "weddinghub_admin_token";
   const SESSION_KEY = "weddinghub_session_token";
-  // A page opened over file:// has no hostname, and a page on a non-loopback host
-  // cannot guess where the API lives, so those need an explicit URL in Settings.
   const LOOPBACK_HOST = /^(localhost|0\.0\.0\.0|::1|\[::1\]|127(?:\.\d{1,3}){3})$/i;
   const baseURL = () => {
       const configured = window.WEDDINGHUB_API_URL || localStorage.getItem(API_URL_KEY);
       if (configured) return configured.replace(/\/$/, "");
-      return LOOPBACK_HOST.test(location.hostname || "") ? "http://localhost:8080" : "";
+      // A loopback page is usually fronted by a separate dev server (for example
+      // `python3 -m http.server 5500`), so it falls back to the API's default port.
+      if (LOOPBACK_HOST.test(location.hostname || "")) return "http://localhost:8080";
+      // Otherwise the backend is serving this page and /api from one origin (a deployed
+      // host such as Render), so reuse it. A file:// page has no origin and needs an
+      // explicit URL in Settings.
+      if (location.protocol === "http:" || location.protocol === "https:") return location.origin;
+      return "";
     };
 
   // The API is mandatory: WeddingHub stores every wedding in PostgreSQL behind this
@@ -74,6 +79,14 @@
       });
     } catch (_) {
       const error = new Error("WeddingHub API is unreachable at " + endpoint + ". Start the API server and reload.");
+      error.status = 0;
+      throw error;
+    }
+    // A static host answers /api paths with its own HTML, so treat non-JSON success
+    // responses as an unreachable API instead of parsing markup as data.
+    const contentType = response.headers.get("content-type") || "";
+    if (response.ok && response.status !== 204 && !contentType.includes("application/json")) {
+      const error = new Error("WeddingHub API is unreachable at " + endpoint + ". This page is not served by the WeddingHub API; set its URL in Settings.");
       error.status = 0;
       throw error;
     }
