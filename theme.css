@@ -14,7 +14,7 @@
   border-radius: 50%;
   background: #ffffff;
   color: #2b3a33;
-  font-size: 19px;
+  font-size: var(--text-xl);
   line-height: 1;
   box-shadow: 0 10px 30px rgba(20, 35, 28, 0.18);
   cursor: pointer;

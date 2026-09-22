@@ -319,7 +319,7 @@
 }
 
 .studio-panel-header h2 {
-  font-size: 1rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   margin: 0;
   display: flex;
@@ -328,7 +328,7 @@
 }
 
 .studio-panel-header .badge {
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   background: #e2e8f0;
   color: #475569;
   padding: 2px 8px;
@@ -351,7 +351,7 @@
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid var(--border, #cbd5e1);
-  font-size: 0.88rem;
+  font-size: var(--text-base);
   box-sizing: border-box;
 }
 
@@ -367,7 +367,7 @@
 .cat-pill {
   padding: 4px 10px;
   border-radius: 16px;
-  font-size: 0.76rem;
+  font-size: var(--text-xs);
   font-weight: 500;
   white-space: nowrap;
   background: var(--surface-subtle, #f1f5f9);
@@ -429,7 +429,7 @@
 }
 
 .mini-card-thumb span.mini-name {
-  font-size: 0.85rem;
+  font-size: var(--text-base);
   line-height: 1.1;
   margin: 4px 0;
 }
@@ -442,14 +442,14 @@
 
 .mini-card-meta strong {
   display: block;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .mini-card-meta small {
-  font-size: 0.68rem;
+  font-size:var(--text-xs);
   color: #64748b;
 }
 
@@ -466,7 +466,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: #94a3b8;
   z-index: 5;
   transition: color 0.15s ease;
@@ -512,7 +512,7 @@
   padding: 6px 12px;
   border: none;
   background: transparent;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
@@ -530,7 +530,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   color: #475569;
 }
 
@@ -604,7 +604,7 @@
   padding: 12px 8px;
   border: none;
   background: transparent;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: #64748b;
   cursor: pointer;
@@ -629,7 +629,7 @@
 }
 
 .customizer-section h3 {
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #64748b;
@@ -644,7 +644,7 @@
 
 .font-field-row label {
   display: block;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: #334155;
   margin-bottom: 6px;
@@ -656,7 +656,7 @@
   border-radius: 8px;
   border: 1px solid #cbd5e1;
   background: #ffffff;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   cursor: pointer;
 }
 
@@ -697,7 +697,7 @@
 }
 
 .palette-chip small {
-  font-size: 0.68rem;
+  font-size:var(--text-xs);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -713,7 +713,7 @@
 
 .color-picker-item label {
   display: block;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   color: #475569;
   margin-bottom: 4px;
   font-weight: 500;
@@ -742,7 +742,7 @@
 .color-input-wrapper input[type="text"] {
   border: none;
   font-family: monospace;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   width: 70px;
 }
 
@@ -786,18 +786,18 @@
 
 .role-card-item h4 {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   font-weight: 600;
 }
 
 .role-card-item p {
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   color: var(--muted, #64748b);
   margin: 0;
 }
 
 .role-badge-custom {
-  font-size: 0.68rem;
+  font-size:var(--text-xs);
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 4px;
@@ -807,7 +807,7 @@
 }
 
 .role-badge-core {
-  font-size: 0.68rem;
+  font-size:var(--text-xs);
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 4px;
@@ -822,7 +822,7 @@
   align-items: center;
   border-top: 1px solid var(--border, #f1f5f9);
   padding-top: 8px;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   color: #64748b;
 }
 
@@ -853,7 +853,7 @@
 
 .card-showcase-toolbar .card-badge {
   color: #d4af37;
-  font-size: 0.85rem;
+  font-size: var(--text-base);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 600;
@@ -931,7 +931,7 @@ body.invite-preview-mode .invitation-card-showcase-section {
   padding: 10px 12px;
   border: 1px solid #dfe4e0;
   border-radius: 9px;
-  font-size: 12px;
+  font-size:var(--text-sm);
 }
 .share-actions {
   display: flex;
@@ -973,7 +973,7 @@ body.invite-preview-mode .invitation-card-showcase-section {
   z-index: 5;
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: 0.5rem;
+  font-size:var(--text-xs);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 2px 6px;
@@ -986,7 +986,7 @@ body.invite-preview-mode .invitation-card-showcase-section {
   align-items: center;
   gap: 8px;
   padding: 6px 0;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--muted, #666);
   cursor: pointer;
 }

@@ -39,7 +39,7 @@
 .tour-step {
   margin: 0 0 7px;
   color: var(--gold);
-  font-size: 9px;
+  font-size:var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -48,7 +48,7 @@
 .tour-popover h2 {
   margin: 0 0 10px;
   font-family: var(--serif);
-  font-size: 21px;
+  font-size: var(--text-2xl);
   font-weight: 400;
 }
 
@@ -71,7 +71,7 @@
 .tour-body {
   margin: 0 0 16px;
   color: #5f6964;
-  font-size: 11px;
+  font-size:var(--text-sm);
   line-height: 1.6;
 }
 
@@ -87,7 +87,7 @@
   border: 0;
   color: var(--muted);
   background: none;
-  font-size: 10px;
+  font-size:var(--text-xs);
   text-decoration: underline;
 }
 
@@ -97,7 +97,7 @@
   padding: 0 14px;
   border: 0;
   border-radius: 8px;
-  font-size: 11px;
+  font-size:var(--text-sm);
   font-weight: 700;
 }
 
@@ -138,5 +138,5 @@ html[data-theme="dark"] .tour-dots i.on { background: var(--dk-gold); }
 /* The tour drives the sidebar, so keep it uncluttered on small screens. */
 @media (max-width: 700px) {
   .tour-popover { padding: 17px; }
-  .tour-popover h2 { font-size: 19px; }
+  .tour-popover h2 { font-size: var(--text-xl); }
 }
