@@ -52,7 +52,7 @@ func TestBuiltinCatalogMatchesTemplateJSON(t *testing.T) {
 			if id == "" {
 				id = "<missing>"
 			}
-			t.Errorf("entry %d differs (%s); regenerate with .qwen/tmp/sync_builtin_catalog.py", i, id)
+			t.Errorf("entry %d differs (%s); regenerate with templates/sync-builtin-catalog.py", i, id)
 			diverged++
 		}
 	}
