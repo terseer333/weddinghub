@@ -1,3 +1,12 @@
-the invitation link sent displays 2 cards , i want only the dissigned card on the studio to display..
-guest should accept invitation before moving to there space ..
-the email address or number registered should  for guest invite.. i want the link Sent directly to the email and if the number registerd is a whatapp number it should also sent there..
+https://www.canva.com/templates/EAGQ7QGX0fU-yellow-and-green-vintage-wedding-invitation/
+https://www.canva.com/templates/EAHNjyN1Oec-pink-green-and-white-illustrated-wedding-invitation/
+https://www.canva.com/templates/EAGvfz2KS9g-maroon-and-beige-illustrative-florist-elegant-wedding-invitation/
+https://www.canva.com/templates/EAHI5B8MIj8-burgundy-white-and-pink-traditional-wedding-invitation/
+https://www.canva.com/templates/EAHIsT5Y5yA-red-roses-bouquet-elegant-nikah-wedding-invitation/
+https://www.canva.com/templates/EAHHZKu3LR8-burgundy-and-white-elegant-wedding-invitation/
+https://www.canva.com/templates/EAHQ2rExgu8-beige-elegant-classic-menu/
+https://www.canva.com/templates/EAHI4a96OGM-brown-and-beige-lace-floral-nikah-wedding-invitation/
+https://www.canva.com/templates/EAG8Vs17mI0-white-and-gold-elegant-save-the-date-invitation/
+https://www.canva.com/templates/EAHJKoKKdto-green-white-and-olive-traditional-wedding-invitation/
+https://www.canva.com/templates/EAHGExj1PlY-monochrome-vintage-lace-frame-wedding-invitation/
+https://www.canva.com/templates/EAG-SMP13nk-blue-ornamental-dinner-party-invitation/
