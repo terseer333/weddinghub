@@ -29,7 +29,8 @@
     "background": {
       "style": "gradient",
       "secondary": "#a3b49e"
-    }
+    },
+    "archived": false
   },
   {
     "id": "luxury-gold-botanical",
@@ -61,103 +62,8 @@
     "background": {
       "style": "paper",
       "overlay": "linen"
-    }
-  },
-  {
-    "id": "luxury-emerald-vines",
-    "name": "Emerald & Gilded Vines",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Dark forest emerald backdrop with shimmering gold vines and Roman serif",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Cinzel Decorative",
-      "body": "Cormorant Garamond"
     },
-    "colors": {
-      "background": "#1b3327",
-      "text": "#fffcf2",
-      "accent": "#ffd700",
-      "border": "#e0b83b",
-      "secondary": "#99b8a5"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#99b8a5"
-    }
-  },
-  {
-    "id": "luxury-champagne-magnolia",
-    "name": "Champagne Magnolia",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Warm champagne satin finish with delicate magnolia blooms and golden accents",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#f5ede3",
-      "text": "#3d3229",
-      "accent": "#b3894b",
-      "border": "#c9a76d",
-      "secondary": "#827060"
-    },
-    "decorations": {
-      "floralStyle": "luxury-frame",
-      "borderStyle": "double-gold",
-      "layout": "royal-frame",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "royal-frame",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "luxury-gilded-orchid",
-    "name": "Gilded Orchid Grandeur",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Midnight olive background with exotic gold-dusted orchid accents and script",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Bodoni Moda",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#232d25",
-      "text": "#fdf8ee",
-      "accent": "#e6be58",
-      "border": "#d1a83e",
-      "secondary": "#b0c2b2"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#b0c2b2"
-    }
+    "archived": false
   },
   {
     "id": "luxury-opulent-peony",
@@ -189,394 +95,8 @@
     "background": {
       "style": "gradient",
       "secondary": "#c49a9e"
-    }
-  },
-  {
-    "id": "luxury-baroque-blossom",
-    "name": "Baroque Gold Blossom",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Ornate gold filigree and lush blooms on royal antique parchment",
-    "fonts": {
-      "couple": "Pinyon Script",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
     },
-    "colors": {
-      "background": "#faf6ed",
-      "text": "#473824",
-      "accent": "#b88a38",
-      "border": "#caa052",
-      "secondary": "#7e6d54"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "luxury-royal-ivy",
-    "name": "Royal Ivy & Gold",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Dark hunter green with interwoven ivy leaf motifs and classic gilded borders",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Marcellus",
-      "body": "Playfair Display"
-    },
-    "colors": {
-      "background": "#1e382b",
-      "text": "#fdf7e7",
-      "accent": "#d4af37",
-      "border": "#dfbe5a",
-      "secondary": "#8fa899"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#8fa899"
-    }
-  },
-  {
-    "id": "luxury-antique-rose-leaf",
-    "name": "Antique Rose & Golden Leaf",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Rich mocha background with embossed cream roses and brushed gold foliage",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#3a2d27",
-      "text": "#faeee6",
-      "accent": "#cca666",
-      "border": "#deb87a",
-      "secondary": "#bda69a"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#bda69a"
-    }
-  },
-  {
-    "id": "luxury-gold-foil-garland",
-    "name": "Gold Foil Botanical Garland",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Crisp alabaster with opulent gold foil floral wreath and regal serif typography",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Playfair Display"
-    },
-    "colors": {
-      "background": "#fdfdfa",
-      "text": "#2a2825",
-      "accent": "#cda142",
-      "border": "#d8b259",
-      "secondary": "#7a746b"
-    },
-    "decorations": {
-      "floralStyle": "botanical-arch",
-      "borderStyle": "double-gold",
-      "layout": "top-arch",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "top-arch",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "luxury-versailles-garden",
-    "name": "Versailles Palatial Garden",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Chateau-inspired French green with delicate gilded acanthus leaves",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#33473b",
-      "text": "#fdf9ee",
-      "accent": "#dfba58",
-      "border": "#eac96f",
-      "secondary": "#a2b5a9"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#a2b5a9"
-    }
-  },
-  {
-    "id": "luxury-olive-gold",
-    "name": "Tuscan Olive & Warm Gold",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Earthy olive hues with Mediterranean laurel garlands and clean serif details",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Cormorant Garamond",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#3a4233",
-      "text": "#f9f6ed",
-      "accent": "#d4af37",
-      "border": "#dfc168",
-      "secondary": "#aeb7a4"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#aeb7a4"
-    }
-  },
-  {
-    "id": "luxury-jasmine-cascade",
-    "name": "Jasmine Cascade",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Soft pearl background with cascading starry jasmine blossoms and gold pinstripes",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#faf8f5",
-      "text": "#38322c",
-      "accent": "#b89047",
-      "border": "#cba55f",
-      "secondary": "#8c8276"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "luxury-imperial-flora",
-    "name": "Imperial Botanical Silk",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Deep midnight green silk backdrop with double gold frame and grand script",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#24362b",
-      "text": "#fffdf5",
-      "accent": "#ffd700",
-      "border": "#e5c158",
-      "secondary": "#8fa596"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#8fa596"
-    }
-  },
-  {
-    "id": "luxury-gilded-eucalyptus",
-    "name": "Gilded Eucalyptus Luxe",
-    "category": "luxury-floral",
-    "categoryLabel": "Luxury Floral",
-    "description": "Silver dollar eucalyptus branches overlaid with molten gold foil leaves",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Cormorant Garamond",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#2f3d36",
-      "text": "#f6f3ea",
-      "accent": "#dfba58",
-      "border": "#ebd07f",
-      "secondary": "#9cb0a5"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#9cb0a5"
-    }
-  },
-  {
-    "id": "modern-clean-white",
-    "name": "Pure Modern White",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Pristine white canvas with sophisticated letter-spaced typography and black ink",
-    "fonts": {
-      "couple": "Montserrat",
-      "heading": "Montserrat",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#ffffff",
-      "text": "#1a1a1a",
-      "accent": "#666666",
-      "border": "#e0e0e0",
-      "secondary": "#888888"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "thin-line",
-      "layout": "editorial-top",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "editorial-top",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#888888",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-bauhaus-mono",
-    "name": "Bauhaus Monolith",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Bold modern typography hierarchy with crisp geometric spacing",
-    "fonts": {
-      "couple": "Montserrat",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#f8f8f8",
-      "text": "#111111",
-      "accent": "#c9a44f",
-      "border": "#cccccc",
-      "secondary": "#555555"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "none",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#555555",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-scandinavian-chic",
-    "name": "Scandinavian Chic",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Nordic muted warmth with generous whitespace and understated serif",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Montserrat",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#fbf9f5",
-      "text": "#2e2c29",
-      "accent": "#8c7d70",
-      "border": "#e5ded4",
-      "secondary": "#6e6862"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "thin-line",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#6e6862",
-      "split": "vertical"
-    }
+    "archived": false
   },
   {
     "id": "modern-architectural-line",
@@ -609,238 +129,8 @@
       "style": "duotone",
       "secondary": "#75827b",
       "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-zen-slate",
-    "name": "Zen Slate & Ivory",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Cool slate gray paper with crisp off-white text and quiet elegance",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Montserrat",
-      "body": "Lato"
     },
-    "colors": {
-      "background": "#2c3338",
-      "text": "#f5f6f7",
-      "accent": "#b8c2cc",
-      "border": "#4a5560",
-      "secondary": "#94a3b8"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "none",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "modern-minimal",
-    "premium": true,
-    "background": {
-      "style": "duotone",
-      "secondary": "#94a3b8",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-swiss-sans",
-    "name": "Swiss Typographic Style",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Rigorous grid layout, bold contrast, and ultra-legible humanist sans",
-    "fonts": {
-      "couple": "Montserrat",
-      "heading": "Montserrat",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#ffffff",
-      "text": "#000000",
-      "accent": "#d43827",
-      "border": "#e2e2e2",
-      "secondary": "#555555"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "none",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#555555",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-vogue-editorial",
-    "name": "Vogue Editorial Minimal",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "High-fashion magazine layout with oversized couple title and clean columns",
-    "fonts": {
-      "couple": "Playfair Display",
-      "heading": "Montserrat",
-      "body": "Playfair Display"
-    },
-    "colors": {
-      "background": "#eae6df",
-      "text": "#1a1816",
-      "accent": "#9e4037",
-      "border": "#9e4037",
-      "secondary": "#57524d"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "none",
-      "layout": "editorial-top",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "editorial-top",
-    "premium": true,
-    "background": {
-      "style": "duotone",
-      "secondary": "#57524d",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-ultra-clean",
-    "name": "Ultra Clean Off-White",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Minimalist simplicity with perfect margin breathing room and thin serif body",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Libre Baskerville",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#fdfdfb",
-      "text": "#242424",
-      "accent": "#a1998e",
-      "border": "#e8e5df",
-      "secondary": "#706d69"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "thin-line",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#706d69",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-mono-gold-line",
-    "name": "Minimalist Gold Hairline",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Pure white card accented by a single ultra-fine gold hairline border",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Montserrat",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#ffffff",
-      "text": "#222222",
-      "accent": "#d4af37",
-      "border": "#d4af37",
-      "secondary": "#777777"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "single-gold",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": true,
-    "background": {
-      "style": "duotone",
-      "secondary": "#777777",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-asymmetric-grid",
-    "name": "Asymmetric Modern Gallery",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Contemporary off-center text block balanced by architectural space",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Montserrat",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#f6f5f1",
-      "text": "#202522",
-      "accent": "#6d7d75",
-      "border": "#dcdbd4",
-      "secondary": "#58665f"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "none",
-      "layout": "editorial-top",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "editorial-top",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#58665f",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-contemporary-serenity",
-    "name": "Contemporary Serenity",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Pale oat canvas with calm charcoal text and centered micro-accents",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Cormorant Garamond",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#f7f4ed",
-      "text": "#2a2d2c",
-      "accent": "#9e9182",
-      "border": "#ded8cd",
-      "secondary": "#636967"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "thin-line",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#636967",
-      "split": "vertical"
-    }
+    "archived": false
   },
   {
     "id": "modern-noir-minimal",
@@ -873,73 +163,8 @@
       "style": "duotone",
       "secondary": "#888888",
       "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-studio-blank",
-    "name": "Design Studio Blank",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Understated design studio aesthetic with refined letterform contrast",
-    "fonts": {
-      "couple": "Playfair Display",
-      "heading": "Montserrat",
-      "body": "Lato"
     },
-    "colors": {
-      "background": "#fcfcf9",
-      "text": "#262626",
-      "accent": "#737373",
-      "border": "#ebebeb",
-      "secondary": "#595959"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "none",
-      "layout": "editorial-top",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "editorial-top",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#595959",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "modern-pure-ivory",
-    "name": "Pure Ivory Essential",
-    "category": "modern-minimalist",
-    "categoryLabel": "Modern Minimalist",
-    "description": "Ivory cardstock, black typography, and warm gray details",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#fcfbf7",
-      "text": "#21201d",
-      "accent": "#8a8376",
-      "border": "#e8e4dc",
-      "secondary": "#57534c"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "thin-line",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#57534c",
-      "split": "vertical"
-    }
+    "archived": false
   },
   {
     "id": "romantic-rose-blush",
@@ -971,295 +196,8 @@
     "background": {
       "style": "paper",
       "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-sweetheart-petals",
-    "name": "Sweetheart Petals",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Floating rose petals on creamy porcelain paper with flowing calligraphy",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Playfair Display"
     },
-    "colors": {
-      "background": "#fdf7f5",
-      "text": "#4d343c",
-      "accent": "#c27485",
-      "border": "#e8c3cb",
-      "secondary": "#85656f"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "none",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-soft-watercolor",
-    "name": "Soft Watercolor Blossom",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Gentle watercolor washes of blush and champagne with golden foil cursive",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Cormorant Garamond",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#f9f0ed",
-      "text": "#482e36",
-      "accent": "#c48857",
-      "border": "#dfb696",
-      "secondary": "#806655"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-peony-dream",
-    "name": "Peony Reverie",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Lush garden peonies in dusty rose and soft mauve with romantic serif",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#f7eef0",
-      "text": "#442b34",
-      "accent": "#9c576b",
-      "border": "#c992a2",
-      "secondary": "#755460"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-parisian-romance",
-    "name": "Parisian Romance",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "French salon aesthetic with dusty blush stationery and vintage gold script",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#fdf5f3",
-      "text": "#3d2a30",
-      "accent": "#ba8c59",
-      "border": "#d6b289",
-      "secondary": "#7a6269"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-dusty-rose-vintage",
-    "name": "Vintage Dusty Rose",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Muted heritage rose hues with delicate filigree corners and serif details",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Libre Baskerville",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#f5e8e8",
-      "text": "#4f313a",
-      "accent": "#945667",
-      "border": "#ba8795",
-      "secondary": "#7d5d67"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-sunset-blush",
-    "name": "Sunset Blush & Peach",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Warm peach and blush sunset tones with glowing gold accents and cursive names",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#fdf0ec",
-      "text": "#4e332f",
-      "accent": "#cb7c63",
-      "border": "#e8ad9d",
-      "secondary": "#8c6b65"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-cherish-script",
-    "name": "Cherish Calligraphy",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Generous script title in deep rose wine on soft ivory velvet cardstock",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#faf4f3",
-      "text": "#402630",
-      "accent": "#8f475b",
-      "border": "#d4a9b5",
-      "secondary": "#6e525b"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-whispering-rose",
-    "name": "Whispering English Rose",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Cottage garden roses with pastel sage leaves and warm gold borders",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Cormorant Garamond",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#f8f3f1",
-      "text": "#423237",
-      "accent": "#ad6b7c",
-      "border": "#caa2ac",
-      "secondary": "#7a8277"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-ethereal-pink",
-    "name": "Ethereal Pastel Pink",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Airy pink cloud palette with delicate hairline borders and italic lettering",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#fcf5f7",
-      "text": "#4a353e",
-      "accent": "#b87088",
-      "border": "#e5c5d0",
-      "secondary": "#806672"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
+    "archived": false
   },
   {
     "id": "romantic-eternal-flame",
@@ -1291,103 +229,8 @@
     "background": {
       "style": "paper",
       "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-velvet-rose",
-    "name": "Velvet Rose & Burgundy",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Lush burgundy rose corners on soft mauve parchment with gold lettering",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
     },
-    "colors": {
-      "background": "#f5e8ec",
-      "text": "#471e2b",
-      "accent": "#8c2e48",
-      "border": "#b86e84",
-      "secondary": "#6e4552"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-pastel-symphony",
-    "name": "Pastel Blossom Symphony",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Soft garden flowers in pastel blush, buttercup and mint with flowing script",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Cormorant Garamond",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#faf7f4",
-      "text": "#3d3337",
-      "accent": "#ab7385",
-      "border": "#d6b4bf",
-      "secondary": "#7a8a7c"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "romantic-blushing-bride",
-    "name": "Blushing Bride Chiffon",
-    "category": "romantic",
-    "categoryLabel": "Romantic",
-    "description": "Silky chiffon pink paper with elegant rose flourishes and gold cursive",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#fbf2f4",
-      "text": "#482b35",
-      "accent": "#c48398",
-      "border": "#dfb0bf",
-      "secondary": "#7d5d68"
-    },
-    "decorations": {
-      "floralStyle": "rose-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
+    "archived": false
   },
   {
     "id": "royal-black-gold-gala",
@@ -1419,7 +262,8 @@
     "background": {
       "style": "gradient",
       "secondary": "#bda46b"
-    }
+    },
+    "archived": false
   },
   {
     "id": "royal-navy-monarch",
@@ -1451,391 +295,8 @@
     "background": {
       "style": "gradient",
       "secondary": "#7a95b8"
-    }
-  },
-  {
-    "id": "royal-burgundy-velvet",
-    "name": "Regal Burgundy Velvet",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Rich royal burgundy wine backdrop with gilded corner filigree and golden text",
-    "fonts": {
-      "couple": "Pinyon Script",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
     },
-    "colors": {
-      "background": "#3d101c",
-      "text": "#fff2eb",
-      "accent": "#d4af37",
-      "border": "#e8c35a",
-      "secondary": "#bd8b97"
-    },
-    "decorations": {
-      "floralStyle": "burgundy-flowers",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#bd8b97"
-    }
-  },
-  {
-    "id": "royal-imperial-crest",
-    "name": "Imperial Sovereign Crest",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Crown insignia and heraldic flourishes in antique gold on midnight onyx",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Cinzel Decorative",
-      "body": "Playfair Display"
-    },
-    "colors": {
-      "background": "#161614",
-      "text": "#f7f1e1",
-      "accent": "#cda142",
-      "border": "#e0b852",
-      "secondary": "#8c7f69"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#8c7f69"
-    }
-  },
-  {
-    "id": "royal-midnight-sovereign",
-    "name": "Midnight Sovereign",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Charcoal black background with burnished brass borders and timeless typography",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#181a19",
-      "text": "#ede7d8",
-      "accent": "#cca34c",
-      "border": "#dfb860",
-      "secondary": "#7e827b"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "royal-frame",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "royal-frame",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#7e827b"
-    }
-  },
-  {
-    "id": "royal-queens-damask",
-    "name": "Queen's Gilded Damask",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Palace-grade gold damask frame with deep sapphire blue foundation",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#101d2d",
-      "text": "#fcf7e8",
-      "accent": "#dfba58",
-      "border": "#ffd700",
-      "secondary": "#87a0bd"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#87a0bd"
-    }
-  },
-  {
-    "id": "royal-crown-sapphire",
-    "name": "Sapphire Crown Royalty",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Deep French sapphire with bright gold bevel framing and stately typography",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#142236",
-      "text": "#fffef5",
-      "accent": "#ffd700",
-      "border": "#e5c158",
-      "secondary": "#9bb1cb"
-    },
-    "decorations": {
-      "floralStyle": "luxury-frame",
-      "borderStyle": "double-gold",
-      "layout": "royal-frame",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "royal-frame",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#9bb1cb"
-    }
-  },
-  {
-    "id": "royal-gold-brocade",
-    "name": "Imperial Gold Brocade",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Heavy gold embroidery styling on dark chocolate espresso canvas",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#211a14",
-      "text": "#fbeef2",
-      "accent": "#d4af37",
-      "border": "#e8c566",
-      "secondary": "#a18d78"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#a18d78"
-    }
-  },
-  {
-    "id": "royal-gilded-windsor",
-    "name": "Windsor Castle Court",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "British royal stationery aesthetics with thick gold border rule and clean serif",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#171f1a",
-      "text": "#f9f4e8",
-      "accent": "#cda74a",
-      "border": "#dfba58",
-      "secondary": "#7b8a80"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "royal-frame",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "royal-frame",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#7b8a80"
-    }
-  },
-  {
-    "id": "royal-onyx-grandeur",
-    "name": "Onyx & Champagne Grandeur",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Lustrous matte onyx with champagne gold accents and flowing script names",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#1a1918",
-      "text": "#fdf7eb",
-      "accent": "#e0be6c",
-      "border": "#eccd7f",
-      "secondary": "#8e887d"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#8e887d"
-    }
-  },
-  {
-    "id": "royal-purple-gold",
-    "name": "Byzantine Royal Purple",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Deep imperial purple velvet foundation with shimmering gold filigree",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Cinzel Decorative",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#29132b",
-      "text": "#fdf5f8",
-      "accent": "#d4af37",
-      "border": "#e5c158",
-      "secondary": "#a881ab"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#a881ab"
-    }
-  },
-  {
-    "id": "royal-stately-navy",
-    "name": "Stately Midnight Navy",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Crisp midnight navy with classical double border and gold foil lettering",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#0b1626",
-      "text": "#f7f2e4",
-      "accent": "#cda344",
-      "border": "#e0b852",
-      "secondary": "#6e84a1"
-    },
-    "decorations": {
-      "floralStyle": "luxury-frame",
-      "borderStyle": "double-gold",
-      "layout": "royal-frame",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "royal-frame",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#6e84a1"
-    }
-  },
-  {
-    "id": "royal-tudor-gold",
-    "name": "Tudor Court Gold",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Historical royal court styling with antique gold flourishes on dark walnut",
-    "fonts": {
-      "couple": "Pinyon Script",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#241e17",
-      "text": "#f9f2e3",
-      "accent": "#d8ac44",
-      "border": "#ebd175",
-      "secondary": "#998675"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#998675"
-    }
-  },
-  {
-    "id": "royal-grand-chandelier",
-    "name": "Grand Ballroom Chandelier",
-    "category": "royal-wedding",
-    "categoryLabel": "Royal Wedding",
-    "description": "Black tie ballroom opulence with intricate chandelier-inspired ornaments",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Playfair Display"
-    },
-    "colors": {
-      "background": "#141412",
-      "text": "#fffcf2",
-      "accent": "#ffd700",
-      "border": "#dfba58",
-      "secondary": "#8c8577"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "gradient",
-      "secondary": "#8c8577"
-    }
+    "archived": false
   },
   {
     "id": "traditional-classic-flourish",
@@ -1867,70 +328,8 @@
     "background": {
       "style": "paper",
       "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-classic-filigree",
-    "name": "Classic Filigree Heritage",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Intricate filigree corner frames on parchment with serif body and cursive couple names",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Cormorant Garamond",
-      "body": "Cormorant Garamond"
     },
-    "colors": {
-      "background": "#fdfbf5",
-      "text": "#47382f",
-      "accent": "#b88a4c",
-      "border": "#cca264",
-      "secondary": "#78655a"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-african-royal",
-    "name": "African Royal Heritage",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Bold African geometric borders in rich gold on midnight bronze background",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Cinzel Decorative",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#1f1812",
-      "text": "#fdf2d8",
-      "accent": "#d4a84b",
-      "border": "#e8be5a",
-      "secondary": "#9c8266"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "solid"
-    }
+    "archived": false
   },
   {
     "id": "traditional-wax-seal",
@@ -1962,231 +361,8 @@
     "background": {
       "style": "paper",
       "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-victorian-heritage",
-    "name": "Victorian Manor Heritage",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Formal Victorian stationery with heavy borders and small-caps details",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Playfair Display"
     },
-    "colors": {
-      "background": "#f8f2e6",
-      "text": "#403126",
-      "accent": "#8f6838",
-      "border": "#ab814a",
-      "secondary": "#665448"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-golden-arabesque",
-    "name": "Golden Arabesque Arch",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Elaborate Moorish arch and arabesque flourishes in shimmering warm gold",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#faf5ea",
-      "text": "#3d2e24",
-      "accent": "#c99a3c",
-      "border": "#dfb256",
-      "secondary": "#856a57"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "top-arch",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "top-arch",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-celtic-knot",
-    "name": "Celtic Knot Eternity",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Endless Celtic knotwork border symbolizing eternal love and unity",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Cormorant Garamond",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#f5f6f0",
-      "text": "#2e3b33",
-      "accent": "#5e7d69",
-      "border": "#8fa897",
-      "secondary": "#576b5d"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-calligraphy-arch",
-    "name": "Cathedral Calligraphy Arch",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Gothic cathedral arch lines with formal church wedding ceremony styling",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#fbf8f2",
-      "text": "#382c23",
-      "accent": "#a1783f",
-      "border": "#b88c4e",
-      "secondary": "#69584d"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "top-arch",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "top-arch",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-antique-roman",
-    "name": "Antique Roman Vows",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Classical Roman laurel wreath and column rules on warm travertine card",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Marcellus",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#f7f1e4",
-      "text": "#423326",
-      "accent": "#ad8242",
-      "border": "#c29753",
-      "secondary": "#7a6755"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-mandala-grace",
-    "name": "Mandala Blessing",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Sacred geometric mandala crest in gold foil on rich terracotta canvas",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#fef6ee",
-      "text": "#4d291e",
-      "accent": "#bf5734",
-      "border": "#d98264",
-      "secondary": "#8c5344"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-baroque-arch",
-    "name": "Baroque Archway",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Grand Italian archway with classical floral scrolls and timeless serif",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Playfair Display"
-    },
-    "colors": {
-      "background": "#fcf9f2",
-      "text": "#3a3026",
-      "accent": "#b88a44",
-      "border": "#cca056",
-      "secondary": "#756658"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "double-gold",
-      "layout": "top-arch",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "top-arch",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
+    "archived": false
   },
   {
     "id": "traditional-porcelain-blue",
@@ -2218,39 +394,8 @@
     "background": {
       "style": "paper",
       "overlay": "linen"
-    }
-  },
-  {
-    "id": "traditional-formal-script",
-    "name": "Formal Invitation Script",
-    "category": "traditional-wedding",
-    "categoryLabel": "Traditional Wedding",
-    "description": "Classic engraved wedding stationery with center-aligned formal hierarchy",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Playfair Display"
     },
-    "colors": {
-      "background": "#fbfbf8",
-      "text": "#2e2b27",
-      "accent": "#8c7e6d",
-      "border": "#cfc7ba",
-      "secondary": "#57524a"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
+    "archived": false
   },
   {
     "id": "rustic-kraft-wildflower",
@@ -2282,231 +427,8 @@
     "background": {
       "style": "paper",
       "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-woodland-pine",
-    "name": "Woodland Pine & Cedar",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Evergreen botanical accents on warm birch bark paper with forest green ink",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Lato"
     },
-    "colors": {
-      "background": "#f0ebe1",
-      "text": "#263b2f",
-      "accent": "#4a6b57",
-      "border": "#759983",
-      "secondary": "#566b5e"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-barn-wood-greenery",
-    "name": "Rustic Barn & Greenery",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Warm timber grain undertones with sprigs of rosemary and olive branches",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#e5d5c0",
-      "text": "#3d3023",
-      "accent": "#6d563d",
-      "border": "#8c7050",
-      "secondary": "#5a6e55"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-twine-lace",
-    "name": "Twine, Lace & Burlap",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Country cottage romance with lace border details on textured oatmeal paper",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#f4ede1",
-      "text": "#45382b",
-      "accent": "#997b5c",
-      "border": "#b89a77",
-      "secondary": "#786552"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-country-meadow",
-    "name": "Sunlit Country Meadow",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Golden wheat, chamomile and field grasses on warm cream paper",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Cormorant Garamond",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#faf5eb",
-      "text": "#42372c",
-      "accent": "#b88a44",
-      "border": "#d4a965",
-      "secondary": "#7a705e"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-dried-eucalyptus",
-    "name": "Dried Eucalyptus & Amber",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Boho dried floral arrangement in terracotta, eucalyptus and warm beige",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#f2ebe1",
-      "text": "#3d3227",
-      "accent": "#aa6849",
-      "border": "#c98869",
-      "secondary": "#6d7869"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-tuscan-olive",
-    "name": "Tuscan Farmhouse Olive",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Sun-warmed Italian olive leaves with rustic script on rough-edge paper",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#f6f1e7",
-      "text": "#3b362c",
-      "accent": "#736b45",
-      "border": "#968d62",
-      "secondary": "#636d59"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-bohemian-pampas",
-    "name": "Bohemian Pampas Grass",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Feathery pampas grass and palm spear silhouettes in desert sand tones",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#f7f0e6",
-      "text": "#42352b",
-      "accent": "#b88a5e",
-      "border": "#d6aa7e",
-      "secondary": "#8c7562"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "none",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
+    "archived": false
   },
   {
     "id": "rustic-timber-gold",
@@ -2537,7 +459,8 @@
     "premium": true,
     "background": {
       "style": "solid"
-    }
+    },
+    "archived": false
   },
   {
     "id": "rustic-burlap-lavender",
@@ -2569,102 +492,8 @@
     "background": {
       "style": "paper",
       "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-farmhouse-chalk",
-    "name": "Farmhouse Slate & Flora",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Chalkboard slate texture softened with hand-drawn white botanicals",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
     },
-    "colors": {
-      "background": "#26292b",
-      "text": "#f7f7f5",
-      "accent": "#d9cbaf",
-      "border": "#545b61",
-      "secondary": "#8c949a"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "solid"
-    }
-  },
-  {
-    "id": "rustic-forest-foliage",
-    "name": "Deep Forest Foliage",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Fern fronds and mountain moss on recycled bark paper with earthy tones",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#ebe4d8",
-      "text": "#2d382e",
-      "accent": "#4d6b52",
-      "border": "#6e8f73",
-      "secondary": "#576b5a"
-    },
-    "decorations": {
-      "floralStyle": "sage-botanical-corners",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
-  },
-  {
-    "id": "rustic-sunlit-wheat",
-    "name": "Golden Harvest Wheat",
-    "category": "rustic-wedding",
-    "categoryLabel": "Rustic Wedding",
-    "description": "Warm harvest wheat sheaves with golden hour glow and rustic cursive",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Cormorant Garamond",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#fdf7ed",
-      "text": "#453625",
-      "accent": "#c4923e",
-      "border": "#dbae60",
-      "secondary": "#826f58"
-    },
-    "decorations": {
-      "floralStyle": "wildflower-garden",
-      "borderStyle": "double-gold",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "centered-classic",
-    "premium": false,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
+    "archived": false
   },
   {
     "id": "tropical-palm-paradise",
@@ -2697,172 +526,8 @@
       "style": "duotone",
       "secondary": "#4d8065",
       "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-exotic-monstera",
-    "name": "Exotic Monstera & Gold",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Sculptural monstera foliage with gold foil veining on crisp white card",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Montserrat",
-      "body": "Lato"
     },
-    "colors": {
-      "background": "#ffffff",
-      "text": "#1a382c",
-      "accent": "#d4af37",
-      "border": "#d4af37",
-      "secondary": "#426b58"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "double-gold",
-      "layout": "tropical-fringe",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "tropical-fringe",
-    "premium": true,
-    "background": {
-      "style": "duotone",
-      "secondary": "#426b58",
-      "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-flamingo-orchid",
-    "name": "Golden Flamingo & Orchid",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Exotic pink orchids and banana leaves with warm tropical gold accents",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#fef7f5",
-      "text": "#3d2a2a",
-      "accent": "#d96f5b",
-      "border": "#e89989",
-      "secondary": "#4f7560"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "thin-line",
-      "layout": "tropical-fringe",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "tropical-fringe",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#4f7560",
-      "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-island-hibiscus",
-    "name": "Island Breeze Hibiscus",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Coral hibiscus blooms and lush jungle palms for a seaside celebration",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Playfair Display",
-      "body": "Montserrat"
-    },
-    "colors": {
-      "background": "#faf8f2",
-      "text": "#293830",
-      "accent": "#dd6e52",
-      "border": "#eba08d",
-      "secondary": "#3d6951"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "none",
-      "layout": "tropical-fringe",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "tropical-fringe",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#3d6951",
-      "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-bamboo-leaf",
-    "name": "Bali Bamboo & Frond",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Delicate bamboo shoots and tropical fronds with zen minimalism",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Cormorant Garamond",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#f7f6f0",
-      "text": "#2b3b30",
-      "accent": "#809971",
-      "border": "#a8bd9d",
-      "secondary": "#576e55"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "thin-line",
-      "layout": "tropical-fringe",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "tropical-fringe",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#576e55",
-      "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-coconut-palm",
-    "name": "Coastal Coconut Palm",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Swaying coconut palm arch on sandy warm beige with golden ocean sunset accents",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#f8f3eb",
-      "text": "#333d34",
-      "accent": "#c7923e",
-      "border": "#deb168",
-      "secondary": "#496650"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "double-gold",
-      "layout": "tropical-fringe",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "tropical-fringe",
-    "premium": true,
-    "background": {
-      "style": "duotone",
-      "secondary": "#496650",
-      "split": "edge"
-    }
+    "archived": false
   },
   {
     "id": "tropical-lush-rainforest",
@@ -2895,40 +560,8 @@
       "style": "duotone",
       "secondary": "#6fa887",
       "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-night-flora",
-    "name": "Tropic Midnight Flora",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Nightfall navy background with neon-lit tropical foliage and gold script",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Montserrat",
-      "body": "Lato"
     },
-    "colors": {
-      "background": "#0f2126",
-      "text": "#fffefa",
-      "accent": "#e6be58",
-      "border": "#ffd700",
-      "secondary": "#4da692"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "double-gold",
-      "layout": "tropical-fringe",
-      "frameGlow": true,
-      "datePill": false
-    },
-    "layout": "tropical-fringe",
-    "premium": true,
-    "background": {
-      "style": "duotone",
-      "secondary": "#4da692",
-      "split": "edge"
-    }
+    "archived": false
   },
   {
     "id": "tropical-havana-sunset",
@@ -2961,204 +594,8 @@
       "style": "duotone",
       "secondary": "#576b5c",
       "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-emerald-fronds",
-    "name": "Verdant Island Fronds",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Layered botanical leaves from palm to monstera with crisp white center card",
-    "fonts": {
-      "couple": "Alex Brush",
-      "heading": "Cormorant Garamond",
-      "body": "Montserrat"
     },
-    "colors": {
-      "background": "#f5f7f2",
-      "text": "#213629",
-      "accent": "#3f7a55",
-      "border": "#5c9e74",
-      "secondary": "#335940"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "thin-line",
-      "layout": "tropical-fringe",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "tropical-fringe",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#335940",
-      "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-caribbean-coral",
-    "name": "Caribbean Coral & Palm",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Coral reefs and palm branches for destination beach weddings",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Playfair Display",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#fdf6f2",
-      "text": "#3d2b27",
-      "accent": "#d46b55",
-      "border": "#e89987",
-      "secondary": "#4f7566"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "double-gold",
-      "layout": "tropical-fringe",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "tropical-fringe",
-    "premium": true,
-    "background": {
-      "style": "duotone",
-      "secondary": "#4f7566",
-      "split": "edge"
-    }
-  },
-  {
-    "id": "tropical-golden-palms",
-    "name": "Golden Palm Silhouette",
-    "category": "tropical-wedding",
-    "categoryLabel": "Tropical Wedding",
-    "description": "Shimmering gold palm leaves on rich warm sand with luxurious typography",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#f7f1e6",
-      "text": "#332c24",
-      "accent": "#c99a38",
-      "border": "#dfb658",
-      "secondary": "#637361"
-    },
-    "decorations": {
-      "floralStyle": "tropical-leaves",
-      "borderStyle": "double-gold",
-      "layout": "tropical-fringe",
-      "frameGlow": true,
-      "datePill": true
-    },
-    "layout": "tropical-fringe",
-    "premium": true,
-    "background": {
-      "style": "duotone",
-      "secondary": "#637361",
-      "split": "edge"
-    }
-  },
-  {
-    "id": "elegant-timeless-serif",
-    "name": "Timeless Serif Luxe",
-    "category": "elegant-simple",
-    "categoryLabel": "Elegant Simple",
-    "description": "Classic editorial Didot typography on heavy cotton card with delicate gold divider",
-    "fonts": {
-      "couple": "Playfair Display",
-      "heading": "Playfair Display",
-      "body": "Cormorant Garamond"
-    },
-    "colors": {
-      "background": "#fdfdfa",
-      "text": "#262320",
-      "accent": "#bfa054",
-      "border": "#d4b872",
-      "secondary": "#6e6861"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "thin-line",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": true
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#6e6861",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "elegant-graceful-script",
-    "name": "Graceful Calligraphy",
-    "category": "elegant-simple",
-    "categoryLabel": "Elegant Simple",
-    "description": "Prominent flourishing script names with subtle muted charcoal supporting details",
-    "fonts": {
-      "couple": "Great Vibes",
-      "heading": "Playfair Display",
-      "body": "Lato"
-    },
-    "colors": {
-      "background": "#fcfbf7",
-      "text": "#2b2a28",
-      "accent": "#8c7f70",
-      "border": "#e0dad0",
-      "secondary": "#5e5850"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "none",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#5e5850",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "elegant-delicate-monogram",
-    "name": "Delicate Crest Monogram",
-    "category": "elegant-simple",
-    "categoryLabel": "Elegant Simple",
-    "description": "Interlocking initials crest header with refined serif invitation wording",
-    "fonts": {
-      "couple": "Allura",
-      "heading": "Playfair Display",
-      "body": "Playfair Display"
-    },
-    "colors": {
-      "background": "#faf8f2",
-      "text": "#302d29",
-      "accent": "#bda05e",
-      "border": "#d1ba82",
-      "secondary": "#736b60"
-    },
-    "decorations": {
-      "floralStyle": "traditional-flourish",
-      "borderStyle": "thin-line",
-      "layout": "centered-classic",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "centered-classic",
-    "premium": true,
-    "background": {
-      "style": "paper",
-      "overlay": "linen"
-    }
+    "archived": false
   },
   {
     "id": "elegant-gilded-edge",
@@ -3191,73 +628,8 @@
       "style": "duotone",
       "secondary": "#6e6e6e",
       "split": "vertical"
-    }
-  },
-  {
-    "id": "elegant-classic-offwhite",
-    "name": "Classic Off-White & Charcoal",
-    "category": "elegant-simple",
-    "categoryLabel": "Elegant Simple",
-    "description": "Warm alabaster background with deep charcoal lettering and balanced spacing",
-    "fonts": {
-      "couple": "Parisienne",
-      "heading": "Cormorant Garamond",
-      "body": "Cormorant Garamond"
     },
-    "colors": {
-      "background": "#f9f8f4",
-      "text": "#292929",
-      "accent": "#78746c",
-      "border": "#dedbd3",
-      "secondary": "#57544e"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "thin-line",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#57544e",
-      "split": "vertical"
-    }
-  },
-  {
-    "id": "elegant-thin-line",
-    "name": "Thin Line Precision",
-    "category": "elegant-simple",
-    "categoryLabel": "Elegant Simple",
-    "description": "Whisper-thin border rules with graceful italic headers and classic serif details",
-    "fonts": {
-      "couple": "Dancing Script",
-      "heading": "Playfair Display",
-      "body": "Libre Baskerville"
-    },
-    "colors": {
-      "background": "#fbfbf8",
-      "text": "#2e2d2b",
-      "accent": "#8f8a81",
-      "border": "#cfcac2",
-      "secondary": "#63605a"
-    },
-    "decorations": {
-      "floralStyle": "minimal",
-      "borderStyle": "thin-line",
-      "layout": "modern-minimal",
-      "frameGlow": false,
-      "datePill": false
-    },
-    "layout": "modern-minimal",
-    "premium": false,
-    "background": {
-      "style": "duotone",
-      "secondary": "#63605a",
-      "split": "vertical"
-    }
+    "archived": false
   },
   {
     "id": "elegant-pearl-charcoal",
@@ -3290,7 +662,3067 @@
       "style": "duotone",
       "secondary": "#706a62",
       "split": "vertical"
-    }
+    },
+    "archived": false
+  },
+  {
+    "id": "vintage-yellow-green",
+    "name": "Vintage Mustard & Olive",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Mustard yellow and olive laurel sprays over warm cream with a fine vintage rule",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Marcellus",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f7f0dd",
+      "text": "#3f4227",
+      "accent": "#c68f16",
+      "border": "#d9a520",
+      "secondary": "#6b7a3a"
+    },
+    "decorations": {
+      "floralStyle": "vintage-yellow-green",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "secondary": "#6b7a3a"
+    },
+    "archived": false
+  },
+  {
+    "id": "illustrated-pink-garden",
+    "name": "Illustrated Pink Garden",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Illustrated blush roses and sage foliage framing a soft pink card",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fdf6f4",
+      "text": "#4a3b3d",
+      "accent": "#c97c8e",
+      "border": "#dd97a6",
+      "secondary": "#869a78"
+    },
+    "decorations": {
+      "floralStyle": "illustrated-pink-garden",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "solid",
+      "secondary": "#869a78"
+    },
+    "archived": false
+  },
+  {
+    "id": "maroon-beige-florist",
+    "name": "Maroon Florist Spray",
+    "category": "elegant-simple",
+    "categoryLabel": "Elegant Simple",
+    "description": "Cascading maroon dahlias with beige filler blooms on a warm beige ground",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Cormorant Garamond",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f6efe2",
+      "text": "#4a2c26",
+      "accent": "#7c2434",
+      "border": "#dbc8a5",
+      "secondary": "#8a6247"
+    },
+    "decorations": {
+      "floralStyle": "maroon-beige-florist",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "secondary": "#8a6247"
+    },
+    "archived": false
+  },
+  {
+    "id": "burgundy-pink-traditional",
+    "name": "Burgundy & Pink Tradition",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Symmetrical burgundy medallions and scrollwork accented with pink blossom",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fdf7f5",
+      "text": "#4e111c",
+      "accent": "#73202f",
+      "border": "#c9a253",
+      "secondary": "#d98ca0"
+    },
+    "decorations": {
+      "floralStyle": "burgundy-pink-traditional",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "solid",
+      "secondary": "#d98ca0"
+    },
+    "archived": false
+  },
+  {
+    "id": "red-roses-nikah",
+    "name": "Red Rose Nikah Bouquet",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "A red rose bouquet tied with gold ribbon crowning an elegant Nikah card",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Cormorant Garamond",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fffaf6",
+      "text": "#3d1418",
+      "accent": "#a11f2d",
+      "border": "#c8a152",
+      "secondary": "#5d7a4d"
+    },
+    "decorations": {
+      "floralStyle": "red-roses-bouquet",
+      "borderStyle": "thin-line",
+      "layout": "editorial-top",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "editorial-top",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "secondary": "#5d7a4d"
+    },
+    "archived": false
+  },
+  {
+    "id": "burgundy-white-elegant",
+    "name": "Burgundy Elegant Scroll",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Restrained burgundy scrollwork corners on crisp white with a double rule",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fffdfb",
+      "text": "#3f1620",
+      "accent": "#6d1d2a",
+      "border": "#9a4150",
+      "secondary": "#8a6247"
+    },
+    "decorations": {
+      "floralStyle": "burgundy-white-elegant",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "solid",
+      "secondary": "#9a4150"
+    },
+    "archived": false
+  },
+  {
+    "id": "brown-beige-lace-nikah",
+    "name": "Brown Beige Lace Nikah",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Brown and beige scalloped lace border with rosette corners",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Cormorant Garamond",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#faf4e9",
+      "text": "#3f2c1e",
+      "accent": "#6b4a34",
+      "border": "#ddc9a6",
+      "secondary": "#a8815e"
+    },
+    "decorations": {
+      "floralStyle": "brown-beige-lace",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "secondary": "#a8815e"
+    },
+    "archived": false
+  },
+  {
+    "id": "white-gold-save-date",
+    "name": "White & Gold Save the Date",
+    "category": "elegant-simple",
+    "categoryLabel": "Elegant Simple",
+    "description": "Fine gold rule frame with delicate line flourishes on pure white",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Marcellus",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#ffffff",
+      "text": "#26221c",
+      "accent": "#c9a253",
+      "border": "#d4af37",
+      "secondary": "#8f897e"
+    },
+    "decorations": {
+      "floralStyle": "white-gold-elegant",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "solid",
+      "secondary": "#c9a253"
+    },
+    "archived": false
+  },
+  {
+    "id": "green-olive-traditional",
+    "name": "Green & Olive Tradition",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Green and olive foliage medallions in a traditional symmetrical arrangement",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Marcellus",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fbfdf9",
+      "text": "#1e3a28",
+      "accent": "#2b563a",
+      "border": "#7c8145",
+      "secondary": "#7c8145"
+    },
+    "decorations": {
+      "floralStyle": "green-olive-traditional",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "solid",
+      "secondary": "#7c8145"
+    },
+    "archived": false
+  },
+  {
+    "id": "monochrome-lace-frame",
+    "name": "Monochrome Lace Frame",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Vintage grey lace border and filigree corners in a monochrome palette",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Prata",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#f7f7f5",
+      "text": "#1c1c1c",
+      "accent": "#4d4d4d",
+      "border": "#8a8a8a",
+      "secondary": "#a8a8a8"
+    },
+    "decorations": {
+      "floralStyle": "monochrome-lace-frame",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "solid",
+      "secondary": "#a8a8a8"
+    },
+    "archived": false
+  },
+  {
+    "id": "luxury-emerald-vines",
+    "name": "Emerald & Gilded Vines",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Dark forest emerald backdrop with shimmering gold vines and Roman serif",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Cinzel Decorative",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#1b3327",
+      "text": "#fffcf2",
+      "accent": "#ffd700",
+      "border": "#e0b83b",
+      "secondary": "#99b8a5"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#99b8a5"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-champagne-magnolia",
+    "name": "Champagne Magnolia",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Warm champagne satin finish with delicate magnolia blooms and golden accents",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#f5ede3",
+      "text": "#3d3229",
+      "accent": "#b3894b",
+      "border": "#c9a76d",
+      "secondary": "#827060"
+    },
+    "decorations": {
+      "floralStyle": "luxury-frame",
+      "borderStyle": "double-gold",
+      "layout": "royal-frame",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "royal-frame",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-gilded-orchid",
+    "name": "Gilded Orchid Grandeur",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Midnight olive background with exotic gold-dusted orchid accents and script",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Bodoni Moda",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#232d25",
+      "text": "#fdf8ee",
+      "accent": "#e6be58",
+      "border": "#d1a83e",
+      "secondary": "#b0c2b2"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#b0c2b2"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-baroque-blossom",
+    "name": "Baroque Gold Blossom",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Ornate gold filigree and lush blooms on royal antique parchment",
+    "fonts": {
+      "couple": "Pinyon Script",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#faf6ed",
+      "text": "#473824",
+      "accent": "#b88a38",
+      "border": "#caa052",
+      "secondary": "#7e6d54"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-royal-ivy",
+    "name": "Royal Ivy & Gold",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Dark hunter green with interwoven ivy leaf motifs and classic gilded borders",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Marcellus",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#1e382b",
+      "text": "#fdf7e7",
+      "accent": "#d4af37",
+      "border": "#dfbe5a",
+      "secondary": "#8fa899"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#8fa899"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-antique-rose-leaf",
+    "name": "Antique Rose & Golden Leaf",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Rich mocha background with embossed cream roses and brushed gold foliage",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#3a2d27",
+      "text": "#faeee6",
+      "accent": "#cca666",
+      "border": "#deb87a",
+      "secondary": "#bda69a"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#bda69a"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-gold-foil-garland",
+    "name": "Gold Foil Botanical Garland",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Crisp alabaster with opulent gold foil floral wreath and regal serif typography",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#fdfdfa",
+      "text": "#2a2825",
+      "accent": "#cda142",
+      "border": "#d8b259",
+      "secondary": "#7a746b"
+    },
+    "decorations": {
+      "floralStyle": "botanical-arch",
+      "borderStyle": "double-gold",
+      "layout": "top-arch",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "top-arch",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-versailles-garden",
+    "name": "Versailles Palatial Garden",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Chateau-inspired French green with delicate gilded acanthus leaves",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#33473b",
+      "text": "#fdf9ee",
+      "accent": "#dfba58",
+      "border": "#eac96f",
+      "secondary": "#a2b5a9"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#a2b5a9"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-olive-gold",
+    "name": "Tuscan Olive & Warm Gold",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Earthy olive hues with Mediterranean laurel garlands and clean serif details",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Cormorant Garamond",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#3a4233",
+      "text": "#f9f6ed",
+      "accent": "#d4af37",
+      "border": "#dfc168",
+      "secondary": "#aeb7a4"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#aeb7a4"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-jasmine-cascade",
+    "name": "Jasmine Cascade",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Soft pearl background with cascading starry jasmine blossoms and gold pinstripes",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#faf8f5",
+      "text": "#38322c",
+      "accent": "#b89047",
+      "border": "#cba55f",
+      "secondary": "#8c8276"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-imperial-flora",
+    "name": "Imperial Botanical Silk",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Deep midnight green silk backdrop with double gold frame and grand script",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#24362b",
+      "text": "#fffdf5",
+      "accent": "#ffd700",
+      "border": "#e5c158",
+      "secondary": "#8fa596"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#8fa596"
+    },
+    "archived": true
+  },
+  {
+    "id": "luxury-gilded-eucalyptus",
+    "name": "Gilded Eucalyptus Luxe",
+    "category": "luxury-floral",
+    "categoryLabel": "Luxury Floral",
+    "description": "Silver dollar eucalyptus branches overlaid with molten gold foil leaves",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Cormorant Garamond",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#2f3d36",
+      "text": "#f6f3ea",
+      "accent": "#dfba58",
+      "border": "#ebd07f",
+      "secondary": "#9cb0a5"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#9cb0a5"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-clean-white",
+    "name": "Pure Modern White",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Pristine white canvas with sophisticated letter-spaced typography and black ink",
+    "fonts": {
+      "couple": "Montserrat",
+      "heading": "Montserrat",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#ffffff",
+      "text": "#1a1a1a",
+      "accent": "#666666",
+      "border": "#e0e0e0",
+      "secondary": "#888888"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "thin-line",
+      "layout": "editorial-top",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "editorial-top",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#888888",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-bauhaus-mono",
+    "name": "Bauhaus Monolith",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Bold modern typography hierarchy with crisp geometric spacing",
+    "fonts": {
+      "couple": "Montserrat",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#f8f8f8",
+      "text": "#111111",
+      "accent": "#c9a44f",
+      "border": "#cccccc",
+      "secondary": "#555555"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "none",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#555555",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-scandinavian-chic",
+    "name": "Scandinavian Chic",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Nordic muted warmth with generous whitespace and understated serif",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Montserrat",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fbf9f5",
+      "text": "#2e2c29",
+      "accent": "#8c7d70",
+      "border": "#e5ded4",
+      "secondary": "#6e6862"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "thin-line",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#6e6862",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-zen-slate",
+    "name": "Zen Slate & Ivory",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Cool slate gray paper with crisp off-white text and quiet elegance",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Montserrat",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#2c3338",
+      "text": "#f5f6f7",
+      "accent": "#b8c2cc",
+      "border": "#4a5560",
+      "secondary": "#94a3b8"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "none",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "modern-minimal",
+    "premium": true,
+    "background": {
+      "style": "duotone",
+      "secondary": "#94a3b8",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-swiss-sans",
+    "name": "Swiss Typographic Style",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Rigorous grid layout, bold contrast, and ultra-legible humanist sans",
+    "fonts": {
+      "couple": "Montserrat",
+      "heading": "Montserrat",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#ffffff",
+      "text": "#000000",
+      "accent": "#d43827",
+      "border": "#e2e2e2",
+      "secondary": "#555555"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "none",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#555555",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-vogue-editorial",
+    "name": "Vogue Editorial Minimal",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "High-fashion magazine layout with oversized couple title and clean columns",
+    "fonts": {
+      "couple": "Playfair Display",
+      "heading": "Montserrat",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#eae6df",
+      "text": "#1a1816",
+      "accent": "#9e4037",
+      "border": "#9e4037",
+      "secondary": "#57524d"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "none",
+      "layout": "editorial-top",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "editorial-top",
+    "premium": true,
+    "background": {
+      "style": "duotone",
+      "secondary": "#57524d",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-ultra-clean",
+    "name": "Ultra Clean Off-White",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Minimalist simplicity with perfect margin breathing room and thin serif body",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Libre Baskerville",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fdfdfb",
+      "text": "#242424",
+      "accent": "#a1998e",
+      "border": "#e8e5df",
+      "secondary": "#706d69"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "thin-line",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#706d69",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-mono-gold-line",
+    "name": "Minimalist Gold Hairline",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Pure white card accented by a single ultra-fine gold hairline border",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Montserrat",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#ffffff",
+      "text": "#222222",
+      "accent": "#d4af37",
+      "border": "#d4af37",
+      "secondary": "#777777"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "single-gold",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": true,
+    "background": {
+      "style": "duotone",
+      "secondary": "#777777",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-asymmetric-grid",
+    "name": "Asymmetric Modern Gallery",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Contemporary off-center text block balanced by architectural space",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Montserrat",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#f6f5f1",
+      "text": "#202522",
+      "accent": "#6d7d75",
+      "border": "#dcdbd4",
+      "secondary": "#58665f"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "none",
+      "layout": "editorial-top",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "editorial-top",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#58665f",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-contemporary-serenity",
+    "name": "Contemporary Serenity",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Pale oat canvas with calm charcoal text and centered micro-accents",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Cormorant Garamond",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#f7f4ed",
+      "text": "#2a2d2c",
+      "accent": "#9e9182",
+      "border": "#ded8cd",
+      "secondary": "#636967"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "thin-line",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#636967",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-studio-blank",
+    "name": "Design Studio Blank",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Understated design studio aesthetic with refined letterform contrast",
+    "fonts": {
+      "couple": "Playfair Display",
+      "heading": "Montserrat",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fcfcf9",
+      "text": "#262626",
+      "accent": "#737373",
+      "border": "#ebebeb",
+      "secondary": "#595959"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "none",
+      "layout": "editorial-top",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "editorial-top",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#595959",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "modern-pure-ivory",
+    "name": "Pure Ivory Essential",
+    "category": "modern-minimalist",
+    "categoryLabel": "Modern Minimalist",
+    "description": "Ivory cardstock, black typography, and warm gray details",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fcfbf7",
+      "text": "#21201d",
+      "accent": "#8a8376",
+      "border": "#e8e4dc",
+      "secondary": "#57534c"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "thin-line",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#57534c",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-sweetheart-petals",
+    "name": "Sweetheart Petals",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Floating rose petals on creamy porcelain paper with flowing calligraphy",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#fdf7f5",
+      "text": "#4d343c",
+      "accent": "#c27485",
+      "border": "#e8c3cb",
+      "secondary": "#85656f"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-soft-watercolor",
+    "name": "Soft Watercolor Blossom",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Gentle watercolor washes of blush and champagne with golden foil cursive",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Cormorant Garamond",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#f9f0ed",
+      "text": "#482e36",
+      "accent": "#c48857",
+      "border": "#dfb696",
+      "secondary": "#806655"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-peony-dream",
+    "name": "Peony Reverie",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Lush garden peonies in dusty rose and soft mauve with romantic serif",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#f7eef0",
+      "text": "#442b34",
+      "accent": "#9c576b",
+      "border": "#c992a2",
+      "secondary": "#755460"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-parisian-romance",
+    "name": "Parisian Romance",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "French salon aesthetic with dusty blush stationery and vintage gold script",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fdf5f3",
+      "text": "#3d2a30",
+      "accent": "#ba8c59",
+      "border": "#d6b289",
+      "secondary": "#7a6269"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-dusty-rose-vintage",
+    "name": "Vintage Dusty Rose",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Muted heritage rose hues with delicate filigree corners and serif details",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Libre Baskerville",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f5e8e8",
+      "text": "#4f313a",
+      "accent": "#945667",
+      "border": "#ba8795",
+      "secondary": "#7d5d67"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-sunset-blush",
+    "name": "Sunset Blush & Peach",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Warm peach and blush sunset tones with glowing gold accents and cursive names",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fdf0ec",
+      "text": "#4e332f",
+      "accent": "#cb7c63",
+      "border": "#e8ad9d",
+      "secondary": "#8c6b65"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-cherish-script",
+    "name": "Cherish Calligraphy",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Generous script title in deep rose wine on soft ivory velvet cardstock",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#faf4f3",
+      "text": "#402630",
+      "accent": "#8f475b",
+      "border": "#d4a9b5",
+      "secondary": "#6e525b"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-whispering-rose",
+    "name": "Whispering English Rose",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Cottage garden roses with pastel sage leaves and warm gold borders",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Cormorant Garamond",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f8f3f1",
+      "text": "#423237",
+      "accent": "#ad6b7c",
+      "border": "#caa2ac",
+      "secondary": "#7a8277"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-ethereal-pink",
+    "name": "Ethereal Pastel Pink",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Airy pink cloud palette with delicate hairline borders and italic lettering",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fcf5f7",
+      "text": "#4a353e",
+      "accent": "#b87088",
+      "border": "#e5c5d0",
+      "secondary": "#806672"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-velvet-rose",
+    "name": "Velvet Rose & Burgundy",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Lush burgundy rose corners on soft mauve parchment with gold lettering",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f5e8ec",
+      "text": "#471e2b",
+      "accent": "#8c2e48",
+      "border": "#b86e84",
+      "secondary": "#6e4552"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-pastel-symphony",
+    "name": "Pastel Blossom Symphony",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Soft garden flowers in pastel blush, buttercup and mint with flowing script",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Cormorant Garamond",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#faf7f4",
+      "text": "#3d3337",
+      "accent": "#ab7385",
+      "border": "#d6b4bf",
+      "secondary": "#7a8a7c"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "romantic-blushing-bride",
+    "name": "Blushing Bride Chiffon",
+    "category": "romantic",
+    "categoryLabel": "Romantic",
+    "description": "Silky chiffon pink paper with elegant rose flourishes and gold cursive",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#fbf2f4",
+      "text": "#482b35",
+      "accent": "#c48398",
+      "border": "#dfb0bf",
+      "secondary": "#7d5d68"
+    },
+    "decorations": {
+      "floralStyle": "rose-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-burgundy-velvet",
+    "name": "Regal Burgundy Velvet",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Rich royal burgundy wine backdrop with gilded corner filigree and golden text",
+    "fonts": {
+      "couple": "Pinyon Script",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#3d101c",
+      "text": "#fff2eb",
+      "accent": "#d4af37",
+      "border": "#e8c35a",
+      "secondary": "#bd8b97"
+    },
+    "decorations": {
+      "floralStyle": "burgundy-flowers",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#bd8b97"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-imperial-crest",
+    "name": "Imperial Sovereign Crest",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Crown insignia and heraldic flourishes in antique gold on midnight onyx",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Cinzel Decorative",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#161614",
+      "text": "#f7f1e1",
+      "accent": "#cda142",
+      "border": "#e0b852",
+      "secondary": "#8c7f69"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#8c7f69"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-midnight-sovereign",
+    "name": "Midnight Sovereign",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Charcoal black background with burnished brass borders and timeless typography",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#181a19",
+      "text": "#ede7d8",
+      "accent": "#cca34c",
+      "border": "#dfb860",
+      "secondary": "#7e827b"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "royal-frame",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "royal-frame",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#7e827b"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-queens-damask",
+    "name": "Queen's Gilded Damask",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Palace-grade gold damask frame with deep sapphire blue foundation",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#101d2d",
+      "text": "#fcf7e8",
+      "accent": "#dfba58",
+      "border": "#ffd700",
+      "secondary": "#87a0bd"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#87a0bd"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-crown-sapphire",
+    "name": "Sapphire Crown Royalty",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Deep French sapphire with bright gold bevel framing and stately typography",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#142236",
+      "text": "#fffef5",
+      "accent": "#ffd700",
+      "border": "#e5c158",
+      "secondary": "#9bb1cb"
+    },
+    "decorations": {
+      "floralStyle": "luxury-frame",
+      "borderStyle": "double-gold",
+      "layout": "royal-frame",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "royal-frame",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#9bb1cb"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-gold-brocade",
+    "name": "Imperial Gold Brocade",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Heavy gold embroidery styling on dark chocolate espresso canvas",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#211a14",
+      "text": "#fbeef2",
+      "accent": "#d4af37",
+      "border": "#e8c566",
+      "secondary": "#a18d78"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#a18d78"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-gilded-windsor",
+    "name": "Windsor Castle Court",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "British royal stationery aesthetics with thick gold border rule and clean serif",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#171f1a",
+      "text": "#f9f4e8",
+      "accent": "#cda74a",
+      "border": "#dfba58",
+      "secondary": "#7b8a80"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "royal-frame",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "royal-frame",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#7b8a80"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-onyx-grandeur",
+    "name": "Onyx & Champagne Grandeur",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Lustrous matte onyx with champagne gold accents and flowing script names",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#1a1918",
+      "text": "#fdf7eb",
+      "accent": "#e0be6c",
+      "border": "#eccd7f",
+      "secondary": "#8e887d"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#8e887d"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-purple-gold",
+    "name": "Byzantine Royal Purple",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Deep imperial purple velvet foundation with shimmering gold filigree",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Cinzel Decorative",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#29132b",
+      "text": "#fdf5f8",
+      "accent": "#d4af37",
+      "border": "#e5c158",
+      "secondary": "#a881ab"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#a881ab"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-stately-navy",
+    "name": "Stately Midnight Navy",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Crisp midnight navy with classical double border and gold foil lettering",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#0b1626",
+      "text": "#f7f2e4",
+      "accent": "#cda344",
+      "border": "#e0b852",
+      "secondary": "#6e84a1"
+    },
+    "decorations": {
+      "floralStyle": "luxury-frame",
+      "borderStyle": "double-gold",
+      "layout": "royal-frame",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "royal-frame",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#6e84a1"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-tudor-gold",
+    "name": "Tudor Court Gold",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Historical royal court styling with antique gold flourishes on dark walnut",
+    "fonts": {
+      "couple": "Pinyon Script",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#241e17",
+      "text": "#f9f2e3",
+      "accent": "#d8ac44",
+      "border": "#ebd175",
+      "secondary": "#998675"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#998675"
+    },
+    "archived": true
+  },
+  {
+    "id": "royal-grand-chandelier",
+    "name": "Grand Ballroom Chandelier",
+    "category": "royal-wedding",
+    "categoryLabel": "Royal Wedding",
+    "description": "Black tie ballroom opulence with intricate chandelier-inspired ornaments",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#141412",
+      "text": "#fffcf2",
+      "accent": "#ffd700",
+      "border": "#dfba58",
+      "secondary": "#8c8577"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "gradient",
+      "secondary": "#8c8577"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-classic-filigree",
+    "name": "Classic Filigree Heritage",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Intricate filigree corner frames on parchment with serif body and cursive couple names",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Cormorant Garamond",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fdfbf5",
+      "text": "#47382f",
+      "accent": "#b88a4c",
+      "border": "#cca264",
+      "secondary": "#78655a"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-african-royal",
+    "name": "African Royal Heritage",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Bold African geometric borders in rich gold on midnight bronze background",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Cinzel Decorative",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#1f1812",
+      "text": "#fdf2d8",
+      "accent": "#d4a84b",
+      "border": "#e8be5a",
+      "secondary": "#9c8266"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "solid"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-victorian-heritage",
+    "name": "Victorian Manor Heritage",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Formal Victorian stationery with heavy borders and small-caps details",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#f8f2e6",
+      "text": "#403126",
+      "accent": "#8f6838",
+      "border": "#ab814a",
+      "secondary": "#665448"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-golden-arabesque",
+    "name": "Golden Arabesque Arch",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Elaborate Moorish arch and arabesque flourishes in shimmering warm gold",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#faf5ea",
+      "text": "#3d2e24",
+      "accent": "#c99a3c",
+      "border": "#dfb256",
+      "secondary": "#856a57"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "top-arch",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "top-arch",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-celtic-knot",
+    "name": "Celtic Knot Eternity",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Endless Celtic knotwork border symbolizing eternal love and unity",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Cormorant Garamond",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#f5f6f0",
+      "text": "#2e3b33",
+      "accent": "#5e7d69",
+      "border": "#8fa897",
+      "secondary": "#576b5d"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-calligraphy-arch",
+    "name": "Cathedral Calligraphy Arch",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Gothic cathedral arch lines with formal church wedding ceremony styling",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fbf8f2",
+      "text": "#382c23",
+      "accent": "#a1783f",
+      "border": "#b88c4e",
+      "secondary": "#69584d"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "top-arch",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "top-arch",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-antique-roman",
+    "name": "Antique Roman Vows",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Classical Roman laurel wreath and column rules on warm travertine card",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Marcellus",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f7f1e4",
+      "text": "#423326",
+      "accent": "#ad8242",
+      "border": "#c29753",
+      "secondary": "#7a6755"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-mandala-grace",
+    "name": "Mandala Blessing",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Sacred geometric mandala crest in gold foil on rich terracotta canvas",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#fef6ee",
+      "text": "#4d291e",
+      "accent": "#bf5734",
+      "border": "#d98264",
+      "secondary": "#8c5344"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-baroque-arch",
+    "name": "Baroque Archway",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Grand Italian archway with classical floral scrolls and timeless serif",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#fcf9f2",
+      "text": "#3a3026",
+      "accent": "#b88a44",
+      "border": "#cca056",
+      "secondary": "#756658"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "double-gold",
+      "layout": "top-arch",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "top-arch",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "traditional-formal-script",
+    "name": "Formal Invitation Script",
+    "category": "traditional-wedding",
+    "categoryLabel": "Traditional Wedding",
+    "description": "Classic engraved wedding stationery with center-aligned formal hierarchy",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#fbfbf8",
+      "text": "#2e2b27",
+      "accent": "#8c7e6d",
+      "border": "#cfc7ba",
+      "secondary": "#57524a"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-woodland-pine",
+    "name": "Woodland Pine & Cedar",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Evergreen botanical accents on warm birch bark paper with forest green ink",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#f0ebe1",
+      "text": "#263b2f",
+      "accent": "#4a6b57",
+      "border": "#759983",
+      "secondary": "#566b5e"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-barn-wood-greenery",
+    "name": "Rustic Barn & Greenery",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Warm timber grain undertones with sprigs of rosemary and olive branches",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#e5d5c0",
+      "text": "#3d3023",
+      "accent": "#6d563d",
+      "border": "#8c7050",
+      "secondary": "#5a6e55"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-twine-lace",
+    "name": "Twine, Lace & Burlap",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Country cottage romance with lace border details on textured oatmeal paper",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#f4ede1",
+      "text": "#45382b",
+      "accent": "#997b5c",
+      "border": "#b89a77",
+      "secondary": "#786552"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-country-meadow",
+    "name": "Sunlit Country Meadow",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Golden wheat, chamomile and field grasses on warm cream paper",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Cormorant Garamond",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#faf5eb",
+      "text": "#42372c",
+      "accent": "#b88a44",
+      "border": "#d4a965",
+      "secondary": "#7a705e"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-dried-eucalyptus",
+    "name": "Dried Eucalyptus & Amber",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Boho dried floral arrangement in terracotta, eucalyptus and warm beige",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#f2ebe1",
+      "text": "#3d3227",
+      "accent": "#aa6849",
+      "border": "#c98869",
+      "secondary": "#6d7869"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-tuscan-olive",
+    "name": "Tuscan Farmhouse Olive",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Sun-warmed Italian olive leaves with rustic script on rough-edge paper",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f6f1e7",
+      "text": "#3b362c",
+      "accent": "#736b45",
+      "border": "#968d62",
+      "secondary": "#636d59"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-bohemian-pampas",
+    "name": "Bohemian Pampas Grass",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Feathery pampas grass and palm spear silhouettes in desert sand tones",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#f7f0e6",
+      "text": "#42352b",
+      "accent": "#b88a5e",
+      "border": "#d6aa7e",
+      "secondary": "#8c7562"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "none",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-farmhouse-chalk",
+    "name": "Farmhouse Slate & Flora",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Chalkboard slate texture softened with hand-drawn white botanicals",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#26292b",
+      "text": "#f7f7f5",
+      "accent": "#d9cbaf",
+      "border": "#545b61",
+      "secondary": "#8c949a"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "solid"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-forest-foliage",
+    "name": "Deep Forest Foliage",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Fern fronds and mountain moss on recycled bark paper with earthy tones",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#ebe4d8",
+      "text": "#2d382e",
+      "accent": "#4d6b52",
+      "border": "#6e8f73",
+      "secondary": "#576b5a"
+    },
+    "decorations": {
+      "floralStyle": "sage-botanical-corners",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "rustic-sunlit-wheat",
+    "name": "Golden Harvest Wheat",
+    "category": "rustic-wedding",
+    "categoryLabel": "Rustic Wedding",
+    "description": "Warm harvest wheat sheaves with golden hour glow and rustic cursive",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Cormorant Garamond",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fdf7ed",
+      "text": "#453625",
+      "accent": "#c4923e",
+      "border": "#dbae60",
+      "secondary": "#826f58"
+    },
+    "decorations": {
+      "floralStyle": "wildflower-garden",
+      "borderStyle": "double-gold",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "centered-classic",
+    "premium": false,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-exotic-monstera",
+    "name": "Exotic Monstera & Gold",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Sculptural monstera foliage with gold foil veining on crisp white card",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Montserrat",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#ffffff",
+      "text": "#1a382c",
+      "accent": "#d4af37",
+      "border": "#d4af37",
+      "secondary": "#426b58"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "double-gold",
+      "layout": "tropical-fringe",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "tropical-fringe",
+    "premium": true,
+    "background": {
+      "style": "duotone",
+      "secondary": "#426b58",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-flamingo-orchid",
+    "name": "Golden Flamingo & Orchid",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Exotic pink orchids and banana leaves with warm tropical gold accents",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fef7f5",
+      "text": "#3d2a2a",
+      "accent": "#d96f5b",
+      "border": "#e89989",
+      "secondary": "#4f7560"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "thin-line",
+      "layout": "tropical-fringe",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "tropical-fringe",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#4f7560",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-island-hibiscus",
+    "name": "Island Breeze Hibiscus",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Coral hibiscus blooms and lush jungle palms for a seaside celebration",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Playfair Display",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#faf8f2",
+      "text": "#293830",
+      "accent": "#dd6e52",
+      "border": "#eba08d",
+      "secondary": "#3d6951"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "none",
+      "layout": "tropical-fringe",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "tropical-fringe",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#3d6951",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-bamboo-leaf",
+    "name": "Bali Bamboo & Frond",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Delicate bamboo shoots and tropical fronds with zen minimalism",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Cormorant Garamond",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#f7f6f0",
+      "text": "#2b3b30",
+      "accent": "#809971",
+      "border": "#a8bd9d",
+      "secondary": "#576e55"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "thin-line",
+      "layout": "tropical-fringe",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "tropical-fringe",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#576e55",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-coconut-palm",
+    "name": "Coastal Coconut Palm",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Swaying coconut palm arch on sandy warm beige with golden ocean sunset accents",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#f8f3eb",
+      "text": "#333d34",
+      "accent": "#c7923e",
+      "border": "#deb168",
+      "secondary": "#496650"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "double-gold",
+      "layout": "tropical-fringe",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "tropical-fringe",
+    "premium": true,
+    "background": {
+      "style": "duotone",
+      "secondary": "#496650",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-night-flora",
+    "name": "Tropic Midnight Flora",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Nightfall navy background with neon-lit tropical foliage and gold script",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Montserrat",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#0f2126",
+      "text": "#fffefa",
+      "accent": "#e6be58",
+      "border": "#ffd700",
+      "secondary": "#4da692"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "double-gold",
+      "layout": "tropical-fringe",
+      "frameGlow": true,
+      "datePill": false
+    },
+    "layout": "tropical-fringe",
+    "premium": true,
+    "background": {
+      "style": "duotone",
+      "secondary": "#4da692",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-emerald-fronds",
+    "name": "Verdant Island Fronds",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Layered botanical leaves from palm to monstera with crisp white center card",
+    "fonts": {
+      "couple": "Alex Brush",
+      "heading": "Cormorant Garamond",
+      "body": "Montserrat"
+    },
+    "colors": {
+      "background": "#f5f7f2",
+      "text": "#213629",
+      "accent": "#3f7a55",
+      "border": "#5c9e74",
+      "secondary": "#335940"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "thin-line",
+      "layout": "tropical-fringe",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "tropical-fringe",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#335940",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-caribbean-coral",
+    "name": "Caribbean Coral & Palm",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Coral reefs and palm branches for destination beach weddings",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Playfair Display",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fdf6f2",
+      "text": "#3d2b27",
+      "accent": "#d46b55",
+      "border": "#e89987",
+      "secondary": "#4f7566"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "double-gold",
+      "layout": "tropical-fringe",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "tropical-fringe",
+    "premium": true,
+    "background": {
+      "style": "duotone",
+      "secondary": "#4f7566",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "tropical-golden-palms",
+    "name": "Golden Palm Silhouette",
+    "category": "tropical-wedding",
+    "categoryLabel": "Tropical Wedding",
+    "description": "Shimmering gold palm leaves on rich warm sand with luxurious typography",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f7f1e6",
+      "text": "#332c24",
+      "accent": "#c99a38",
+      "border": "#dfb658",
+      "secondary": "#637361"
+    },
+    "decorations": {
+      "floralStyle": "tropical-leaves",
+      "borderStyle": "double-gold",
+      "layout": "tropical-fringe",
+      "frameGlow": true,
+      "datePill": true
+    },
+    "layout": "tropical-fringe",
+    "premium": true,
+    "background": {
+      "style": "duotone",
+      "secondary": "#637361",
+      "split": "edge"
+    },
+    "archived": true
+  },
+  {
+    "id": "elegant-timeless-serif",
+    "name": "Timeless Serif Luxe",
+    "category": "elegant-simple",
+    "categoryLabel": "Elegant Simple",
+    "description": "Classic editorial Didot typography on heavy cotton card with delicate gold divider",
+    "fonts": {
+      "couple": "Playfair Display",
+      "heading": "Playfair Display",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#fdfdfa",
+      "text": "#262320",
+      "accent": "#bfa054",
+      "border": "#d4b872",
+      "secondary": "#6e6861"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "thin-line",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": true
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#6e6861",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "elegant-graceful-script",
+    "name": "Graceful Calligraphy",
+    "category": "elegant-simple",
+    "categoryLabel": "Elegant Simple",
+    "description": "Prominent flourishing script names with subtle muted charcoal supporting details",
+    "fonts": {
+      "couple": "Great Vibes",
+      "heading": "Playfair Display",
+      "body": "Lato"
+    },
+    "colors": {
+      "background": "#fcfbf7",
+      "text": "#2b2a28",
+      "accent": "#8c7f70",
+      "border": "#e0dad0",
+      "secondary": "#5e5850"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "none",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#5e5850",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "elegant-delicate-monogram",
+    "name": "Delicate Crest Monogram",
+    "category": "elegant-simple",
+    "categoryLabel": "Elegant Simple",
+    "description": "Interlocking initials crest header with refined serif invitation wording",
+    "fonts": {
+      "couple": "Allura",
+      "heading": "Playfair Display",
+      "body": "Playfair Display"
+    },
+    "colors": {
+      "background": "#faf8f2",
+      "text": "#302d29",
+      "accent": "#bda05e",
+      "border": "#d1ba82",
+      "secondary": "#736b60"
+    },
+    "decorations": {
+      "floralStyle": "traditional-flourish",
+      "borderStyle": "thin-line",
+      "layout": "centered-classic",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "centered-classic",
+    "premium": true,
+    "background": {
+      "style": "paper",
+      "overlay": "linen"
+    },
+    "archived": true
+  },
+  {
+    "id": "elegant-classic-offwhite",
+    "name": "Classic Off-White & Charcoal",
+    "category": "elegant-simple",
+    "categoryLabel": "Elegant Simple",
+    "description": "Warm alabaster background with deep charcoal lettering and balanced spacing",
+    "fonts": {
+      "couple": "Parisienne",
+      "heading": "Cormorant Garamond",
+      "body": "Cormorant Garamond"
+    },
+    "colors": {
+      "background": "#f9f8f4",
+      "text": "#292929",
+      "accent": "#78746c",
+      "border": "#dedbd3",
+      "secondary": "#57544e"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "thin-line",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#57544e",
+      "split": "vertical"
+    },
+    "archived": true
+  },
+  {
+    "id": "elegant-thin-line",
+    "name": "Thin Line Precision",
+    "category": "elegant-simple",
+    "categoryLabel": "Elegant Simple",
+    "description": "Whisper-thin border rules with graceful italic headers and classic serif details",
+    "fonts": {
+      "couple": "Dancing Script",
+      "heading": "Playfair Display",
+      "body": "Libre Baskerville"
+    },
+    "colors": {
+      "background": "#fbfbf8",
+      "text": "#2e2d2b",
+      "accent": "#8f8a81",
+      "border": "#cfcac2",
+      "secondary": "#63605a"
+    },
+    "decorations": {
+      "floralStyle": "minimal",
+      "borderStyle": "thin-line",
+      "layout": "modern-minimal",
+      "frameGlow": false,
+      "datePill": false
+    },
+    "layout": "modern-minimal",
+    "premium": false,
+    "background": {
+      "style": "duotone",
+      "secondary": "#63605a",
+      "split": "vertical"
+    },
+    "archived": true
   },
   {
     "id": "elegant-modern-classic",
@@ -3323,7 +3755,8 @@
       "style": "duotone",
       "secondary": "#635f56",
       "split": "vertical"
-    }
+    },
+    "archived": true
   },
   {
     "id": "elegant-understated-luxury",
@@ -3356,7 +3789,8 @@
       "style": "duotone",
       "secondary": "#5e5b55",
       "split": "vertical"
-    }
+    },
+    "archived": true
   },
   {
     "id": "elegant-fine-art-type",
@@ -3389,7 +3823,8 @@
       "style": "duotone",
       "secondary": "#666055",
       "split": "vertical"
-    }
+    },
+    "archived": true
   },
   {
     "id": "elegant-contemporary-grace",
@@ -3422,7 +3857,8 @@
       "style": "duotone",
       "secondary": "#5e5950",
       "split": "vertical"
-    }
+    },
+    "archived": true
   },
   {
     "id": "elegant-pristine-border",
@@ -3455,6 +3891,7 @@
       "style": "duotone",
       "secondary": "#616161",
       "split": "vertical"
-    }
+    },
+    "archived": true
   }
 ]

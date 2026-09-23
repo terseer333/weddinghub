@@ -297,6 +297,9 @@ type Template struct {
 	Layout        string          `json:"layout,omitempty"`
 	Background    map[string]any  `json:"background,omitempty"`
 	Premium       bool            `json:"premium,omitempty"`
+	// Archived templates are retired from the picker but must stay in this catalog:
+	// weddings that already reference one need it to keep rendering its design.
+	Archived bool `json:"archived,omitempty"`
 }
 
 type FontItem struct {

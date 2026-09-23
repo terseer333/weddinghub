@@ -121,6 +121,46 @@
   background-image: url("assets/templates/luxury-frame.svg");
 }
 
+.luxury-invitation-card[data-floral="vintage-yellow-green"] .card-floral-layer {
+  background-image: url("assets/templates/vintage-yellow-green.svg");
+}
+
+.luxury-invitation-card[data-floral="illustrated-pink-garden"] .card-floral-layer {
+  background-image: url("assets/templates/illustrated-pink-garden.svg");
+}
+
+.luxury-invitation-card[data-floral="maroon-beige-florist"] .card-floral-layer {
+  background-image: url("assets/templates/maroon-beige-florist.svg");
+}
+
+.luxury-invitation-card[data-floral="burgundy-pink-traditional"] .card-floral-layer {
+  background-image: url("assets/templates/burgundy-pink-traditional.svg");
+}
+
+.luxury-invitation-card[data-floral="red-roses-bouquet"] .card-floral-layer {
+  background-image: url("assets/templates/red-roses-bouquet.svg");
+}
+
+.luxury-invitation-card[data-floral="burgundy-white-elegant"] .card-floral-layer {
+  background-image: url("assets/templates/burgundy-white-elegant.svg");
+}
+
+.luxury-invitation-card[data-floral="brown-beige-lace"] .card-floral-layer {
+  background-image: url("assets/templates/brown-beige-lace.svg");
+}
+
+.luxury-invitation-card[data-floral="white-gold-elegant"] .card-floral-layer {
+  background-image: url("assets/templates/white-gold-elegant.svg");
+}
+
+.luxury-invitation-card[data-floral="green-olive-traditional"] .card-floral-layer {
+  background-image: url("assets/templates/green-olive-traditional.svg");
+}
+
+.luxury-invitation-card[data-floral="monochrome-lace-frame"] .card-floral-layer {
+  background-image: url("assets/templates/monochrome-lace-frame.svg");
+}
+
 .luxury-invitation-card[data-floral="minimal"] .card-floral-layer {
   display: none;
 }

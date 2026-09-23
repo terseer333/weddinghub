@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="blBrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8a6247"/>
+      <stop offset="55%" stop-color="#6b4a34"/>
+      <stop offset="100%" stop-color="#4b3222"/>
+    </linearGradient>
+    <linearGradient id="blBeige" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f2e6d0"/>
+      <stop offset="58%" stop-color="#ddc9a6"/>
+      <stop offset="100%" stop-color="#c2a982"/>
+    </linearGradient>
+    <pattern id="blLace" width="56" height="30" patternUnits="userSpaceOnUse">
+      <path d="M0 30a28 30 0 0 1 56 0" fill="none" stroke="url(#blBrown)" stroke-width="2.2"/>
+      <path d="M0 14a14 14 0 0 1 28 0 14 14 0 0 1 28 0" fill="none" stroke="#8a6247" stroke-width="1.2" opacity=".55"/>
+      <circle cx="28" cy="6" r="3.4" fill="url(#blBeige)"/>
+      <circle cx="0" cy="24" r="2" fill="#a8815e" opacity=".7"/>
+      <circle cx="56" cy="24" r="2" fill="#a8815e" opacity=".7"/>
+    </pattern>
+    <g id="blRosette">
+      <circle r="20" fill="url(#blBeige)"/>
+      <circle r="13" fill="none" stroke="url(#blBrown)" stroke-width="2"/>
+      <path d="M0-20C7-13 7-7 0 0-7-7-7-13 0-20ZM20 0C13 7 7 7 0 0 7-7 13-7 20 0ZM0 20C-7 13-7 7 0 0 7 7 7 13 0 20ZM-20 0C-13-7-7-7 0 0-7 7-13 7-20 0Z" fill="url(#blBrown)" opacity=".7"/>
+      <circle r="3.6" fill="url(#blBrown)"/>
+    </g>
+  </defs>
+
+  <rect x="34" y="34" width="732" height="998" rx="4" stroke="url(#blBrown)" stroke-width="3"/>
+
+  <g transform="translate(44 44)"><rect width="712" height="30" fill="url(#blLace)"/></g>
+  <g transform="translate(756 1022) rotate(180)"><rect width="712" height="30" fill="url(#blLace)"/></g>
+  <g transform="translate(44 1022) rotate(-90)"><rect width="978" height="30" fill="url(#blLace)"/></g>
+  <g transform="translate(756 44) rotate(90)"><rect width="978" height="30" fill="url(#blLace)"/></g>
+
+  <use xlink:href="#blRosette" transform="translate(44 44)"/>
+  <use xlink:href="#blRosette" transform="translate(756 44)"/>
+  <use xlink:href="#blRosette" transform="translate(44 1022)"/>
+  <use xlink:href="#blRosette" transform="translate(756 1022)"/>
+  <use xlink:href="#blRosette" transform="translate(400 44) scale(.86)"/>
+  <use xlink:href="#blRosette" transform="translate(400 1022) scale(.86)"/>
+</svg>

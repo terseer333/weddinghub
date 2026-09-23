@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="ipSage" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a8b99a"/>
+      <stop offset="58%" stop-color="#869a78"/>
+      <stop offset="100%" stop-color="#63775a"/>
+    </linearGradient>
+    <linearGradient id="ipPink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0c0c9"/>
+      <stop offset="55%" stop-color="#dd97a6"/>
+      <stop offset="100%" stop-color="#bd6f81"/>
+    </linearGradient>
+    <g id="ipLeaf">
+      <path d="M0 0c15-17 36-21 53-11-11 19-32 25-53 11Z" fill="url(#ipSage)"/>
+      <path d="M9 2c13-9 26-11 36-6" stroke="#5b6d51" stroke-width="1.6" opacity=".55"/>
+    </g>
+    <g id="ipRose">
+      <path d="M0-27C15-27 27-15 27 0S15 27 0 27-27 15-27 0-15-27 0-27Z" fill="#d98d9d"/>
+      <path d="M0-19c10 0 19 8 19 19S10 19 0 19-19 11-19 0-10-19 0-19Z" fill="#e8a8b5"/>
+      <path d="M0-11c6 0 11 5 11 11S6 11 0 11-11 6-11 0-6-11 0-11Z" fill="#f4cbd2"/>
+      <path d="M0-4c2 0 4 2 4 4S2 4 0 4-4 2-4 0-2-4 0-4Z" fill="#b1687a"/>
+    </g>
+    <g id="ipPeony">
+      <path d="M0-31c12 0 23 7 27 18 11 3 18 13 18 25 0 14-11 25-25 25h-40c-14 0-25-11-25-25 0-12 7-22 18-25 4-11 15-18 27-18Z" fill="url(#ipPink)"/>
+      <path d="M-14-6c6 0 11 5 11 11s-5 11-11 11-11-5-11-11 5-11 11-11Z" fill="#f6dde1" opacity=".8"/>
+      <path d="M16-2c5 0 9 4 9 9s-4 9-9 9-9-4-9-9 4-9 9-9Z" fill="#f6dde1" opacity=".75"/>
+      <path d="M-2 14c4 0 7 3 7 7s-3 7-7 7-7-3-7-7 3-7 7-7Z" fill="#c9808f" opacity=".7"/>
+    </g>
+    <g id="ipBud">
+      <path d="M0 0c-7-11-5-24 5-31 11 6 14 19 8 30-5 7-9 8-13 1Z" fill="#c97c8e"/>
+      <path d="M4-24c4 4 6 9 5 14" stroke="#9d5a6c" stroke-width="1.4" opacity=".6"/>
+    </g>
+    <g id="ipCluster">
+      <use xlink:href="#ipLeaf" transform="translate(6 34) rotate(-18)"/>
+      <use xlink:href="#ipLeaf" transform="translate(30 52) rotate(24) scale(.9)"/>
+      <use xlink:href="#ipLeaf" transform="translate(-6 62) rotate(-46) scale(.82)"/>
+      <use xlink:href="#ipLeaf" transform="translate(44 12) rotate(-64) scale(.78)"/>
+      <use xlink:href="#ipPeony" transform="translate(30 30) scale(.92)"/>
+      <use xlink:href="#ipRose" transform="translate(74 62)"/>
+      <use xlink:href="#ipBud" transform="translate(4 4) rotate(-28)"/>
+      <use xlink:href="#ipBud" transform="translate(62 -8) rotate(22) scale(.86)"/>
+    </g>
+  </defs>
+
+  <use xlink:href="#ipCluster" transform="translate(28 28)"/>
+  <use xlink:href="#ipCluster" transform="translate(772 28) scale(-1 1)"/>
+  <use xlink:href="#ipCluster" transform="translate(28 1038) scale(1 -1)"/>
+  <use xlink:href="#ipCluster" transform="translate(772 1038) scale(-1 -1)"/>
+
+  <use xlink:href="#ipLeaf" transform="translate(300 46) rotate(16) scale(.9)"/>
+  <use xlink:href="#ipLeaf" transform="translate(470 40) rotate(-24) scale(.86)"/>
+  <use xlink:href="#ipBud" transform="translate(388 34) rotate(6) scale(.9)"/>
+  <use xlink:href="#ipLeaf" transform="translate(310 1022) rotate(-14) scale(.9)"/>
+  <use xlink:href="#ipLeaf" transform="translate(478 1028) rotate(22) scale(.86)"/>
+  <use xlink:href="#ipBud" transform="translate(396 1032) rotate(-8) scale(.9)"/>
+</svg>

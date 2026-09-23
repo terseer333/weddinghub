@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="rrRose" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d3475a"/>
+      <stop offset="46%" stop-color="#a11f2d"/>
+      <stop offset="100%" stop-color="#6d0f19"/>
+    </linearGradient>
+    <linearGradient id="rrGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0dca8"/>
+      <stop offset="48%" stop-color="#c8a152"/>
+      <stop offset="100%" stop-color="#99752c"/>
+    </linearGradient>
+    <linearGradient id="rrLeaf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5d7a4d"/>
+      <stop offset="100%" stop-color="#33482a"/>
+    </linearGradient>
+    <g id="rrLeaf">
+      <path d="M0 0c8-24 32-38 58-32 2 26-18 48-44 48-6 0-11-6-14-16Z" fill="url(#rrLeaf)"/>
+      <path d="M10-6C22-18 36-24 50-24" stroke="#243418" stroke-width="1.8" opacity=".5"/>
+    </g>
+    <g id="rrRose">
+      <path d="M0-30C17-30 30-17 30 0S17 30 0 30-30 17-30 0-17-30 0-30Z" fill="url(#rrRose)"/>
+      <path d="M0-21c12 0 21 9 21 21S12 21 0 21-21 12-21 0-12-21 0-21Z" fill="#bd4251" opacity=".85"/>
+      <path d="M0-12c7 0 12 5 12 12S7 12 0 12-12 7-12 0-7-12 0-12Z" fill="#e08a92" opacity=".7"/>
+      <path d="M-2-4c3-2 7 0 8 3 1 4-2 7-6 6-3-1-5-5-2-9Z" fill="#7e1420"/>
+    </g>
+    <g id="rrRoseSm">
+      <path d="M0-20C11-20 20-11 20 0S11 20 0 20-20 11-20 0-11-20 0-20Z" fill="url(#rrRose)"/>
+      <path d="M0-12c7 0 12 5 12 12S7 12 0 12-12 7-12 0-7-12 0-12Z" fill="#bc4150" opacity=".8"/>
+      <path d="M0-5c3 0 5 2 5 5S3 5 0 5-5 3-5 0-3-5 0-5Z" fill="#dd8189"/>
+    </g>
+    <g id="rrBud">
+      <path d="M0 0c-8-13-6-30 5-40 14 9 18 26 11 39-5 9-11 10-16 1Z" fill="#a3212f"/>
+      <path d="M6-32c5 6 8 13 6 20" stroke="#6d0f19" stroke-width="1.6" opacity=".6"/>
+    </g>
+    <g id="rrBouquet">
+      <use xlink:href="#rrLeaf" transform="translate(-96 34) rotate(-34) scale(.9)"/>
+      <use xlink:href="#rrLeaf" transform="translate(-70 62) rotate(-12) scale(.82)"/>
+      <use xlink:href="#rrLeaf" transform="translate(96 34) rotate(28) scale(-.9 .9)"/>
+      <use xlink:href="#rrLeaf" transform="translate(70 62) rotate(10) scale(-.82 .82)"/>
+      <use xlink:href="#rrLeaf" transform="translate(-24 96) rotate(-8) scale(.88)"/>
+      <use xlink:href="#rrLeaf" transform="translate(26 96) rotate(6) scale(-.88 .88)"/>
+      <use xlink:href="#rrRoseSm" transform="translate(-54 10) rotate(-10)"/>
+      <use xlink:href="#rrRoseSm" transform="translate(54 10) rotate(12)"/>
+      <use xlink:href="#rrBud" transform="translate(-86 -14) rotate(-30)"/>
+      <use xlink:href="#rrBud" transform="translate(86 -14) rotate(30) scale(-1 1)"/>
+      <use xlink:href="#rrRose" transform="translate(-24 34)"/>
+      <use xlink:href="#rrRose" transform="translate(26 38)"/>
+      <use xlink:href="#rrRose" transform="translate(0 4) scale(1.06)"/>
+      <path d="M-30 78C-16 96 16 96 30 78" stroke="url(#rrGold)" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <path d="M0 92v40" stroke="url(#rrGold)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M0 132c-14 12-20 26-18 44M0 132c14 12 20 26 18 44" stroke="url(#rrGold)" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+    </g>
+  </defs>
+
+  <use xlink:href="#rrBouquet" transform="translate(400 148)"/>
+  <use xlink:href="#rrBouquet" transform="translate(400 918) rotate(180) scale(.82)"/>
+
+  <rect x="46" y="46" width="708" height="974" rx="6" stroke="url(#rrGold)" stroke-width="1.8" opacity=".8"/>
+</svg>

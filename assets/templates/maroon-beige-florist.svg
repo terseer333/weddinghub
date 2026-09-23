@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="mfMaroon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a4445a"/>
+      <stop offset="52%" stop-color="#7c2434"/>
+      <stop offset="100%" stop-color="#54131f"/>
+    </linearGradient>
+    <linearGradient id="mfBeige" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f1e4cb"/>
+      <stop offset="60%" stop-color="#dbc8a5"/>
+      <stop offset="100%" stop-color="#c0a87f"/>
+    </linearGradient>
+    <g id="mfLeaf">
+      <path d="M0 0c18-14 42-14 56 2-16 16-40 16-56-2Z" fill="#6f6b45"/>
+      <path d="M6 2c14-8 28-9 40-2" stroke="#534f31" stroke-width="1.6" opacity=".5"/>
+    </g>
+    <g id="mfDahlia">
+      <path d="M0-38L10-14 34-24 20-2 42 6 16 18 24 40 0 26-24 40-16 18-42 6-20-2-34-24-10-14Z" fill="url(#mfMaroon)"/>
+      <path d="M0-20L6-8 18-12 10 0 20 4 8 10 12 20 0 14-12 20-8 10-20 4-10 0-18-12-6-8Z" fill="#b8607a" opacity=".85"/>
+      <circle r="9" fill="url(#mfBeige)"/>
+      <circle r="3.5" fill="#7c2434"/>
+    </g>
+    <g id="mfBloom">
+      <circle r="16" fill="url(#mfBeige)"/>
+      <circle r="10" fill="#efe3ca" opacity=".85"/>
+      <circle r="4" fill="#a8863f"/>
+    </g>
+    <g id="mfBud">
+      <path d="M0 0c-9-12-8-28 3-38 13 8 17 24 11 36-5 9-10 10-14 2Z" fill="#8a3a4c"/>
+    </g>
+    <g id="mfSpray">
+      <path d="M0 0C52 30 78 96 68 178 60 246 22 300-46 330" stroke="#6f6b45" stroke-width="6" stroke-linecap="round" fill="none"/>
+      <path d="M26 44C54 62 66 96 58 130" stroke="#6f6b45" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      <path d="M8 12C36-8 72-14 104-4" stroke="#6f6b45" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      <use xlink:href="#mfLeaf" transform="translate(10 6) rotate(14) scale(.86)"/>
+      <use xlink:href="#mfLeaf" transform="translate(52 -6) rotate(-16) scale(.8)"/>
+      <use xlink:href="#mfLeaf" transform="translate(52 62) rotate(52) scale(.82)"/>
+      <use xlink:href="#mfLeaf" transform="translate(66 110) rotate(78) scale(.78)"/>
+      <use xlink:href="#mfLeaf" transform="translate(40 142) rotate(112) scale(.76)"/>
+      <use xlink:href="#mfLeaf" transform="translate(-22 176) rotate(146) scale(.74)"/>
+      <use xlink:href="#mfDahlia" transform="translate(30 26) scale(.92)"/>
+      <use xlink:href="#mfDahlia" transform="translate(-30 232) rotate(18) scale(.68)"/>
+      <use xlink:href="#mfBloom" transform="translate(70 76)"/>
+      <use xlink:href="#mfBloom" transform="translate(60 156) scale(.86)"/>
+      <use xlink:href="#mfBloom" transform="translate(-58 300) scale(.9)"/>
+      <use xlink:href="#mfBud" transform="translate(100 -8) rotate(24)"/>
+      <use xlink:href="#mfBud" transform="translate(24 190) rotate(-16) scale(.9)"/>
+      <use xlink:href="#mfBud" transform="translate(-72 322) rotate(40) scale(.8)"/>
+    </g>
+  </defs>
+
+  <use xlink:href="#mfSpray" transform="translate(34 16)"/>
+  <use xlink:href="#mfSpray" transform="translate(766 1050) rotate(180) scale(.72)"/>
+
+  <rect x="52" y="52" width="696" height="962" rx="4" stroke="url(#mfBeige)" stroke-width="2" opacity=".55"/>
+</svg>

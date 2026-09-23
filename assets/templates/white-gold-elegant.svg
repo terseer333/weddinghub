@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="wgGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f4e3b4"/>
+      <stop offset="44%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#a5801f"/>
+    </linearGradient>
+    <g id="wgLeaf">
+      <path d="M0 0c13-10 30-10 40 2-12 12-28 12-40-2Z" fill="url(#wgGold)"/>
+    </g>
+    <g id="wgFlourish">
+      <path d="M0 0C40 0 74 16 100 48c22 28 34 62 34 100" stroke="url(#wgGold)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <path d="M0 0c-20 14-30 36-26 60 3 20 16 36 34 44" stroke="url(#wgGold)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <path d="M100 48c26-16 58-16 82 2-18 20-48 24-74 10" stroke="url(#wgGold)" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".9"/>
+      <use xlink:href="#wgLeaf" transform="translate(26 4) rotate(30) scale(.8)"/>
+      <use xlink:href="#wgLeaf" transform="translate(56 20) rotate(46) scale(.72)"/>
+      <use xlink:href="#wgLeaf" transform="translate(8 30) rotate(-52) scale(.66)"/>
+      <circle cx="134" cy="148" r="4" fill="url(#wgGold)"/>
+      <circle cx="46" cy="118" r="3" fill="url(#wgGold)" opacity=".8"/>
+    </g>
+    <g id="wgSprig">
+      <path d="M0 0h44" stroke="url(#wgGold)" stroke-width="1.8"/>
+      <circle cx="0" cy="0" r="3.6" fill="url(#wgGold)"/>
+      <circle cx="44" cy="0" r="3.6" fill="url(#wgGold)"/>
+      <use xlink:href="#wgLeaf" transform="translate(12 -2) rotate(-32) scale(.6)"/>
+      <use xlink:href="#wgLeaf" transform="translate(32 2) rotate(32) scale(-.6 .6)"/>
+    </g>
+  </defs>
+
+  <rect x="36" y="36" width="728" height="994" stroke="url(#wgGold)" stroke-width="2.6"/>
+  <rect x="50" y="50" width="700" height="966" stroke="url(#wgGold)" stroke-width="1" opacity=".75"/>
+
+  <use xlink:href="#wgFlourish" transform="translate(52 52)"/>
+  <use xlink:href="#wgFlourish" transform="translate(748 52) scale(-1 1)"/>
+  <use xlink:href="#wgFlourish" transform="translate(52 1014) scale(1 -1)"/>
+  <use xlink:href="#wgFlourish" transform="translate(748 1014) scale(-1 -1)"/>
+
+  <use xlink:href="#wgSprig" transform="translate(368 40)"/>
+  <use xlink:href="#wgSprig" transform="translate(368 1022)"/>
+  <use xlink:href="#wgSprig" transform="translate(40 520) rotate(90)"/>
+  <use xlink:href="#wgSprig" transform="translate(760 520) rotate(-90)"/>
+</svg>

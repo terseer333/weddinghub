@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="mlInk" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4d4d4d"/>
+      <stop offset="55%" stop-color="#242424"/>
+      <stop offset="100%" stop-color="#101010"/>
+    </linearGradient>
+    <linearGradient id="mlGrey" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f4f4f4"/>
+      <stop offset="55%" stop-color="#d2d2d2"/>
+      <stop offset="100%" stop-color="#a8a8a8"/>
+    </linearGradient>
+    <pattern id="mlLace" width="64" height="36" patternUnits="userSpaceOnUse">
+      <path d="M0 36a32 36 0 0 1 64 0" fill="none" stroke="url(#mlInk)" stroke-width="2.4"/>
+      <path d="M0 20a16 16 0 0 1 32 0 16 16 0 0 1 32 0" fill="none" stroke="#4d4d4d" stroke-width="1.3" opacity=".7"/>
+      <path d="M16 36a16 16 0 0 1 32 0" fill="none" stroke="#8a8a8a" stroke-width="1" opacity=".6"/>
+      <circle cx="32" cy="7" r="3.8" fill="url(#mlGrey)"/>
+      <circle cx="32" cy="7" r="1.4" fill="#4d4d4d"/>
+      <circle cx="0" cy="30" r="2.2" fill="#8a8a8a"/>
+      <circle cx="64" cy="30" r="2.2" fill="#8a8a8a"/>
+    </pattern>
+    <g id="mlRosette">
+      <circle r="30" fill="url(#mlGrey)" opacity=".55"/>
+      <circle r="24" fill="none" stroke="url(#mlInk)" stroke-width="2.6"/>
+      <circle r="16" fill="none" stroke="#4d4d4d" stroke-width="1.4" opacity=".8"/>
+      <path d="M0-24C9-16 9-8 0 0-9-8-9-16 0-24ZM24 0C16 9 8 9 0 0 8-9 16-9 24 0ZM0 24C-9 16-9 8 0 0 9 8 9 16 0 24ZM-24 0C-16-9-8-9 0 0-8 9-16 9-24 0Z" fill="url(#mlInk)" opacity=".55"/>
+      <circle r="5" fill="url(#mlInk)"/>
+      <circle r="2" fill="url(#mlGrey)"/>
+    </g>
+    <g id="mlFiligree">
+      <path d="M0 0C34 10 58 34 68 68c9 30 6 64-8 94" stroke="url(#mlInk)" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M14 16c18 12 28 32 28 54" stroke="#4d4d4d" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".8"/>
+      <path d="M68 68c22-12 48-8 66 12-16 18-42 22-64 10" stroke="url(#mlInk)" stroke-width="2.2" stroke-linecap="round" fill="none" opacity=".85"/>
+      <circle cx="104" cy="140" r="4.4" fill="url(#mlInk)"/>
+      <circle cx="26" cy="96" r="3.4" fill="#4d4d4d" opacity=".85"/>
+    </g>
+  </defs>
+
+  <rect x="30" y="30" width="740" height="1006" stroke="url(#mlInk)" stroke-width="4"/>
+
+  <g transform="translate(40 40)"><rect width="720" height="36" fill="url(#mlLace)"/></g>
+  <g transform="translate(760 1026) rotate(180)"><rect width="720" height="36" fill="url(#mlLace)"/></g>
+  <g transform="translate(40 1026) rotate(-90)"><rect width="986" height="36" fill="url(#mlLace)"/></g>
+  <g transform="translate(760 40) rotate(90)"><rect width="986" height="36" fill="url(#mlLace)"/></g>
+
+  <rect x="72" y="72" width="656" height="922" stroke="#4d4d4d" stroke-width="1.2" opacity=".8"/>
+
+  <use xlink:href="#mlFiligree" transform="translate(76 76)"/>
+  <use xlink:href="#mlFiligree" transform="translate(724 76) scale(-1 1)"/>
+  <use xlink:href="#mlFiligree" transform="translate(76 990) scale(1 -1)"/>
+  <use xlink:href="#mlFiligree" transform="translate(724 990) scale(-1 -1)"/>
+
+  <use xlink:href="#mlRosette" transform="translate(40 1026) scale(.9)"/>
+  <use xlink:href="#mlRosette" transform="translate(760 1026) scale(.9)"/>
+  <use xlink:href="#mlRosette" transform="translate(40 40) scale(.9)"/>
+  <use xlink:href="#mlRosette" transform="translate(760 40) scale(.9)"/>
+</svg>

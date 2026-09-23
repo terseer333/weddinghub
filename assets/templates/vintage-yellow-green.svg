@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="vyOlive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#95a65e"/>
+      <stop offset="52%" stop-color="#6b7a3a"/>
+      <stop offset="100%" stop-color="#485527"/>
+    </linearGradient>
+    <linearGradient id="vyMustard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7de96"/>
+      <stop offset="42%" stop-color="#d9a520"/>
+      <stop offset="100%" stop-color="#a9780f"/>
+    </linearGradient>
+    <g id="vyLeaf">
+      <path d="M0 0c17-8 35-3 44 13-18 10-36 5-44-13Z" fill="url(#vyOlive)"/>
+      <path d="M7 3c11-3 22 0 29 9" stroke="#3d4920" stroke-width="1.5" opacity=".45"/>
+    </g>
+    <g id="vySprig">
+      <path d="M0 0C88-18 152-76 184-162" stroke="url(#vyOlive)" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <use xlink:href="#vyLeaf" transform="translate(34 -12) rotate(28)"/>
+      <use xlink:href="#vyLeaf" transform="translate(66 -32) rotate(52)"/>
+      <use xlink:href="#vyLeaf" transform="translate(97 -58) rotate(74)"/>
+      <use xlink:href="#vyLeaf" transform="translate(123 -90) rotate(96)"/>
+      <use xlink:href="#vyLeaf" transform="translate(147 -124) rotate(114)"/>
+      <use xlink:href="#vyLeaf" transform="translate(28 6) rotate(-26) scale(.86)"/>
+      <use xlink:href="#vyLeaf" transform="translate(60 -14) rotate(-8) scale(.9)"/>
+      <use xlink:href="#vyLeaf" transform="translate(92 -40) rotate(14) scale(.9)"/>
+      <use xlink:href="#vyLeaf" transform="translate(121 -70) rotate(38) scale(.88)"/>
+      <use xlink:href="#vyLeaf" transform="translate(149 -106) rotate(60) scale(.84)"/>
+      <circle cx="184" cy="-162" r="15" fill="url(#vyMustard)"/>
+      <circle cx="184" cy="-162" r="5.5" fill="#8a6210"/>
+      <circle cx="121" cy="-90" r="9" fill="url(#vyMustard)" opacity=".92"/>
+      <circle cx="60" cy="-14" r="7.5" fill="url(#vyMustard)" opacity=".85"/>
+    </g>
+    <g id="vyDiamond">
+      <path d="M0 -13L13 0 0 13 -13 0Z" fill="url(#vyMustard)"/>
+      <path d="M0 -6L6 0 0 6 -6 0Z" fill="#7d5a0c"/>
+    </g>
+  </defs>
+
+  <rect x="44" y="44" width="712" height="978" rx="6" stroke="url(#vyMustard)" stroke-width="2.6"/>
+  <rect x="57" y="57" width="686" height="952" rx="4" stroke="#c9a02c" stroke-width="1" opacity=".5"/>
+
+  <use xlink:href="#vySprig" transform="translate(58 62)"/>
+  <use xlink:href="#vySprig" transform="translate(742 62) scale(-1 1)"/>
+  <use xlink:href="#vySprig" transform="translate(58 1004) scale(1 -1)"/>
+  <use xlink:href="#vySprig" transform="translate(742 1004) scale(-1 -1)"/>
+
+  <use xlink:href="#vyDiamond" transform="translate(400 46)"/>
+  <use xlink:href="#vyDiamond" transform="translate(400 1020)"/>
+  <use xlink:href="#vyDiamond" transform="translate(46 533) scale(.82)"/>
+  <use xlink:href="#vyDiamond" transform="translate(754 533) scale(.82)"/>
+</svg>

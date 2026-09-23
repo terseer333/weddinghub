@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 1066" fill="none">
+  <defs>
+    <linearGradient id="goGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3f7250"/>
+      <stop offset="55%" stop-color="#2b563a"/>
+      <stop offset="100%" stop-color="#183524"/>
+    </linearGradient>
+    <linearGradient id="goOlive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a3a765"/>
+      <stop offset="55%" stop-color="#7c8145"/>
+      <stop offset="100%" stop-color="#585d2d"/>
+    </linearGradient>
+    <g id="goLeaf">
+      <path d="M0 0c18-9 38-4 48 13-19 11-39 5-48-13Z" fill="url(#goGreen)"/>
+      <path d="M8 3c12-3 24 1 31 10" stroke="#14301f" stroke-width="1.5" opacity=".45"/>
+    </g>
+    <g id="goOliveLeaf">
+      <path d="M0 0c21-7 44 0 56 17-19 13-45 8-56-17Z" fill="url(#goOlive)"/>
+      <path d="M9 1c13-1 26 4 34 12" stroke="#464a22" stroke-width="1.5" opacity=".45"/>
+    </g>
+    <g id="goMedallion">
+      <path d="M0-46C25-46 46-25 46 0S25 46 0 46-46 25-46 0-25-46 0-46Z" stroke="url(#goGreen)" stroke-width="3.4" fill="none"/>
+      <path d="M0-34C19-34 34-19 34 0S19 34 0 34-34 19-34 0-19-34 0-34Z" stroke="url(#goOlive)" stroke-width="1.6" fill="none"/>
+      <path d="M0-22L7-7 22 0 7 7 0 22-7 7-22 0-7-7Z" fill="url(#goGreen)" opacity=".8"/>
+      <circle r="5" fill="url(#goOlive)"/>
+    </g>
+    <g id="goCorner">
+      <path d="M0 0C62 6 110 40 136 94c20 42 22 90 8 140" stroke="url(#goGreen)" stroke-width="4.4" stroke-linecap="round" fill="none"/>
+      <path d="M136 94c34-12 68-2 90 26-22 26-58 30-88 12" stroke="url(#goOlive)" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <use xlink:href="#goOliveLeaf" transform="translate(24 40) rotate(30) scale(.9)"/>
+      <use xlink:href="#goOliveLeaf" transform="translate(64 76) rotate(46) scale(.84)"/>
+      <use xlink:href="#goOliveLeaf" transform="translate(108 44) rotate(-14) scale(.8)"/>
+      <use xlink:href="#goOliveLeaf" transform="translate(30 106) rotate(66) scale(.78)"/>
+      <use xlink:href="#goLeaf" transform="translate(96 118) rotate(84) scale(.9)"/>
+      <use xlink:href="#goLeaf" transform="translate(14 26) rotate(-22) scale(.86)"/>
+      <use xlink:href="#goLeaf" transform="translate(122 174) rotate(108) scale(.8)"/>
+      <use xlink:href="#goMedallion" transform="translate(126 210) scale(.56)"/>
+      <circle cx="60" cy="60" r="5.5" fill="url(#goOlive)"/>
+    </g>
+  </defs>
+
+  <rect x="42" y="42" width="716" height="982" rx="4" stroke="url(#goGreen)" stroke-width="3"/>
+  <rect x="54" y="54" width="692" height="958" rx="3" stroke="url(#goOlive)" stroke-width="1.2" opacity=".75"/>
+
+  <use xlink:href="#goCorner" transform="translate(54 54)"/>
+  <use xlink:href="#goCorner" transform="translate(746 54) scale(-1 1)"/>
+  <use xlink:href="#goCorner" transform="translate(54 1012) scale(1 -1)"/>
+  <use xlink:href="#goCorner" transform="translate(746 1012) scale(-1 -1)"/>
+
+  <use xlink:href="#goMedallion" transform="translate(400 42) scale(.72)"/>
+  <use xlink:href="#goMedallion" transform="translate(400 1024) scale(.72)"/>
+</svg>

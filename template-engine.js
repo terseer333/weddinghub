@@ -69,6 +69,16 @@
       { id: "tropical-leaves", name: "Tropical Palm Fronds", asset: "assets/templates/tropical-leaves.svg" },
       { id: "traditional-flourish", name: "Traditional Heraldic Flourish", asset: "assets/templates/traditional-flourish.svg" },
       { id: "luxury-frame", name: "Gilded Baroque Frame", asset: "assets/templates/luxury-frame.svg" },
+      { id: "vintage-yellow-green", name: "Vintage Mustard Laurel", asset: "assets/templates/vintage-yellow-green.svg" },
+      { id: "illustrated-pink-garden", name: "Illustrated Pinks & Sage", asset: "assets/templates/illustrated-pink-garden.svg" },
+      { id: "maroon-beige-florist", name: "Maroon Florist Spray", asset: "assets/templates/maroon-beige-florist.svg" },
+      { id: "burgundy-pink-traditional", name: "Burgundy & Pink Tradition", asset: "assets/templates/burgundy-pink-traditional.svg" },
+      { id: "red-roses-bouquet", name: "Red Rose Bouquet", asset: "assets/templates/red-roses-bouquet.svg" },
+      { id: "burgundy-white-elegant", name: "Burgundy Elegant Scroll", asset: "assets/templates/burgundy-white-elegant.svg" },
+      { id: "brown-beige-lace", name: "Brown & Beige Lace", asset: "assets/templates/brown-beige-lace.svg" },
+      { id: "white-gold-elegant", name: "White & Gold Elegant", asset: "assets/templates/white-gold-elegant.svg" },
+      { id: "green-olive-traditional", name: "Green & Olive Tradition", asset: "assets/templates/green-olive-traditional.svg" },
+      { id: "monochrome-lace-frame", name: "Monochrome Lace Frame", asset: "assets/templates/monochrome-lace-frame.svg" },
       { id: "minimal", name: "Minimal / No Floral", asset: "" }
     ],
     borders: [
@@ -162,9 +172,19 @@
     return templatesCache && templatesCache.length > 0 ? templatesCache : [DEFAULT_TEMPLATE];
   }
 
+  function activeTemplatesSync() {
+    // Gallery-facing list. Archived templates stay resolvable by id so any wedding
+    // already referencing one keeps rendering its design, but they are not offered again.
+    return allTemplatesSync().filter(t => !t.archived);
+  }
+
   function getTemplateSync(id) {
     const list = allTemplatesSync();
-    return list.find(t => t.id === id) || list[0] || DEFAULT_TEMPLATE;
+    const match = list.find(t => t.id === id);
+    if (match) return match;
+    // Fall back to an active template rather than blindly to list[0], which may
+    // itself be archived.
+    return activeTemplatesSync()[0] || DEFAULT_TEMPLATE;
   }
 
   function getFavorites() {
@@ -194,6 +214,7 @@
     const favs = favoritesOnly ? getFavorites() : [];
     const q = (query || "").trim().toLowerCase();
     return list.filter(t => {
+      if (t.archived) return false;
       if (category && category !== "all" && t.category !== category) return false;
       if (favoritesOnly && !favs.includes(t.id)) return false;
       if (q) {
@@ -206,7 +227,8 @@
 
   window.WeddingTemplates = {
     loadTemplates,
-    all: allTemplatesSync,
+    all: activeTemplatesSync,
+    allIncludingArchived: allTemplatesSync,
     get: getTemplateSync,
     categories: () => CATEGORIES,
     fonts: () => FONTS_CATALOG,
