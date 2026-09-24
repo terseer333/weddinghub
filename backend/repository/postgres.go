@@ -1141,9 +1141,77 @@ func (r *PostgresRepository) DeleteCommitteeMember(weddingID, memberID string) e
 		if affected == 0 {
 			return ErrNotFound
 		}
+		// A removed member's self-service profile is scoped to that member id.
+		if _, err := tx.ExecContext(ctx, `DELETE FROM profiles WHERE wedding_id = $1 AND profile_key = $2`, weddingID, memberID); err != nil {
+			return mapError(err)
+		}
 		_, err = tx.ExecContext(ctx, `UPDATE weddings SET updated_at = $2 WHERE id = $1`, weddingID, time.Now().UTC())
 		return mapError(err)
 	})
+}
+
+func (r *PostgresRepository) GetProfile(weddingID, profileKey string) (models.Profile, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	var (
+		profile models.Profile
+		role    string
+	)
+	err := r.db.QueryRowContext(ctx, `SELECT wedding_id, profile_key, role, display_name, avatar, updated_at
+		FROM profiles WHERE wedding_id = $1 AND profile_key = $2`, weddingID, profileKey).
+		Scan(&profile.WeddingID, &profile.ID, &role, &profile.DisplayName, &profile.Avatar, &profile.UpdatedAt)
+	if err != nil {
+		return models.Profile{}, mapError(err)
+	}
+	profile.Role = models.Role(role)
+	return profile, nil
+}
+
+func (r *PostgresRepository) UpsertProfile(profile models.Profile) (models.Profile, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	err := r.withTx(ctx, func(tx *sql.Tx) error {
+		if _, err := tx.ExecContext(ctx, `INSERT INTO profiles (wedding_id, profile_key, role, display_name, avatar, updated_at)
+			VALUES ($1,$2,$3,$4,$5,$6)
+			ON CONFLICT (wedding_id, profile_key) DO UPDATE SET role = EXCLUDED.role, display_name = EXCLUDED.display_name,
+				avatar = EXCLUDED.avatar, updated_at = EXCLUDED.updated_at`,
+			profile.WeddingID, profile.ID, string(profile.Role), profile.DisplayName, profile.Avatar, profile.UpdatedAt); err != nil {
+			return mapError(err)
+		}
+		_, err := tx.ExecContext(ctx, `UPDATE weddings SET updated_at = $2 WHERE id = $1`, profile.WeddingID, time.Now().UTC())
+		return mapError(err)
+	})
+	if err != nil {
+		return models.Profile{}, err
+	}
+	return profile, nil
+}
+
+func (r *PostgresRepository) ListProfiles(weddingID string) ([]models.Profile, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	rows, err := r.db.QueryContext(ctx, `SELECT wedding_id, profile_key, role, display_name, avatar, updated_at
+		FROM profiles WHERE wedding_id = $1 ORDER BY profile_key`, weddingID)
+	if err != nil {
+		return nil, mapError(err)
+	}
+	defer rows.Close()
+	profiles := make([]models.Profile, 0)
+	for rows.Next() {
+		var (
+			profile models.Profile
+			role    string
+		)
+		if err := rows.Scan(&profile.WeddingID, &profile.ID, &role, &profile.DisplayName, &profile.Avatar, &profile.UpdatedAt); err != nil {
+			return nil, mapError(err)
+		}
+		profile.Role = models.Role(role)
+		profiles = append(profiles, profile)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, mapError(err)
+	}
+	return profiles, nil
 }
 
 func (r *PostgresRepository) CreateUser(user models.User) (models.User, error) {

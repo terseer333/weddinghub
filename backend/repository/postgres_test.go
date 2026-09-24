@@ -29,7 +29,7 @@ func newTestPostgres(t *testing.T) *PostgresRepository {
 	t.Cleanup(func() { repo.Close() })
 	_, err = repo.db.ExecContext(ctx, `TRUNCATE users, sessions, weddings, wedding_admins, committee_roles, guests,
 		committee_members, invitations, events, photos, story_sections, announcements, planning_tasks,
-		committee_messages, rsvps, guest_messages RESTART IDENTITY CASCADE`)
+		committee_messages, rsvps, guest_messages, profiles RESTART IDENTITY CASCADE`)
 	if err != nil {
 		t.Fatalf("truncate tables: %v", err)
 	}
@@ -423,5 +423,71 @@ func TestPostgresUsersAndSessions(t *testing.T) {
 	}
 	if err := repo.AddSession(models.Session{TokenHash: "", UserID: "u1"}); !errors.Is(err, ErrConflict) {
 		t.Fatalf("empty session hash error = %v, want ErrConflict", err)
+	}
+}
+
+func TestPostgresProfiles(t *testing.T) {
+	repo := newTestPostgres(t)
+	now := time.Now().UTC().Truncate(time.Microsecond)
+	mustWedding(t, repo, models.Wedding{ID: "w1", Slug: "profiles", Title: "Profiles", Status: models.StatusPublished, AdminTokenHash: "h1", CreatedAt: now, UpdatedAt: now})
+
+	if _, err := repo.GetProfile("w1", models.ProfileKeyAdmin); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("missing profile error = %v, want ErrNotFound", err)
+	}
+	if _, err := repo.UpsertProfile(models.Profile{WeddingID: "w1", ID: models.ProfileKeyAdmin, Role: models.RoleAdmin,
+		DisplayName: "Ada", Avatar: "data:image/png;base64,AAAA", UpdatedAt: now}); err != nil {
+		t.Fatalf("UpsertProfile: %v", err)
+	}
+	got, err := repo.GetProfile("w1", models.ProfileKeyAdmin)
+	if err != nil || got.DisplayName != "Ada" || got.Role != models.RoleAdmin || got.Avatar != "data:image/png;base64,AAAA" {
+		t.Fatalf("GetProfile = %+v, %v", got, err)
+	}
+
+	// A committee member's profile is removed together with the membership.
+	_, hash, err := models.NewOpaqueToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.AddInvitation("w1", models.Invitation{ID: "i1", Type: models.InvitationCommittee, GuestName: "Sam",
+		MaxPartySize: 1, Status: models.InvitationPending, TokenHash: hash, CreatedAt: now}); err != nil {
+		t.Fatal(err)
+	}
+	wedding, _, err := repo.RespondToInvitation(hash, models.InvitationAccepted, now)
+	if err != nil {
+		t.Fatalf("RespondToInvitation: %v", err)
+	}
+	memberID := wedding.CommitteeMembers[0].ID
+	if _, err := repo.UpsertProfile(models.Profile{WeddingID: "w1", ID: memberID, Role: models.RoleCommitteeMember,
+		DisplayName: "Sam", UpdatedAt: now}); err != nil {
+		t.Fatalf("UpsertProfile(member): %v", err)
+	}
+
+	// An upsert replaces the same actor's row rather than inserting a second one.
+	got.DisplayName = "Ada Lovelace"
+	if _, err := repo.UpsertProfile(got); err != nil {
+		t.Fatalf("second UpsertProfile: %v", err)
+	}
+	profiles, err := repo.ListProfiles("w1")
+	if err != nil || len(profiles) != 2 {
+		t.Fatalf("ListProfiles = %+v, %v", profiles, err)
+	}
+	for _, profile := range profiles {
+		if profile.ID == models.ProfileKeyAdmin && profile.DisplayName != "Ada Lovelace" {
+			t.Fatalf("admin profile was not replaced: %+v", profile)
+		}
+	}
+
+	if err := repo.DeleteCommitteeMember("w1", memberID); err != nil {
+		t.Fatalf("DeleteCommitteeMember: %v", err)
+	}
+	if _, err := repo.GetProfile("w1", memberID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("member profile after delete error = %v, want ErrNotFound", err)
+	}
+
+	if err := repo.DeleteWedding("w1"); err != nil {
+		t.Fatalf("DeleteWedding: %v", err)
+	}
+	if _, err := repo.GetProfile("w1", models.ProfileKeyAdmin); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("profile after wedding delete error = %v, want ErrNotFound", err)
 	}
 }

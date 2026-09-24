@@ -9,6 +9,12 @@ import (
 	"weddinghub/models"
 )
 
+// profileRef scopes a stored profile to its wedding and actor.
+type profileRef struct {
+	WeddingID string
+	ProfileID string
+}
+
 // MemoryRepository is concurrency-safe. Returned aggregates are defensive copies.
 type MemoryRepository struct {
 	mu       sync.RWMutex
@@ -16,6 +22,7 @@ type MemoryRepository struct {
 	users    map[string]models.User
 	emails   map[string]string
 	sessions map[string]models.Session
+	profiles map[profileRef]models.Profile
 }
 
 func NewMemoryRepository() *MemoryRepository {
@@ -24,6 +31,7 @@ func NewMemoryRepository() *MemoryRepository {
 		users:    make(map[string]models.User),
 		emails:   make(map[string]string),
 		sessions: make(map[string]models.Session),
+		profiles: make(map[profileRef]models.Profile),
 	}
 }
 
@@ -479,6 +487,39 @@ func (r *MemoryRepository) DeleteCommitteeMember(weddingID, memberID string) err
 		return nil
 	}
 	return ErrNotFound
+}
+
+func (r *MemoryRepository) GetProfile(weddingID, profileKey string) (models.Profile, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	profile, ok := r.profiles[profileRef{WeddingID: weddingID, ProfileID: profileKey}]
+	if !ok {
+		return models.Profile{}, ErrNotFound
+	}
+	return profile, nil
+}
+
+func (r *MemoryRepository) UpsertProfile(profile models.Profile) (models.Profile, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.weddings[profile.WeddingID]; !ok {
+		return models.Profile{}, ErrNotFound
+	}
+	r.profiles[profileRef{WeddingID: profile.WeddingID, ProfileID: profile.ID}] = profile
+	return profile, nil
+}
+
+func (r *MemoryRepository) ListProfiles(weddingID string) ([]models.Profile, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	out := make([]models.Profile, 0)
+	for ref, profile := range r.profiles {
+		if ref.WeddingID == weddingID {
+			out = append(out, profile)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out, nil
 }
 
 func (r *MemoryRepository) CreateUser(user models.User) (models.User, error) {

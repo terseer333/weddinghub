@@ -79,6 +79,10 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("POST /api/guest/{token}/messages", a.createGuestMessage)
 	// Committee routes require the admin token or an accepted committee invitation.
 	mux.HandleFunc("GET /api/weddings/{weddingID}/committee/dashboard", a.committeeDashboard)
+	// Self-service profile: the admin edits the "admin" profile, a committee member
+	// edits their own, both resolved from the capability token requireCommittee checks.
+	mux.HandleFunc("GET /api/weddings/{weddingID}/profile", a.getProfile)
+	mux.HandleFunc("PUT /api/weddings/{weddingID}/profile", a.updateProfile)
 	mux.HandleFunc("GET /api/weddings/{weddingID}/committee/chat", a.committeeChat)
 	mux.HandleFunc("POST /api/weddings/{weddingID}/committee/chat", a.sendCommitteeMessage)
 	mux.HandleFunc("POST /api/weddings/{weddingID}/committee/tasks", a.createCommitteeTask)
@@ -692,6 +696,7 @@ type rosterView struct {
 	Guests           []models.Guest           `json:"guests"`
 	CommitteeMembers []models.CommitteeMember `json:"committee_members"`
 	CommitteeRoles   []models.CommitteeRole   `json:"committee_roles"`
+	Profiles         []models.Profile         `json:"profiles"`
 }
 
 // adminRoster returns the full invitation status of both groups so the admin can
@@ -711,6 +716,7 @@ func (a *API) adminRoster(w http.ResponseWriter, r *http.Request) {
 		Guests:           wedding.Guests,
 		CommitteeMembers: wedding.CommitteeMembers,
 		CommitteeRoles:   roles,
+		Profiles:         a.listProfiles(wedding.ID),
 	})
 }
 
@@ -740,6 +746,10 @@ type committeeDashboardView struct {
 	Tasks         []models.PlanningTask    `json:"planning_tasks"`
 	Announcements []models.Announcement    `json:"announcements"`
 	GuestStats    guestStats               `json:"guest_stats"`
+	// Profile is the calling actor's own profile; Profiles carries every stored
+	// profile so the workspace can show committee avatars beside names.
+	Profile  models.Profile   `json:"profile"`
+	Profiles []models.Profile `json:"profiles"`
 }
 
 func (a *API) committeeDashboard(w http.ResponseWriter, r *http.Request) {
@@ -758,6 +768,8 @@ func (a *API) committeeDashboard(w http.ResponseWriter, r *http.Request) {
 		Roles:   roles,
 		Tasks:   wedding.PlanningTasks,
 	}
+	view.Profile = a.actorProfile(wedding, actor)
+	view.Profiles = a.listProfiles(wedding.ID)
 	for _, item := range wedding.Announcements {
 		if item.Status == models.StatusPublished {
 			view.Announcements = append(view.Announcements, item)
@@ -765,6 +777,107 @@ func (a *API) committeeDashboard(w http.ResponseWriter, r *http.Request) {
 	}
 	view.GuestStats = computeGuestStats(wedding)
 	writeJSON(w, http.StatusOK, view)
+}
+
+// profileKey identifies the profile an actor owns within a wedding: the committee
+// member id, or the shared "admin" key for the wedding's admin capability holder.
+func profileKey(actor actor) string {
+	if actor.MemberID != "" {
+		return actor.MemberID
+	}
+	return models.ProfileKeyAdmin
+}
+
+// actorProfile returns the caller's stored profile, or a default derived from the
+// actor so the workspace always has a display name to show.
+func (a *API) actorProfile(wedding models.Wedding, actor actor) models.Profile {
+	profile, err := a.repo.GetProfile(wedding.ID, profileKey(actor))
+	if err == nil {
+		return profile
+	}
+	// A committee member defaults to their membership name; the admin's personal name
+	// lives on their account, so their profile starts blank and the UI falls back to it.
+	name := actor.Name
+	if actor.MemberID == "" {
+		name = ""
+	}
+	return models.Profile{WeddingID: wedding.ID, ID: profileKey(actor), Role: actor.Role, DisplayName: name}
+}
+
+// listProfiles returns every profile stored for a wedding. It never returns nil so
+// JSON clients can iterate without a null check.
+func (a *API) listProfiles(weddingID string) []models.Profile {
+	profiles, err := a.repo.ListProfiles(weddingID)
+	if err != nil || profiles == nil {
+		return []models.Profile{}
+	}
+	return profiles
+}
+
+// profileRequest is the self-service subset an actor may change. Identity, role, and
+// membership are never accepted from the client.
+type profileRequest struct {
+	DisplayName string `json:"display_name"`
+	Avatar      string `json:"avatar"`
+}
+
+func (a *API) getProfile(w http.ResponseWriter, r *http.Request) {
+	wedding, actor, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	writeJSON(w, http.StatusOK, a.actorProfile(wedding, actor))
+}
+
+func (a *API) updateProfile(w http.ResponseWriter, r *http.Request) {
+	wedding, actor, ok := a.requireCommittee(w, r, r.PathValue("weddingID"))
+	if !ok {
+		return
+	}
+	var input profileRequest
+	if err := decodeJSON(w, r, &input); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	displayName, valid := models.NormalizeProfileDisplayName(input.DisplayName)
+	if !valid {
+		writeError(w, http.StatusBadRequest, fmt.Sprintf("display_name is required and must be at most %d characters", models.MaxProfileDisplayNameLength))
+		return
+	}
+	if !models.ValidProfileAvatar(input.Avatar) {
+		writeError(w, http.StatusBadRequest, "avatar must be a small base64 image data URL")
+		return
+	}
+	profile := models.Profile{WeddingID: wedding.ID, ID: profileKey(actor), Role: actor.Role,
+		DisplayName: displayName, Avatar: input.Avatar, UpdatedAt: a.now()}
+	saved, err := a.repo.UpsertProfile(profile)
+	if err != nil {
+		writeRepositoryError(w, err)
+		return
+	}
+	// A committee member's display name is also their roster identity, so keep the
+	// membership record in step rather than leaving two names for one person.
+	if actor.MemberID != "" {
+		if err := a.syncCommitteeMemberName(wedding, actor.MemberID, displayName); err != nil {
+			writeRepositoryError(w, err)
+			return
+		}
+	}
+	writeJSON(w, http.StatusOK, saved)
+}
+
+// syncCommitteeMemberName mirrors a member's self-service display name onto their
+// committee membership so invitations, rosters, and chat agree on one name.
+func (a *API) syncCommitteeMemberName(wedding models.Wedding, memberID, name string) error {
+	for _, member := range wedding.CommitteeMembers {
+		if member.ID != memberID || member.Name == name {
+			continue
+		}
+		member.Name = name
+		_, err := a.repo.UpdateCommitteeMember(wedding.ID, member)
+		return err
+	}
+	return nil
 }
 
 // computeGuestStats aggregates the guest group only, so the committee sees an

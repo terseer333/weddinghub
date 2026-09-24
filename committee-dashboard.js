@@ -15,14 +15,17 @@
   let chatSince = "";
   let chatTimer = null;
   let unreadCount = 0;
+  let profileAvatarDraft;
+  const PROFILE_AVATAR_MAX = 320;
 
   function actor() {
+    const saved = data.myProfile?.displayName;
     if (member) {
       const roleObj = (data.committeeRoles || []).find(r => r.id === (member.roleId || member.role_id));
       const roleTitle = roleObj?.name || member.title || member.committeeTitle || "Committee member";
-      return { role: member.invitationStatus === "accepted" ? "committee_member" : "pending", name: member.name, title: roleTitle };
+      return { role: member.invitationStatus === "accepted" ? "committee_member" : "pending", name: saved || member.name, title: roleTitle };
     }
-    if (isAdmin) return { role: "admin", name: (() => { try { return JSON.parse(localStorage.getItem("weddinghub_user") || localStorage.getItem("weddinghub_local_profile"))?.fullName || "Wedding admin"; } catch (_) { return "Wedding admin"; } })(), title: "Wedding admin" };
+    if (isAdmin) return { role: "admin", name: saved || (() => { try { return JSON.parse(localStorage.getItem("weddinghub_user") || localStorage.getItem("weddinghub_local_profile"))?.fullName || "Wedding admin"; } catch (_) { return "Wedding admin"; } })(), title: "Wedding admin" };
     return null;
   }
 
@@ -111,7 +114,7 @@
   function setupIdentity(person) {
     $("committeeUserName").textContent = person.name;
     $("committeeUserRole").textContent = person.title || (person.role === "admin" ? "Wedding admin" : "Planning team");
-    $("committeeUserAvatar").textContent = initials(person.name);
+    paintAvatar($("committeeUserAvatar"), person.name, data.myProfile?.avatar);
     $("committeeNames").textContent = `${wedding.brideName} & ${wedding.groomName}`;
     $("committeeRole").textContent = person.role === "admin" ? "Admin · planning workspace" : "Committee member";
     $("committeeCoupleAvatar").textContent = `${initials(wedding.brideName)[0] || "B"}&${initials(wedding.groomName)[0] || "G"}`;
@@ -138,7 +141,66 @@
     document.body.classList.remove("menu-open");
   }
 
-  function renderAll() { renderOverview(); renderInformation(); renderEvents(); renderTasks(); renderAnnouncements(); renderPhotos(); renderChat(); }
+  function renderAll() { renderOverview(); renderInformation(); renderEvents(); renderTasks(); renderAnnouncements(); renderPhotos(); renderChat(); renderProfile(); }
+
+  function paintAvatar(el, name, avatar) {
+    if (!el) return;
+    const image = WH.profileAvatar(avatar);
+    if (image) el.innerHTML = `<img src="${image}" alt="">`;
+    else el.textContent = initials(name);
+  }
+
+  // chatAvatarMarkup prefers the author's saved profile photo over their initials.
+  function chatAvatarMarkup(message) {
+    const profile = WH.profileById(data, message.authorId);
+    const image = WH.profileAvatar(profile?.avatar);
+    return image ? `<img src="${image}" alt="">` : WH.escape(initials(message.authorName || "C"));
+  }
+
+  function currentAvatar() {
+    return profileAvatarDraft === undefined ? (data.myProfile?.avatar || "") : profileAvatarDraft;
+  }
+
+  function renderProfile() {
+    const person = actor();
+    const nameField = $("committeeProfileName");
+    if (!person || !nameField) return;
+    nameField.value = data.myProfile?.displayName || (member ? member.name : person.name);
+    paintAvatar($("committeeProfileAvatar"), person.name, currentAvatar());
+    $("committeeProfileEmail").textContent = member?.email || "—";
+    $("committeeProfileRole").textContent = person.title || "Committee member";
+    $("committeeProfileClear").disabled = !currentAvatar();
+  }
+
+  async function saveProfile(event) {
+    event.preventDefault();
+    const person = actor();
+    const name = $("committeeProfileName").value.trim();
+    if (!name) { WH.toast("Add a display name first."); return; }
+    const button = event.target.querySelector('button[type="submit"]');
+    if (button) button.disabled = true;
+    const avatar = currentAvatar();
+    try {
+      await API.saveProfile(weddingID, { display_name: name, avatar }, token);
+    } catch (error) {
+      if (button) button.disabled = false;
+      reportAPIError(error);
+      return;
+    }
+    data.myProfile = { id: member?.id || "admin", role: person?.role || "committee_member", displayName: name, avatar, updatedAt: new Date().toISOString() };
+    if (member) {
+      member.name = name;
+      const stored = (data.committeeMembers || []).find(item => item.id === member.id);
+      if (stored) stored.name = name;
+    }
+    profileAvatarDraft = undefined;
+    WH.saveData(data);
+    if (button) button.disabled = false;
+    WH.toast("Profile saved");
+    await syncFromServer();
+    setupIdentity(actor());
+    renderAll();
+  }
 
   function renderOverview() {
     const stats = guestStats || computeGuestStats();
@@ -211,7 +273,7 @@
     $("chatMemberCount").textContent = `${messages.length} ${messages.length === 1 ? "message" : "messages"}`;
     if (stream) stream.innerHTML = messages.length ? messages.map(message => `
       <div class="chat-message ${message.authorRole === "admin" ? "admin" : ""}">
-        <span class="chat-avatar">${initials(message.authorName || "C")}</span>
+        <span class="chat-avatar">${chatAvatarMarkup(message)}</span>
         <div class="chat-bubble"><p><strong>${WH.escape(message.authorName || "Committee")}</strong>${message.authorRole === "admin" ? " <i>admin</i>" : ""}<time>${chatTime(message.createdAt)}</time></p><span>${WH.escape(message.body)}</span></div>
       </div>`).join("") : '<p class="empty-inline">No messages yet — start the planning conversation.</p>';
     requestAnimationFrame(() => { stream.scrollTop = stream.scrollHeight; });
@@ -343,6 +405,20 @@
   $("committeeBackdrop").onclick = closeSidebar;
   document.addEventListener("keydown", event => { if (event.key === "Escape") closeSidebar(); });
   $("openChatFromOverview").onclick = () => openView("chat");
+  const profileButton = $("committeeProfileButton");
+  if (profileButton) profileButton.onclick = () => openView("profile");
+  const profileForm = $("committeeProfileForm");
+  if (profileForm) {
+    profileForm.onsubmit = saveProfile;
+    $("committeeProfilePhoto").onchange = async event => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      try { profileAvatarDraft = await WH.resizeImage(file, PROFILE_AVATAR_MAX); renderProfile(); }
+      catch (error) { WH.toast(error.message || "That photo could not be used."); }
+      event.target.value = "";
+    };
+    $("committeeProfileClear").onclick = () => { profileAvatarDraft = ""; renderProfile(); };
+  }
   $("addCommitteeTask").onclick = () => editTask();
   $("addCommitteeAnnouncement").onclick = () => editAnnouncement();
   $("committeeModalClose").onclick = closeModal;
@@ -370,7 +446,8 @@
     try { await API.sendCommitteeMessage(weddingID, body, token); }
     catch (error) { reportAPIError(error); return; }
     input.value = "";
-    const message = { id: `cc_${Date.now()}`, authorName: actor()?.name || "Committee", authorRole: actor()?.role || "committee_member", body, createdAt: new Date().toISOString() };
+    const author = actor();
+    const message = { id: `cc_${Date.now()}`, authorId: member?.id || author?.role || "committee_member", authorName: author?.name || "Committee", authorRole: author?.role || "committee_member", body, createdAt: new Date().toISOString() };
     data.committeeChat = data.committeeChat || [];
     data.committeeChat.push(message);
     WH.saveData(data);

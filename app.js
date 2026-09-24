@@ -126,5 +126,38 @@
     tick(); return setInterval(tick, 1000);
   }
 
-  window.WeddingHub = { getData, saveData, resetData, query, guestByToken, committeeMemberByToken, published, publicAnnouncements, committeeAnnouncements, escape, formatDate, toast, templates, countdown };
+  function initials(value) {
+    const parts = String(value || "").trim().split(/\s+/).filter(Boolean);
+    return parts.map(part => part[0]).join("").slice(0, 2).toUpperCase() || "?";
+  }
+  // profileAvatar returns a data URL only when it is a real inline image, so a stray
+  // value can never be injected into an <img src>.
+  function profileAvatar(value) { return /^data:image\//.test(value || "") ? value : ""; }
+  function profileById(data, id) { return (data?.profiles || []).find(item => item.id === id) || null; }
+  // resizeImage downsamples a chosen photo in the browser so the stored avatar stays
+  // small enough for the JSON API, which caps request bodies at 1 MB.
+  function resizeImage(file, max = 320, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+      if (!file || !/^image\//.test(file.type || "")) { reject(new Error("Choose an image file.")); return; }
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("That image could not be read."));
+      reader.onload = () => {
+        const image = new Image();
+        image.onerror = () => reject(new Error("That image could not be read."));
+        image.onload = () => {
+          const scale = Math.min(1, max / Math.max(image.width, image.height));
+          const width = Math.max(1, Math.round(image.width * scale));
+          const height = Math.max(1, Math.round(image.height * scale));
+          const canvas = document.createElement("canvas");
+          canvas.width = width; canvas.height = height;
+          canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  window.WeddingHub = { getData, saveData, resetData, query, guestByToken, committeeMemberByToken, published, publicAnnouncements, committeeAnnouncements, escape, formatDate, toast, templates, countdown, initials, profileAvatar, profileById, resizeImage };
 })();

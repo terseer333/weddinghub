@@ -30,6 +30,7 @@ data.guests = data.guests || [];
 data.messages = data.messages || [];
 data.committeeMembers = data.committeeMembers || [];
 data.committeeRoles = data.committeeRoles || [];
+data.profiles = data.profiles || [];
 
 function initials(value) {
   return String(value || "Wedding Admin").split(/\s+/).map(part => part[0]).join("").slice(0, 2).toUpperCase();
@@ -63,13 +64,83 @@ function openView(name) {
 }
 function setupIdentity() {
   const admin = currentAdmin();
-  const name = admin.fullName || admin.email?.split('@')[0] || 'Wedding Admin';
+  const name = data.myProfile?.displayName || admin.fullName || admin.email?.split('@')[0] || 'Wedding Admin';
   $('#adminName').textContent = name;
-  $('#userAvatar').textContent = initials(name);
+  paintAvatar($('#userAvatar'), name, data.myProfile?.avatar);
   $('#welcomeHeading').textContent = `Welcome back, ${firstName(name)}.`;
   $('#switcherNames').textContent = `${data.wedding.brideName} & ${data.wedding.groomName}`;
   $('#switcherDate').textContent = WH.formatDate(data.wedding.date);
   $('#coupleAvatar').textContent = `${initials(data.wedding.brideName)[0] || ''}&${initials(data.wedding.groomName)[0] || ''}`;
+}
+function paintAvatar(el, name, avatar) {
+  if (!el) return;
+  const image = WH.profileAvatar(avatar);
+  if (image) el.innerHTML = `<img src="${image}" alt="">`;
+  else el.textContent = initials(name);
+}
+// avatarDraft: undefined keeps the stored photo, "" removes it, a string is a new one.
+let avatarDraft;
+function currentAvatar() { return avatarDraft === undefined ? (data.myProfile?.avatar || "") : avatarDraft; }
+function adminDisplayName() {
+  const admin = currentAdmin();
+  return data.myProfile?.displayName || admin.fullName || admin.email?.split('@')[0] || 'Wedding Admin';
+}
+function openProfileEditor() {
+  const admin = currentAdmin();
+  avatarDraft = undefined;
+  AdminModal.show(`<p class="eyebrow">Your account</p><h2>My profile</h2>
+    <div class="profile-avatar-row"><span class="avatar-preview" id="profileAvatarPreview"></span><div><strong>Profile photo</strong><p class="profile-hint">JPG or PNG. Images are resized automatically.</p><div class="profile-actions"><label class="button secondary" for="profilePhotoInput">Upload photo</label><input type="file" id="profilePhotoInput" accept="image/*" class="visually-hidden"><button type="button" class="button secondary" id="profilePhotoClear">Remove photo</button></div></div></div>
+    <form id="profileForm" class="profile-form"><label>Display name<input id="profileDisplayName" maxlength="80" value="${WH.escape(adminDisplayName())}" required></label><div class="profile-meta"><div><small>Email</small><strong>${WH.escape(admin.email || '—')}</strong></div><div><small>Role</small><strong>Wedding admin</strong></div></div><button class="button primary" type="submit">Save profile</button></form>`);
+  paintProfilePreview();
+  $('#profilePhotoInput').onchange = async event => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    try { avatarDraft = await WH.resizeImage(file, 320); paintProfilePreview(); }
+    catch (error) { WH.toast(error.message || 'That photo could not be used.'); }
+    event.target.value = '';
+  };
+  $('#profilePhotoClear').onclick = () => { avatarDraft = ''; paintProfilePreview(); };
+  $('#profileForm').onsubmit = saveProfile;
+}
+function paintProfilePreview() {
+  paintAvatar($('#profileAvatarPreview'), adminDisplayName(), currentAvatar());
+  const clear = $('#profilePhotoClear');
+  if (clear) clear.disabled = !currentAvatar();
+}
+async function saveProfile(event) {
+  event.preventDefault();
+  const name = $('#profileDisplayName').value.trim();
+  if (!name) { WH.toast('Add a display name first.'); return; }
+  const button = event.target.querySelector('button[type="submit"]');
+  if (button) button.disabled = true;
+  try {
+    const saved = await API.saveProfile(undefined, { display_name: name, avatar: currentAvatar() });
+    if (saved) data.myProfile = { id: saved.id, role: saved.role, displayName: saved.display_name || name, avatar: saved.avatar || '', updatedAt: saved.updated_at || '' };
+  } catch (error) {
+    if (button) button.disabled = false;
+    WH.toast(error.message || 'WeddingHub could not save your profile.');
+    return;
+  }
+  avatarDraft = undefined;
+  WH.saveData(data);
+  AdminModal.close();
+  setupIdentity();
+  WH.toast('Profile saved');
+}
+// syncProfiles loads the admin's own profile plus every committee profile so member
+// photos appear on the roster. Both calls are best-effort; a failure leaves the
+// locally cached values in place.
+async function syncProfiles() {
+  try {
+    const saved = await API.profile();
+    if (saved) data.myProfile = { id: saved.id, role: saved.role, displayName: saved.display_name || '', avatar: saved.avatar || '', updatedAt: saved.updated_at || '' };
+  } catch (_) {}
+  try {
+    const roster = await API.adminRoster();
+    if (roster && Array.isArray(roster.profiles)) {
+      data.profiles = roster.profiles.map(item => ({ id: item.id, role: item.role, displayName: item.display_name || '', avatar: item.avatar || '', updatedAt: item.updated_at || '' }));
+    }
+  } catch (_) {}
 }
 function completion() {
   const checks = [data.wedding.brideName, data.wedding.groomName, data.wedding.date, data.wedding.venue,
@@ -131,7 +202,10 @@ function renderCommittee() {
   $('#committeeTable').innerHTML = committee.length ? '<div class="table-row table-head"><span>Member</span><span>Role</span><span>Invitation</span><span>Contact</span><span>Actions</span></div>' + committee.map(member => {
     const roleObj = roles.find(r => r.id === (member.roleId || member.role_id));
     const roleName = roleObj ? roleObj.name : (member.title || member.committeeTitle || 'Committee member');
-    return `<div class="table-row"><span class="guest-cell"><i>${initials(member.name)}</i><span><strong>${WH.escape(member.name)}</strong><small>via ${member.email ? WH.escape(member.email) : member.token ? "invitation link" : "local seed"}</small></span></span><span>${WH.escape(roleName)}</span><span><b class="status ${member.invitationStatus || 'pending'}">${member.invitationStatus || 'pending'}</b></span><span>${member.phone ? WH.escape(member.phone) : '—'}</span><span class="row-menu"><button data-copy="${member.token}">Copy</button><button data-action="delete-member" data-id="${member.id}">Remove</button></span></div>`;
+    const profile = WH.profileById(data, member.apiMembershipId) || (data.profiles || []).find(item => item.displayName === member.name);
+    const memberName = profile?.displayName || member.name;
+    const memberPhoto = WH.profileAvatar(profile?.avatar);
+    return `<div class="table-row"><span class="guest-cell"><i>${memberPhoto ? `<img src="${memberPhoto}" alt="">` : WH.escape(initials(memberName))}</i><span><strong>${WH.escape(memberName)}</strong><small>via ${member.email ? WH.escape(member.email) : member.token ? "invitation link" : "local seed"}</small></span></span><span>${WH.escape(roleName)}</span><span><b class="status ${member.invitationStatus || 'pending'}">${member.invitationStatus || 'pending'}</b></span><span>${member.phone ? WH.escape(member.phone) : '—'}</span><span class="row-menu"><button data-copy="${member.token}">Copy</button><button data-action="delete-member" data-id="${member.id}">Remove</button></span></div>`;
   }).join('') : emptyState('No committee members yet', 'Invite your bridal party and coordinators to plan together.');
   const tasks = data.planningTasks || [];
   $('#adminTaskList').innerHTML = tasks.length ? tasks.map(task => `<article class="manage-card"><span class="calendar-tile task-tile">${['✓','◷','○'][['done','in_progress','todo'].indexOf(task.status) + 1] || '○'}</span><div class="manage-copy"><h3>${WH.escape(task.title)} <i class="status ${task.status}">${task.status.replace('_', ' ')}</i></h3><p>${WH.escape(task.details || '')}</p><small>${task.assignedTo ? `Assigned to ${WH.escape(task.assignedTo)}` : 'Unassigned'}${task.dueOn ? ` · Due ${WH.escape(task.dueOn)}` : ''}</small></div></article>`).join('') : emptyState('No planning tasks yet', 'Tasks created in the committee workspace appear here.');
@@ -219,6 +293,10 @@ $$('[data-jump]').forEach(button => {
     openView(button.dataset.jump);
   };
 });
+const profileTrigger = $('#profileButton');
+if (profileTrigger) profileTrigger.onclick = openProfileEditor;
+const openProfileButton = $('#openProfile');
+if (openProfileButton) openProfileButton.onclick = openProfileEditor;
 
 function setupSidebarToggle() {
   const layout = document.querySelector('.admin-layout');
@@ -279,6 +357,7 @@ async function syncFromAPI() {
     if (result && result.data) {
       data = result.data;
       setAPIStatus(true);
+      await syncProfiles();
       renderAll();
     }
   } catch (err) {

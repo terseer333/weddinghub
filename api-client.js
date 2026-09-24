@@ -177,8 +177,15 @@
     return /^[a-f0-9]{32}$/.test(value || "") ? value : "";
   }
 
+  function normalizeProfile(profile) {
+    return { id: profile.id || "", role: profile.role || "", displayName: profile.display_name || "",
+      avatar: profile.avatar || "", updatedAt: profile.updated_at || "" };
+  }
+
   function mergeAPI(data, source) {
     const w = source.wedding || source;
+    if (source.profile) data.myProfile = normalizeProfile(source.profile);
+    if (Array.isArray(source.profiles)) data.profiles = source.profiles.map(normalizeProfile);
     data.wedding = { ...data.wedding, id: w.id, slug: w.slug, brideName: w.partner_one,
       groomName: w.partner_two, date: w.date, status: data.wedding.status,
       venue: w.venue || data.wedding.venue, address: w.address || data.wedding.address,
@@ -210,8 +217,8 @@
     }
     if (w.planning_tasks) data.planningTasks = w.planning_tasks.map(t => ({ id: t.id, title: t.title, details: t.details || "",
       assignedTo: t.assigned_to || "", dueOn: t.due_on || "", status: t.status, createdBy: t.created_by || "" }));
-    if (w.committee_chat) data.committeeChat = w.committee_chat.map(c => ({ id: c.id, authorName: c.author_name,
-      authorRole: c.author_role, body: c.body, createdAt: c.created_at }));
+    if (w.committee_chat) data.committeeChat = w.committee_chat.map(c => ({ id: c.id, authorId: c.author_id || c.author_name,
+      authorName: c.author_name, authorRole: c.author_role, body: c.body, createdAt: c.created_at }));
     if (w.invitations) {
       w.invitations.forEach(invitation => {
         if (invitation.type === "committee") {
@@ -332,6 +339,16 @@
     return request(`/api/weddings/${id}/admin/roster`, { headers: authHeader() });
   }
 
+  async function profile(weddingID, token) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!id) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/profile`, { headers: authHeader(token || committeeToken()) });
+  }
+  async function saveProfile(weddingID, payload, token) {
+    const id = weddingID || localStorage.getItem(API_ID_KEY);
+    if (!id) return null;
+    return request(`/api/weddings/${encodeURIComponent(id)}/profile`, { method: "PUT", headers: authHeader(token || committeeToken()), body: JSON.stringify(payload) });
+  }
   function committeeToken() { return sessionStorage.getItem("weddinghub_invitation_token") || adminToken() || ""; }
   async function committeeDashboard(weddingID, token) {
     return request(`/api/weddings/${encodeURIComponent(weddingID)}/committee/dashboard`, { headers: authHeader(token || committeeToken()) });
@@ -397,5 +414,6 @@
     adminOverview, adminRoster, committeeDashboard, committeeChat, sendCommitteeMessage, createTask, updateTask, deleteTask,
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
     saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,
+    profile, saveProfile,
     mergeAPI, toAPI, baseURL, adminToken, storeAdminToken };
 })();

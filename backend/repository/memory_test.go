@@ -208,3 +208,41 @@ func TestMemoryRepositoryUsersAndSessions(t *testing.T) {
 		t.Fatalf("second delete error = %v, want ErrNotFound", err)
 	}
 }
+
+func TestMemoryProfileLifecycle(t *testing.T) {
+	repo := NewMemoryRepository()
+	if _, err := repo.CreateWedding(models.Wedding{ID: "w1", Slug: "one", Title: "One", Status: models.StatusPublished}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.GetProfile("w1", models.ProfileKeyAdmin); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("missing profile error = %v, want ErrNotFound", err)
+	}
+	saved, err := repo.UpsertProfile(models.Profile{WeddingID: "w1", ID: models.ProfileKeyAdmin, Role: models.RoleAdmin,
+		DisplayName: "Ada", Avatar: "data:image/png;base64,AAAA", UpdatedAt: time.Now().UTC()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := repo.GetProfile("w1", models.ProfileKeyAdmin)
+	if err != nil || got != saved {
+		t.Fatalf("GetProfile = %#v, %v", got, err)
+	}
+	member := models.Profile{WeddingID: "w1", ID: "cm1", Role: models.RoleCommitteeMember, DisplayName: "Sam", UpdatedAt: time.Now().UTC()}
+	if _, err := repo.UpsertProfile(member); err != nil {
+		t.Fatal(err)
+	}
+	profiles, err := repo.ListProfiles("w1")
+	if err != nil || len(profiles) != 2 {
+		t.Fatalf("ListProfiles = %#v, %v", profiles, err)
+	}
+	// An upsert replaces the same actor's profile instead of duplicating it.
+	member.DisplayName = "Samantha"
+	if _, err := repo.UpsertProfile(member); err != nil {
+		t.Fatal(err)
+	}
+	if profiles, err = repo.ListProfiles("w1"); err != nil || len(profiles) != 2 {
+		t.Fatalf("upsert duplicated a profile: %#v, %v", profiles, err)
+	}
+	if _, err := repo.UpsertProfile(models.Profile{WeddingID: "missing", ID: "x"}); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("profile for unknown wedding error = %v, want ErrNotFound", err)
+	}
+}

@@ -46,6 +46,11 @@ type Repository interface {
 	DeleteCommitteeRole(weddingID, roleID string) error
 	UpdateCommitteeMember(weddingID string, member models.CommitteeMember) (models.CommitteeMember, error)
 	DeleteCommitteeMember(weddingID, memberID string) error
+	// Self-service profiles. profileKey is models.ProfileKeyAdmin or a committee member id.
+	// GetProfile returns ErrNotFound when the actor has not customized a profile yet.
+	GetProfile(weddingID, profileKey string) (models.Profile, error)
+	UpsertProfile(profile models.Profile) (models.Profile, error)
+	ListProfiles(weddingID string) ([]models.Profile, error)
 	// User accounts and browser sessions. Emails are normalized before storage and lookup.
 	CreateUser(user models.User) (models.User, error)
 	UserByEmail(email string) (models.User, error)
