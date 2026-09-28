@@ -74,10 +74,31 @@
     } catch (_) { return null; }
   }
 
+  // hydrateMemberFromInvitation recognizes a committee member who reached this workspace
+  // from their invitation link but has no local record yet (a bookmark, another device or
+  // cleared storage). The server still authorizes access below; this only supplies the
+  // identity the page needs before actor() can describe it.
+  async function hydrateMemberFromInvitation() {
+    if (member || !token) return;
+    const view = await API.invitation(token);
+    const invitation = view?.invitation;
+    if (!invitation || invitation.type !== "committee") return;
+    member = data.committeeMembers?.find(item => item.token === token || item.apiInvitationId === invitation.id);
+    if (member) {
+      if (invitation.status !== "pending") member.invitationStatus = invitation.status;
+      return;
+    }
+    member = {
+      id: invitation.id, name: invitation.guest_name, title: invitation.committee_title || "",
+      email: invitation.guest_email || "", invitationStatus: invitation.status, token, type: "committee",
+      apiInvitationId: invitation.id
+    };
+    data.committeeMembers = data.committeeMembers || [];
+    data.committeeMembers.push(member);
+    WH.saveData(data);
+  }
+
   async function initialize() {
-    const person = actor();
-    if (!person) return showGate();
-    setupIdentity(person);
     try {
       await API.requireAPI();
     } catch (error) {
@@ -87,6 +108,7 @@
     $("committeeApiStatus").textContent = "● API connected";
     $("committeeApiStatus").classList.add("online");
     try {
+      await hydrateMemberFromInvitation();
       await resolveWeddingID();
     } catch (_) {
       return showGate("We could not verify this invitation link. Reopen it from your invitation email.");
@@ -98,12 +120,15 @@
       WH.saveData(data);
       guestStats = view.guest_stats || computeGuestStats();
       sessionStorage.setItem("weddinghub_wedding_id", weddingID);
-      WeddingRoleSelectorClear();
-      startChatPolling();
     } catch (error) {
       console.warn("Committee authorization failed:", error);
       return showGate("Your committee invitation is not yet accepted, or this link does not belong to this wedding's committee.");
     }
+    const person = actor();
+    if (!person) return showGate();
+    setupIdentity(person);
+    WeddingRoleSelectorClear();
+    startChatPolling();
     renderAll();
   }
 
