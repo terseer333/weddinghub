@@ -61,6 +61,38 @@ function showAccessGate() {
     <a class="button primary" href="${guest ? `event.html?token=${guest.token}` : "../index.html"}">${guest ? "Return to invitation" : "Return home"}</a></div>`;
 }
 
+// coupleMark draws the couple's initials around the styled ampersand used by the logo.
+function coupleMark(bride, groom) {
+  const initial = name => WH.escape(WH.initials(name)[0] || "•");
+  return `${initial(bride)} <i>&</i> ${initial(groom)}`;
+}
+
+// portraitMarkup prefers one of the couple's own published photos; with none available it
+// falls back to a script monogram so a portrait frame never renders a broken image.
+function portraitMarkup(name, photo) {
+  if (photo?.url) return `<img src="${WH.escape(photo.url)}" alt="">`;
+  return `<span class="couple-monogram">${WH.escape(WH.initials(name)[0] || "•")}</span>`;
+}
+
+// revealOnScroll fades sections in as they reach the viewport. Only sections that start
+// below the fold are hidden, so this can never blank content that is already on screen.
+function revealOnScroll() {
+  if (!("IntersectionObserver" in window)) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.setAttribute("data-reveal", "in");
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: "0px 0px -10% 0px" });
+  document.querySelectorAll("main > section, .guest-footer").forEach(section => {
+    if (!section.hidden && section.getBoundingClientRect().top <= window.innerHeight * 0.92) return;
+    section.setAttribute("data-reveal", "");
+    observer.observe(section);
+  });
+}
+
 function renderGuestDashboard() {
   const visibility = { story: WH.published(data.stories).length > 0, gallery: WH.published(data.photos).length > 0, events: WH.published(data.events).length > 0, announcements: WH.publicAnnouncements(data.announcements).length > 0 };
   Object.entries(visibility).forEach(([id, visible]) => { const section=document.getElementById(id); if(section)section.hidden=!visible; const link=document.querySelector(`.guest-links a[href="#${id}"]`); if(link)link.hidden=!visible; });
@@ -77,10 +109,20 @@ function renderGuestDashboard() {
   document.getElementById("rsvpSummary").textContent = `Attending · Party of ${guest.partySize}`;
   document.getElementById("footerDate").textContent = `${WH.formatDate(wedding.date)} · ${wedding.city}`;
   document.getElementById("myInvitation").href = `event.html?token=${guest.token}`;
+  document.getElementById("guestLogo").innerHTML = coupleMark(wedding.brideName, wedding.groomName);
+  document.getElementById("footerLogo").innerHTML = coupleMark(wedding.brideName, wedding.groomName);
+  document.getElementById("coupleGroomName").textContent = wedding.groomName;
+  document.getElementById("coupleBrideName").textContent = wedding.brideName;
+  const portraits = WH.published(data.photos).slice(1, 3);
+  document.getElementById("groomPortrait").innerHTML = portraitMarkup(wedding.groomName, portraits[0]);
+  document.getElementById("bridePortrait").innerHTML = portraitMarkup(wedding.brideName, portraits[1]);
+  const verse = document.getElementById("coupleVerse");
+  verse.textContent = wedding.verse || "";
+  verse.hidden = !wedding.verse;
 
   WH.countdown(wedding.date, value => {
-    document.getElementById("heroCountdown").innerHTML = value.passed ? "<strong>Today we celebrate love</strong>" :
-      [["DAYS", value.days], ["HRS", value.hours], ["MIN", value.minutes], ["SEC", value.seconds]]
+    document.getElementById("weddingCountdown").innerHTML = value.passed ? '<p class="countdown-today">Today we celebrate love</p>' :
+      [["Days", value.days], ["Hours", value.hours], ["Minutes", value.minutes], ["Seconds", value.seconds]]
         .map(([label, number]) => `<div><b>${String(number).padStart(2, "0")}</b><span>${label}</span></div>`).join("");
   });
 
@@ -98,6 +140,8 @@ function renderGuestDashboard() {
   const announcements = WH.publicAnnouncements(data.announcements);
   document.getElementById("guestAnnouncements").innerHTML = announcements.length ? announcements.map(item => `
     <article><small>${WH.formatDate(item.date)}</small><h3>${WH.escape(item.title)}</h3><p>${WH.escape(item.message)}</p></article>`).join("") : "<p>No announcements yet.</p>";
+
+  revealOnScroll();
 }
 
 function renderGallery() {
