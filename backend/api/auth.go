@@ -56,11 +56,16 @@ func (a *API) requireAdmin(w http.ResponseWriter, r *http.Request, weddingID str
 		writeRepositoryError(w, err)
 		return models.Wedding{}, false
 	}
-	if !constantTimeMatch(wedding.AdminTokenHash, models.HashToken(token)) {
-		writeError(w, http.StatusForbidden, "wedding administration requires this wedding's admin token")
-		return models.Wedding{}, false
+	if constantTimeMatch(wedding.AdminTokenHash, models.HashToken(token)) {
+		return wedding, true
 	}
-	return wedding, true
+	// A signed-in account that administers this wedding needs no browser-local token; this is
+	// how an owner keeps administering after signing in on a new browser or device.
+	if user, ok := a.sessionUser(token); ok && a.repo.IsWeddingAdmin(weddingID, user.ID) {
+		return wedding, true
+	}
+	writeError(w, http.StatusForbidden, "wedding administration requires this wedding's admin token")
+	return models.Wedding{}, false
 }
 
 // requireCommittee authenticates an admin or an accepted committee member of weddingID.
@@ -80,11 +85,11 @@ func (a *API) requireCommittee(w http.ResponseWriter, r *http.Request, weddingID
 	hash := models.HashToken(token)
 
 	if constantTimeMatch(wedding.AdminTokenHash, hash) {
-		name := strings.TrimSpace(wedding.PartnerOne + " & " + wedding.PartnerTwo)
-		if name == "&" || name == "" {
-			name = "Wedding admin"
-		}
-		return wedding, actor{Role: models.RoleAdmin, WeddingID: wedding.ID, Name: name}, true
+		return wedding, actor{Role: models.RoleAdmin, WeddingID: wedding.ID, Name: weddingAdminName(wedding)}, true
+	}
+	// An account that administers the wedding acts as its admin without the capability token.
+	if user, ok := a.sessionUser(token); ok && a.repo.IsWeddingAdmin(weddingID, user.ID) {
+		return wedding, actor{Role: models.RoleAdmin, WeddingID: wedding.ID, Name: weddingAdminName(wedding)}, true
 	}
 
 	inviteWedding, invitation, err := a.repo.InvitationByHash(hash)
@@ -117,6 +122,33 @@ func (a *API) requireCommittee(w http.ResponseWriter, r *http.Request, weddingID
 		}
 	}
 	return wedding, resolved, true
+}
+
+// sessionUser resolves a browser session token to its account without writing a response.
+// It backs endpoints where a session is an alternative credential, so an unknown or
+// expired token simply fails instead of ending the request with an error.
+func (a *API) sessionUser(token string) (models.User, bool) {
+	if token == "" || !validToken(token) {
+		return models.User{}, false
+	}
+	session, err := a.repo.SessionByHash(models.HashToken(token))
+	if err != nil {
+		return models.User{}, false
+	}
+	user, err := a.repo.UserByID(session.UserID)
+	if err != nil {
+		return models.User{}, false
+	}
+	return user, true
+}
+
+// weddingAdminName is the display name for the wedding's admin actor.
+func weddingAdminName(wedding models.Wedding) string {
+	name := strings.TrimSpace(wedding.PartnerOne + " & " + wedding.PartnerTwo)
+	if name == "&" || name == "" {
+		return "Wedding admin"
+	}
+	return name
 }
 
 func writeUnauthorized(w http.ResponseWriter) {

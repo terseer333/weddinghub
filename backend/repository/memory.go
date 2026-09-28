@@ -75,11 +75,13 @@ func (r *MemoryRepository) UpdateWedding(w models.Wedding) (models.Wedding, erro
 	if r.slugExists(w.Slug, w.ID) {
 		return models.Wedding{}, ErrConflict
 	}
-	// Invitation capabilities, guest responses, and committee state cannot be replaced through wedding content updates.
+	// Invitation capabilities, guest responses, committee state and the admin roster cannot
+	// be replaced through wedding content updates.
 	w.Invitations = current.Invitations
 	w.Guests = current.Guests
 	w.CommitteeMembers = current.CommitteeMembers
 	w.CommitteeRoles = current.CommitteeRoles
+	w.Admins = current.Admins
 	if w.CardConfig == nil && current.CardConfig != nil {
 		w.CardConfig = current.CardConfig
 	}
@@ -106,6 +108,45 @@ func (r *MemoryRepository) WeddingByAdminHash(hash string) (models.Wedding, erro
 		}
 	}
 	return models.Wedding{}, ErrNotFound
+}
+
+// IsWeddingAdmin reports whether an account appears in the wedding's admin roster.
+func (r *MemoryRepository) IsWeddingAdmin(weddingID, userID string) bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if weddingID == "" || userID == "" {
+		return false
+	}
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return false
+	}
+	for _, admin := range w.Admins {
+		if admin.UserID == userID {
+			return true
+		}
+	}
+	return false
+}
+
+// WeddingsForUser returns the weddings an account administers, oldest first.
+func (r *MemoryRepository) WeddingsForUser(userID string) []models.Wedding {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	out := make([]models.Wedding, 0)
+	if userID == "" {
+		return out
+	}
+	for _, w := range r.weddings {
+		for _, admin := range w.Admins {
+			if admin.UserID == userID {
+				out = append(out, cloneWedding(w))
+				break
+			}
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].CreatedAt.Before(out[j].CreatedAt) })
+	return out
 }
 
 func (r *MemoryRepository) DeleteWedding(id string) error {

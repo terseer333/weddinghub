@@ -569,9 +569,8 @@ func (r *PostgresRepository) UpdateWedding(w models.Wedding) (models.Wedding, er
 			w.Message, w.Verse, w.DressCode, w.HeroImage, w.TemplateID, cardConfigValue(w.CardConfig), w.UpdatedAt); err != nil {
 			return mapError(err)
 		}
-		if err := replaceWeddingAdmins(ctx, tx, w); err != nil {
-			return err
-		}
+		// The admin roster is set when the wedding is created and is not replaced by content
+		// edits, which always submit an empty roster.
 		return replaceContent(ctx, tx, w)
 	})
 	if err != nil {
@@ -1295,6 +1294,56 @@ func (r *PostgresRepository) DeleteSession(hash string) error {
 	return nil
 }
 
+// IsWeddingAdmin reports whether an account appears in the wedding's admin roster.
+func (r *PostgresRepository) IsWeddingAdmin(weddingID, userID string) bool {
+	if weddingID == "" || userID == "" {
+		return false
+	}
+	ctx, cancel := r.ctx()
+	defer cancel()
+	var exists bool
+	if err := r.db.QueryRowContext(ctx, `SELECT EXISTS (SELECT 1 FROM wedding_admins WHERE wedding_id = $1 AND user_id = $2)`, weddingID, userID).Scan(&exists); err != nil {
+		return false
+	}
+	return exists
+}
+
+// WeddingsForUser returns the weddings an account administers, oldest first.
+func (r *PostgresRepository) WeddingsForUser(userID string) []models.Wedding {
+	out := make([]models.Wedding, 0)
+	if userID == "" {
+		return out
+	}
+	ctx, cancel := r.ctx()
+	defer cancel()
+	rows, err := r.db.QueryContext(ctx, `SELECT wedding_id FROM wedding_admins WHERE user_id = $1`, userID)
+	if err != nil {
+		return out
+	}
+	ids := make([]string, 0)
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			rows.Close()
+			return out
+		}
+		ids = append(ids, id)
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return out
+	}
+	for _, id := range ids {
+		wedding, err := r.GetWedding(id)
+		if err != nil {
+			continue
+		}
+		out = append(out, wedding)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].CreatedAt.Before(out[j].CreatedAt) })
+	return out
+}
+
 // insertAllChildren persists every child collection supplied on wedding creation.
 func insertAllChildren(ctx context.Context, tx *sql.Tx, w models.Wedding) error {
 	for _, admin := range w.Admins {
@@ -1408,19 +1457,6 @@ func insertPlanningTask(ctx context.Context, tx *sql.Tx, weddingID string, task 
 		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
 		task.ID, weddingID, task.Title, task.Details, task.AssignedTo, task.DueOn, task.Status, task.CreatedBy, task.CreatedAt, task.UpdatedAt, position)
 	return mapError(err)
-}
-
-// replaceWeddingAdmins swaps the admin roster, matching UpdateWedding's semantics.
-func replaceWeddingAdmins(ctx context.Context, tx *sql.Tx, w models.Wedding) error {
-	if _, err := tx.ExecContext(ctx, `DELETE FROM wedding_admins WHERE wedding_id = $1`, w.ID); err != nil {
-		return mapError(err)
-	}
-	for _, admin := range w.Admins {
-		if _, err := tx.ExecContext(ctx, `INSERT INTO wedding_admins (wedding_id, user_id, role) VALUES ($1,$2,$3)`, w.ID, admin.UserID, admin.Role); err != nil {
-			return mapError(err)
-		}
-	}
-	return nil
 }
 
 // replaceContent swaps the four content collections UpdateWedding replaces.

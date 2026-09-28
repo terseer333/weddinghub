@@ -23,6 +23,11 @@ type Repository interface {
 	DeleteWedding(id string) error
 	// WeddingByAdminHash resolves the wedding an admin capability token administers.
 	WeddingByAdminHash(hash string) (models.Wedding, error)
+	// IsWeddingAdmin reports whether an account administers the wedding. Session-based
+	// administration relies on this so an owner never depends on a browser-local token.
+	IsWeddingAdmin(weddingID, userID string) bool
+	// WeddingsForUser returns the weddings an account administers.
+	WeddingsForUser(userID string) []models.Wedding
 	AddInvitation(weddingID string, invitation models.Invitation) (models.Invitation, error)
 	InvitationByHash(hash string) (models.Wedding, models.Invitation, error)
 	RespondToInvitation(hash string, status models.InvitationStatus, at time.Time) (models.Wedding, models.Invitation, error)

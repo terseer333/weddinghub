@@ -60,6 +60,7 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("GET /api/auth/me", a.currentUser)
 	mux.HandleFunc("GET /api/weddings", a.listWeddings)
 	mux.HandleFunc("POST /api/weddings", a.createWedding)
+	mux.HandleFunc("GET /api/weddings/mine", a.myWeddings)
 	// Admin-authenticated routes. requireAdmin resolves the wedding and verifies the
 	// caller holds the wedding's admin capability token before any data is touched.
 	mux.HandleFunc("GET /api/weddings/{weddingID}", a.getWedding)
@@ -131,6 +132,11 @@ func (a *API) createWedding(w http.ResponseWriter, r *http.Request) {
 	wedding.CreatedAt, wedding.UpdatedAt = now, now
 	wedding.Slug = strings.TrimSpace(wedding.Slug)
 	wedding.Title = strings.TrimSpace(wedding.Title)
+	// A signed-in creator owns the wedding, so the account can administer it later without
+	// holding on to the one-time admin capability token.
+	if user, ok := a.sessionUser(bearerToken(r)); ok {
+		wedding.Admins = append(wedding.Admins, models.Admin{UserID: user.ID, Role: models.RoleOwner})
+	}
 	if err := prepareWedding(&wedding); err != nil {
 		writeError(w, http.StatusBadRequest, err.Error())
 		return
@@ -157,6 +163,22 @@ type weddingSummary struct {
 	PartnerTwo string                   `json:"partner_two"`
 	Date       *time.Time               `json:"date,omitempty"`
 	Status     models.PublicationStatus `json:"status"`
+}
+
+// myWeddings lists the weddings the signed-in account administers, so a browser can adopt
+// its wedding without the one-time admin capability token.
+func (a *API) myWeddings(w http.ResponseWriter, r *http.Request) {
+	user, ok := a.requireUser(w, r)
+	if !ok {
+		return
+	}
+	weddings := a.repo.WeddingsForUser(user.ID)
+	out := make([]weddingSummary, 0, len(weddings))
+	for _, wedding := range weddings {
+		out = append(out, weddingSummary{ID: wedding.ID, Slug: wedding.Slug, Title: wedding.Title,
+			PartnerOne: wedding.PartnerOne, PartnerTwo: wedding.PartnerTwo, Date: wedding.Date, Status: wedding.Status})
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 // listWeddings exposes only identifiers and names so strangers cannot read guest,
