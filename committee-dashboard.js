@@ -9,7 +9,9 @@
   let data = WH.getData();
   let wedding = data.wedding;
   let member = WH.committeeMemberByToken(data) || null;
-  const isAdmin = Boolean(API.adminToken());
+  // A signed-in account that administers the wedding counts as its admin, even when this
+  // browser holds no admin capability token.
+  const isAdmin = Boolean(API.adminToken() || API.sessionToken());
   let weddingID = localStorage.getItem("weddinghub_api_wedding_id") || data.wedding.id || "";
   let guestStats = {};
   let chatSince = "";

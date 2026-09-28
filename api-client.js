@@ -145,7 +145,9 @@
     catch (_) { return null; }
   }
   function authHeader(token) {
-    const value = token || adminToken();
+    // A browser session is a valid fallback credential: the API accepts it for accounts that
+    // administer the wedding, so an owner never depends on the one-time admin token.
+    const value = token || adminToken() || sessionToken();
     return value ? { Authorization: `Bearer ${value}` } : {};
   }
 
@@ -256,31 +258,49 @@
     await requireAPI();
     let weddingID = localStorage.getItem(API_ID_KEY);
     const adminHeaders = authHeader();
-    if (weddingID && adminToken()) {
+    if (weddingID && (adminToken() || sessionToken())) {
       try {
         const remote = await request(`/api/weddings/${weddingID}`, { headers: adminHeaders });
         return { data: mergeAPI(data, remote), weddingID };
       } catch (error) {
-        if (error.status !== 404) throw error;
-        console.info("Stored API wedding is no longer available; re-bootstrapping.", error);
+        // 404 means it is gone; 403 means this account does not administer it. Either way,
+        // start over rather than trapping the page behind a blocking API error.
+        if (error.status !== 404 && error.status !== 403) throw error;
+        console.info("Stored API wedding is not available to this account; re-bootstrapping.", error);
         localStorage.removeItem(API_ID_KEY);
         weddingID = null;
       }
     }
-    const weddings = await request("/api/weddings");
-    let remote = weddings.find(w => w.slug === data.wedding.slug);
+    // A signed-in account adopts the wedding it already administers, so signing in again or
+    // using a new browser does not need the one-time admin capability token.
+    let remote = null;
+    if (sessionToken()) {
+      try {
+        const owned = await request("/api/weddings/mine", { headers: sessionHeader() });
+        const mine = Array.isArray(owned) ? owned.find(item => item && item.id) : null;
+        if (mine) remote = await request(`/api/weddings/${mine.id}`, { headers: adminHeaders });
+      } catch (_) { remote = null; }
+    }
+    if (!remote) {
+      const weddings = await request("/api/weddings");
+      remote = weddings.find(w => w.slug === data.wedding.slug);
+    }
+    let createdNow = false;
     if (!remote) {
       // A wedding is created from the working copy, which signup fills with real details.
       // Without those, do not invent a placeholder wedding on a fresh deployment.
       if (!data.wedding.slug || !data.wedding.brideName || !data.wedding.groomName) {
         return { data, weddingID: "" };
       }
-      const created = await request("/api/weddings", { method: "POST", body: JSON.stringify(toAPI(data)) });
+      const created = await request("/api/weddings", { method: "POST", headers: sessionHeader(), body: JSON.stringify(toAPI(data)) });
       storeAdminToken(created.admin_token);
       remote = created.wedding;
+      createdNow = true;
     }
     weddingID = remote.id; localStorage.setItem(API_ID_KEY, weddingID);
-    for (const guest of data.guests) {
+    // Only a wedding this browser just created receives the working copy's invitations; an
+    // adopted wedding already has its own.
+    for (const guest of (createdNow ? data.guests : [])) {
       const created = await createInvitation(weddingID, guest);
       guest.token = created.token;
       guest.apiInvitationId = created.invitation.id;
@@ -289,7 +309,7 @@
         await updateRSVP(guest.token, "attending", guest.partySize);
       } else if (guest.rsvp === "declined") await respond(guest.token, "decline");
     }
-    for (const member of data.committeeMembers || []) {
+    for (const member of (createdNow ? data.committeeMembers || [] : [])) {
       const created = await createInvitation(weddingID, { ...member, type: "committee", committeeTitle: member.title });
       member.token = created.token;
       member.apiInvitationId = created.invitation.id;
