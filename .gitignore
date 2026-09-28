@@ -1,1 +1,11 @@
 .aider*
+
+# Local build output, logs and stray captures — not part of the product
+backend/weddinghub-server
+*.log
+check.png
+Screenshot from *.png
+upload/
+
+# Local agent scratch space
+.qwen/tmp/
