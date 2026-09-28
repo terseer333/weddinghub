@@ -153,7 +153,7 @@
     const w = data.wedding;
     return {
       slug: w.slug, title: `${w.brideName} & ${w.groomName}`, partner_one: w.brideName,
-      partner_two: w.groomName, date: new Date(w.date).toISOString(), status: w.status,
+      partner_two: w.groomName, date: w.date ? new Date(w.date).toISOString() : null, status: w.status,
       venue: w.venue, address: w.address, city: w.city, state: w.state, country: w.country,
       message: w.message, verse: w.verse, dress_code: w.dressCode, hero_image: w.heroImage,
       template_id: w.templateId, card_config: w.cardConfig || null, committee_roles: data.committeeRoles || [],
@@ -270,6 +270,11 @@
     const weddings = await request("/api/weddings");
     let remote = weddings.find(w => w.slug === data.wedding.slug);
     if (!remote) {
+      // A wedding is created from the working copy, which signup fills with real details.
+      // Without those, do not invent a placeholder wedding on a fresh deployment.
+      if (!data.wedding.slug || !data.wedding.brideName || !data.wedding.groomName) {
+        return { data, weddingID: "" };
+      }
       const created = await request("/api/weddings", { method: "POST", body: JSON.stringify(toAPI(data)) });
       storeAdminToken(created.admin_token);
       remote = created.wedding;
