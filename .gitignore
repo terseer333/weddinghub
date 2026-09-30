@@ -12,3 +12,6 @@ upload/
 
 # Real configuration and secrets; .env.example is the tracked template
 .env
+
+# Database backups taken before a repair hold guest data and stay local
+backups/
