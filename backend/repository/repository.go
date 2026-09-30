@@ -64,4 +64,8 @@ type Repository interface {
 	AddSession(session models.Session) error
 	SessionByHash(hash string) (models.Session, error)
 	DeleteSession(hash string) error
+	// Platform admin audit trail. AddAuditLog appends; ListAuditLogs returns the newest first.
+	// There is no update or delete: the trail is append-only by design.
+	AddAuditLog(entry models.AuditLog) error
+	ListAuditLogs(limit int) ([]models.AuditLog, error)
 }

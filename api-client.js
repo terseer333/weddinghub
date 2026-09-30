@@ -386,6 +386,25 @@
   async function dashboard(token) { return request(`/api/guest/${encodeURIComponent(token)}/dashboard`); }
   async function sendMessage(token, message) { return request(`/api/guest/${encodeURIComponent(token)}/messages`, { method: "POST", body: JSON.stringify({ message }) }); }
 
+  // Platform administration. These reuse the same session store, but every /api/admin/* request
+  // is authorized on the server against the configured administrator address, so a session alone
+  // is never enough.
+  async function adminLogin(credentials) {
+    const response = await request("/api/admin/login", { method: "POST", body: JSON.stringify(credentials) });
+    storeSession(response && response.session_token);
+    return response;
+  }
+  async function adminLogout() {
+    try {
+      if (sessionToken()) await request("/api/admin/logout", { method: "POST", headers: sessionHeader() });
+    } finally {
+      clearSession();
+    }
+  }
+  async function adminMe() {
+    return request("/api/admin/me", { headers: sessionHeader() });
+  }
+
   async function adminOverview() {
     const id = localStorage.getItem(API_ID_KEY);
     if (!id || !adminToken()) return null;
@@ -469,6 +488,7 @@
 
   window.WeddingHubAPI = { requireAPI, showFatalError, bootstrap, saveWedding, addGuest, sendInvitation, respond, updateRSVP, invitation, dashboard, sendMessage,
     signup, login, logout, currentUser, sessionToken, clearSession,
+    adminLogin, adminLogout, adminMe,
     adminOverview, adminRoster, committeeDashboard, committeeChat, sendCommitteeMessage, createTask, updateTask, deleteTask,
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
     saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,

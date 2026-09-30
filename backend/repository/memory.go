@@ -17,12 +17,13 @@ type profileRef struct {
 
 // MemoryRepository is concurrency-safe. Returned aggregates are defensive copies.
 type MemoryRepository struct {
-	mu       sync.RWMutex
-	weddings map[string]models.Wedding
-	users    map[string]models.User
-	emails   map[string]string
-	sessions map[string]models.Session
-	profiles map[profileRef]models.Profile
+	mu        sync.RWMutex
+	weddings  map[string]models.Wedding
+	users     map[string]models.User
+	emails    map[string]string
+	sessions  map[string]models.Session
+	profiles  map[profileRef]models.Profile
+	auditLogs []models.AuditLog
 }
 
 func NewMemoryRepository() *MemoryRepository {
@@ -639,6 +640,40 @@ func (r *MemoryRepository) DeleteSession(hash string) error {
 	}
 	delete(r.sessions, hash)
 	return nil
+}
+
+// AddAuditLog appends an audit entry. Oldest entries are dropped once the trail reaches
+// maxAuditLogs, so a long-running process cannot grow this slice without bound.
+func (r *MemoryRepository) AddAuditLog(entry models.AuditLog) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.auditLogs = append(r.auditLogs, entry)
+	if len(r.auditLogs) > maxAuditLogs {
+		r.auditLogs = r.auditLogs[len(r.auditLogs)-maxAuditLogs:]
+	}
+	return nil
+}
+
+// ListAuditLogs returns the newest entries first, capped at limit. A non-positive limit is
+// treated as the default page size.
+func (r *MemoryRepository) ListAuditLogs(limit int) ([]models.AuditLog, error) {
+	if limit <= 0 {
+		limit = defaultAuditLogLimit
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	out := make([]models.AuditLog, 0, limitedCount(limit, len(r.auditLogs)))
+	for i := len(r.auditLogs) - 1; i >= 0 && len(out) < limit; i-- {
+		out = append(out, cloneAuditLog(r.auditLogs[i]))
+	}
+	return out, nil
+}
+
+func limitedCount(limit, total int) int {
+	if limit < total {
+		return limit
+	}
+	return total
 }
 
 func (r *MemoryRepository) findInvitation(hash string) (models.Wedding, models.Invitation, bool) {

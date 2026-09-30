@@ -63,6 +63,10 @@ type User struct {
 	Role         Role      `json:"role"`
 	PasswordHash string    `json:"-"`
 	CreatedAt    time.Time `json:"created_at"`
+	// IsAdmin marks the platform administrator in an API response. It is computed per request
+	// from the configured admin email and never stored on the account, so revoking the setting
+	// takes effect immediately and a database row alone cannot grant administration.
+	IsAdmin bool `json:"is_admin,omitempty"`
 }
 
 type Admin struct {

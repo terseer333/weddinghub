@@ -16,7 +16,16 @@ const API = WeddingHubAPI;
 // the visitor to the sign-in page.
 (async () => {
   const user = await API.currentUser();
-  if (!user) location.replace("login.html");
+  if (!user) {
+    location.replace("login.html");
+    return;
+  }
+  // The platform administrator gets a discreet way back to the admin console. Revealing this link
+  // grants nothing: the console re-checks the account on the server for every request.
+  if (user.is_admin) {
+    const link = document.getElementById("siteAdminLink");
+    if (link) link.style.display = "";
+  }
 })();
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);

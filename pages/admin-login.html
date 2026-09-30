@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="WeddingHub platform administration.">
+    <title>Administrator sign-in · WeddingHub</title>
+    <link rel="icon" href="../favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="../assets/favicon-48.png">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+    <meta name="theme-color" content="#59273a">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="../weddinghub.css">
+    <link rel="stylesheet" href="../landing.css">
+    <link rel="stylesheet" href="../theme.css">
+    <script src="../theme.js"></script>
+</head>
+<body class="auth-page" data-auth-page="admin-login">
+<a class="skip-link" href="#admin-login-form">Skip to sign-in form</a>
+<main class="auth-layout">
+    <section class="auth-intro" aria-labelledby="admin-intro-title">
+        <a class="public-brand" href="../index.html" aria-label="WeddingHub home">
+            <span class="brand-mark" aria-hidden="true">W</span>
+            <span>WeddingHub</span>
+        </a>
+        <div class="auth-intro-copy">
+            <p class="landing-eyebrow">Platform administration</p>
+            <h1 id="admin-intro-title">Site control, kept separate.</h1>
+            <p>This sign-in is for the WeddingHub administrator only. It is not the wedding workspace, and ordinary accounts cannot open it.</p>
+            <div class="auth-points" aria-label="Administrator area properties">
+                <span><i aria-hidden="true">✓</i> Restricted to the configured administrator address</span>
+                <span><i aria-hidden="true">✓</i> Verified on the server for every request</span>
+                <span><i aria-hidden="true">✓</i> Failed attempts are limited and recorded</span>
+            </div>
+        </div>
+        <p class="auth-legal">Authorised personnel only</p>
+    </section>
+
+    <section class="auth-main" aria-labelledby="admin-login-title">
+        <div class="auth-card">
+            <a class="auth-back" href="../index.html"><span aria-hidden="true">←</span> Back to WeddingHub</a>
+            <p class="landing-eyebrow">Administrator access</p>
+            <h1 id="admin-login-title">Sign in</h1>
+            <p class="auth-subtitle">Enter the administrator account to open the platform dashboard.</p>
+
+            <aside class="local-notice" aria-label="Administrator sign-in information">
+                <span aria-hidden="true">i</span>
+                <div>Only the account whose email is configured as the WeddingHub administrator can sign in here. Any other account is refused, even with a correct password.</div>
+            </aside>
+
+            <form class="auth-form" id="admin-login-form" data-admin-login>
+                <div class="field">
+                    <label for="adminEmail">Administrator email</label>
+                    <input id="adminEmail" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
+                </div>
+                <div class="field">
+                    <label for="adminPassword">Password</label>
+                    <input id="adminPassword" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required>
+                </div>
+                <button class="auth-submit" type="submit">Open admin dashboard</button>
+            </form>
+            <p class="form-message" id="admin-form-message" role="status" aria-live="polite"></p>
+            <p class="auth-switch"><a href="login.html">Go to the wedding workspace instead</a></p>
+        </div>
+    </section>
+</main>
+<script src="../api-client.js"></script>
+<script src="../admin-login.js"></script>
+</body>
+</html>

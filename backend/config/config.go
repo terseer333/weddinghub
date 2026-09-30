@@ -83,6 +83,14 @@ func parseEnvLine(line string) (string, string, bool) {
 	return key, value, true
 }
 
+// AdminEmail returns the account allowed to use the platform admin dashboard, or "" when no
+// administrator is configured. The address is normalized the same way account emails are, so the
+// comparison is case-insensitive. With no value here the admin endpoints refuse everyone, which
+// keeps a deployment from accidentally exposing administration.
+func AdminEmail() string {
+	return strings.ToLower(strings.TrimSpace(os.Getenv("WEDDINGHUB_ADMIN_EMAIL")))
+}
+
 // ListenAddress returns the address the HTTP server listens on. WEDDINGHUB_ADDR wins; next a
 // PORT injected by a host such as Render, which also requires binding every interface; and the
 // local default comes last.

@@ -107,7 +107,10 @@ func (a *API) currentUser(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	writeJSON(w, http.StatusOK, user)
+	// markAdmin stamps the computed flag so an account can be told, from its own record, that it is
+	// the platform administrator. The wedding dashboard uses it to offer a discreet link to the
+	// console; it grants nothing, because every admin request is re-checked on the server.
+	writeJSON(w, http.StatusOK, a.markAdmin(user))
 }
 
 func (a *API) logout(w http.ResponseWriter, r *http.Request) {

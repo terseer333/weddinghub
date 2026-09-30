@@ -14,6 +14,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"weddinghub/config"
 	"weddinghub/delivery"
 	"weddinghub/models"
 	"weddinghub/repository"
@@ -28,6 +29,11 @@ type API struct {
 	repo   repository.Repository
 	sender delivery.Sender
 	now    func() time.Time
+	// adminEmail is the account allowed to use the platform admin dashboard, resolved once at
+	// startup. Empty means no administrator is configured and every admin route refuses callers.
+	adminEmail string
+	// loginGuard throttles repeated admin login failures.
+	loginGuard *loginGuard
 }
 
 func New(repo repository.Repository) http.Handler {
@@ -51,13 +57,24 @@ func NewWithSender(repo repository.Repository, allowedOrigins string, sender del
 }
 
 func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback bool, sender delivery.Sender) http.Handler {
-	a := &API{repo: repo, sender: sender, now: func() time.Time { return time.Now().UTC() }}
+	a := &API{
+		repo:       repo,
+		sender:     sender,
+		now:        func() time.Time { return time.Now().UTC() },
+		adminEmail: config.AdminEmail(),
+		loginGuard: newLoginGuard(),
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", a.health)
 	mux.HandleFunc("POST /api/auth/signup", a.signup)
 	mux.HandleFunc("POST /api/auth/login", a.login)
 	mux.HandleFunc("POST /api/auth/logout", a.logout)
 	mux.HandleFunc("GET /api/auth/me", a.currentUser)
+	// Platform admin routes. Every one of these resolves the caller's session and confirms the
+	// account is the configured administrator on the server before doing anything else.
+	mux.HandleFunc("POST /api/admin/login", a.adminLogin)
+	mux.HandleFunc("POST /api/admin/logout", a.adminLogout)
+	mux.HandleFunc("GET /api/admin/me", a.adminMe)
 	mux.HandleFunc("GET /api/weddings", a.listWeddings)
 	mux.HandleFunc("POST /api/weddings", a.createWedding)
 	mux.HandleFunc("GET /api/weddings/mine", a.myWeddings)

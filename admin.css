@@ -1,0 +1,29 @@
+/* Platform admin console. The shell, sidebar, topbar and tables come from weddinghub.css and
+   polish.css; this file adds only what the platform console needs on top of them. */
+
+/* A section that exists in the navigation but has no backend yet. It is labelled rather than
+   hidden so the shape of the console is honest, and it never shows invented figures. */
+.side-link.planned { color: #8b958f; }
+.side-link.planned.active { color: #294238; background: #edf3ef; }
+.side-link.planned b { padding: 2px 6px; border-radius: 9px; color: #8a6a3d; background: #f6edde; font-size: var(--text-2xs); font-weight: 700; }
+
+.platform-empty { display: grid; gap: 4px; max-width: 720px; padding: 34px 30px; text-align: left; }
+.platform-empty > span { font-size: var(--text-6xl); line-height: 1; color: #b4a795; }
+.platform-empty h2 { margin: 12px 0 0; font-family: var(--play, var(--serif)); font-size: var(--text-4xl); font-weight: 500; }
+.platform-empty p { margin: 0; max-width: 60ch; color: #707b76; font-size: var(--text-sm); }
+
+/* The dashboard's account card is real data from /api/admin/me, so it is styled as content
+   rather than as a placeholder. */
+.admin-account-card { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 18px; max-width: 720px; }
+.admin-account-card .user-avatar { width: 62px; height: 62px; font-size: var(--text-xl); }
+.admin-account-card h2 { margin: 0 0 2px; font-size: var(--text-4xl); }
+.admin-account-card p { margin: 0; color: var(--muted); font-size: var(--text-sm); }
+.admin-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 720px; margin-top: 15px; }
+.admin-facts article { padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.admin-facts small { display: block; color: var(--muted); font-size: var(--text-xs); }
+.admin-facts strong { display: block; margin-top: 2px; font-size: var(--text-lg); }
+
+@media (max-width: 700px) {
+    .admin-account-card { grid-template-columns: 1fr; }
+    .admin-facts { grid-template-columns: 1fr; }
+}
