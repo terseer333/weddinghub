@@ -9,3 +9,6 @@ upload/
 
 # Local agent scratch space
 .qwen/tmp/
+
+# Real configuration and secrets; .env.example is the tracked template
+.env

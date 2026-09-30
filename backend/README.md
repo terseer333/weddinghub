@@ -6,7 +6,17 @@ A Go standard-library HTTP API backed by PostgreSQL. Run from this directory:
 go run ./cmd
 ```
 
-The default address is `:8080`; override it with `WEDDINGHUB_ADDR`.
+Configuration comes from the environment. A `.env` file is loaded first when one is present —
+`.env` in the working directory, or `../.env` so a file in the repository root works for a run
+from this directory — and values already set in the environment always win, so a deployment's
+variables are never overridden by a checked-in file. Copy the root template to start:
+
+```sh
+cp ../.env.example ../.env     # then set WEDDINGHUB_DATABASE_URL
+```
+
+The default address is `:8080`. When `WEDDINGHUB_ADDR` is unset, a `PORT` injected by a host such
+as Render is used and the server binds `0.0.0.0` on that port.
 
 `WEDDINGHUB_DATABASE_URL` is required and must be a PostgreSQL connection string, for example `postgres://weddinghub:secret@localhost:5432/weddinghub?sslmode=disable`. The process pings the database and applies the embedded migrations at startup, and it exits with a fatal error when the database is missing or unreachable.
 

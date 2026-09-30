@@ -4,14 +4,19 @@ WeddingHub is a connected digital wedding experience: couples manage one central
 
 ## Run the connected application
 
-Create a PostgreSQL database and point the API at it, then start it in one terminal:
+Create a PostgreSQL database and point the API at it, then start it in one terminal. The API reads
+its configuration from the environment, so put the connection string in a `.env` file copied from
+the tracked template:
 
 ```sh
 createdb weddinghub   # or use any PostgreSQL database you already run
+cp .env.example .env  # then set WEDDINGHUB_DATABASE_URL in .env
 cd backend
-export WEDDINGHUB_DATABASE_URL="postgres://localhost:5432/weddinghub?sslmode=disable"
 go run ./cmd
 ```
+
+`.env` is optional and never overrides a real environment variable, so a host such as Render can be
+configured with the same names (`WEDDINGHUB_DATABASE_URL`, and `PORT` is used automatically).
 
 The API pings the database and applies its embedded schema migrations at startup. It exits with a fatal error when `WEDDINGHUB_DATABASE_URL` is missing or the database is unreachable; there is no in-memory fallback.
 

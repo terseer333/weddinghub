@@ -11,14 +11,20 @@ import (
 	"time"
 
 	"weddinghub/api"
+	"weddinghub/config"
 	"weddinghub/repository"
 )
 
 func main() {
-	address := os.Getenv("WEDDINGHUB_ADDR")
-	if address == "" {
-		address = ":8080"
+	// A .env file is optional and never overrides the real environment, so one set of names works
+	// for a local run and for a host's configured variables.
+	if envFile, err := config.LoadEnvFile(); err != nil {
+		log.Fatalf("read environment file: %v", err)
+	} else if envFile != "" {
+		log.Printf("Loaded environment from %s", envFile)
 	}
+
+	address := config.ListenAddress()
 
 	// PostgreSQL is the only supported store. There is no in-memory fallback, so a
 	// missing or unreachable database is a fatal startup error rather than a
