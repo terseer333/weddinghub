@@ -272,6 +272,9 @@ async function persist(message = 'Changes saved') {
   try {
     await API.saveWedding(data);
   } catch (error) {
+    // An unlinked workspace is a state the admin can fix by reloading, not an API outage, so it
+    // is reported without covering the page with the fatal card.
+    if (error && error.code === 'wedding_not_linked') { WH.toast(error.message); return; }
     API.showFatalError(error.message);
     return;
   }

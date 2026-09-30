@@ -179,6 +179,20 @@
     return /^[a-f0-9]{32}$/.test(value || "") ? value : "";
   }
 
+  // weddingSlug is the single place the couple's names become a wedding address. Signup writes it
+  // first; bootstrap re-derives it whenever a working copy has lost it.
+  function weddingSlug(brideName, groomName) {
+    return `${brideName}-and-${groomName}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+
+  // notLinked marks a workspace with no server wedding behind it. That is a state the visitor can
+  // act on, not an API outage, so callers report it instead of blocking the page.
+  function notLinked(message) {
+    const error = new Error(message);
+    error.code = "wedding_not_linked";
+    return error;
+  }
+
   function normalizeProfile(profile) {
     return { id: profile.id || "", role: profile.role || "", displayName: profile.display_name || "",
       avatar: profile.avatar || "", updatedAt: profile.updated_at || "" };
@@ -256,6 +270,13 @@
   // the API is unreachable; there is no local demo fallback.
   async function bootstrap(data) {
     await requireAPI();
+    const working = data.wedding || (data.wedding = {});
+    // Signup is the only place a slug is ever written, so a working copy that lost it (a seed
+    // reset, cleared storage, or a second device) cannot be matched against the API at all.
+    // Re-deriving it from the couple's names keeps that browser able to find or create the wedding.
+    if (!working.slug && working.brideName && working.groomName) {
+      working.slug = weddingSlug(working.brideName, working.groomName);
+    }
     let weddingID = localStorage.getItem(API_ID_KEY);
     const adminHeaders = authHeader();
     if (weddingID && (adminToken() || sessionToken())) {
@@ -322,7 +343,15 @@
 
   async function saveWedding(data) {
     const id = localStorage.getItem(API_ID_KEY);
-    if (!id) return (await bootstrap(data)).data;
+    if (!id) {
+      // Nothing can be written without a wedding to write to, so a first save asks bootstrap to
+      // resolve one. When even that finds no wedding, say so instead of reporting a sync.
+      const linked = await bootstrap(data);
+      if (!linked.weddingID) {
+        throw notLinked("This workspace is not linked to a wedding on the server yet, so nothing was saved. Reload the page to reconnect, then try again.");
+      }
+      return linked.data;
+    }
     const remote = await request(`/api/weddings/${id}`, { method: "PUT", body: JSON.stringify(toAPI(data)), headers: authHeader() });
     return mergeAPI(data, remote);
   }
@@ -336,7 +365,11 @@
       max_party_size: Math.max(1, guest.partySize || 1)
     }) });
   }
-  async function addGuest(guest) { const id = localStorage.getItem(API_ID_KEY); if (!id) return null; return createInvitation(id, guest); }
+  async function addGuest(guest) {
+    const id = localStorage.getItem(API_ID_KEY);
+    if (!id) throw notLinked("This workspace is not linked to your wedding on the server yet, so the invitation was not created. Reload the page to reconnect, then try again.");
+    return createInvitation(id, guest);
+  }
   async function sendInvitation(weddingID, invitationID, token, channels) {
     const id = weddingID || localStorage.getItem(API_ID_KEY);
     if (!id || !invitationID || !token) return null;
@@ -440,5 +473,5 @@
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
     saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,
     profile, saveProfile,
-    mergeAPI, toAPI, baseURL, adminToken, storeAdminToken };
+    mergeAPI, toAPI, baseURL, adminToken, storeAdminToken, weddingSlug };
 })();

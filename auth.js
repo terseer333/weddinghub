@@ -57,7 +57,7 @@
         data.wedding.brideName = partnerOne;
         data.wedding.groomName = partnerTwo;
         data.wedding.date = `${form.elements.weddingDate.value}T10:00:00`;
-        data.wedding.slug = `${partnerOne}-and-${partnerTwo}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        data.wedding.slug = API.weddingSlug(partnerOne, partnerTwo);
         data.wedding.message = `${partnerOne} & ${partnerTwo} invite you to share in the joy of their wedding celebration.`;
         data.wedding.venue = "";
         data.wedding.address = "";
