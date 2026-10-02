@@ -1221,8 +1221,11 @@ func (r *PostgresRepository) CreateUser(user models.User) (models.User, error) {
 	user.Email = email
 	ctx, cancel := r.ctx()
 	defer cancel()
-	if _, err := r.db.ExecContext(ctx, `INSERT INTO users (id, email, display_name, role, password_hash, created_at) VALUES ($1,$2,$3,$4,$5,$6)`,
-		user.ID, email, user.DisplayName, user.Role, user.PasswordHash, user.CreatedAt); err != nil {
+	if user.Status == "" {
+		user.Status = "active"
+	}
+	if _, err := r.db.ExecContext(ctx, `INSERT INTO users (id, email, display_name, role, password_hash, created_at, status) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+		user.ID, email, user.DisplayName, user.Role, user.PasswordHash, user.CreatedAt, user.Status); err != nil {
 		return models.User{}, mapError(err)
 	}
 	return user, nil
@@ -1230,8 +1233,8 @@ func (r *PostgresRepository) CreateUser(user models.User) (models.User, error) {
 
 func userBy(ctx context.Context, r *PostgresRepository, column, value string) (models.User, error) {
 	var user models.User
-	err := r.db.QueryRowContext(ctx, `SELECT id, email, display_name, role, password_hash, created_at FROM users WHERE `+column+` = $1`, value).
-		Scan(&user.ID, &user.Email, &user.DisplayName, &user.Role, &user.PasswordHash, &user.CreatedAt)
+	err := r.db.QueryRowContext(ctx, `SELECT id, email, display_name, role, password_hash, created_at, status FROM users WHERE `+column+` = $1`, value).
+		Scan(&user.ID, &user.Email, &user.DisplayName, &user.Role, &user.PasswordHash, &user.CreatedAt, &user.Status)
 	if err != nil {
 		return models.User{}, mapError(err)
 	}

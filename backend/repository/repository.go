@@ -68,4 +68,19 @@ type Repository interface {
 	// There is no update or delete: the trail is append-only by design.
 	AddAuditLog(entry models.AuditLog) error
 	ListAuditLogs(limit int) ([]models.AuditLog, error)
+	// Platform-owner account controls and statistics.
+	ListUsers(search, status string) ([]models.User, error)
+	SetUserStatus(id, status string) (models.User, error)
+	DeleteUser(id string) error
+	SetUserPasswordHash(id, hash string) error
+	EnsurePlatformAdmin(email, hash string, now time.Time) error
+	PlatformStats(adminEmail string, now time.Time) (PlatformStats, error)
+}
+
+type PlatformStats struct {
+	TotalUsers        int `json:"total_users"`
+	ActiveUsers       int `json:"active_users"`
+	SuspendedUsers    int `json:"suspended_users"`
+	NewUsersThisMonth int `json:"new_users_this_month"`
+	TotalWeddings     int `json:"total_weddings"`
 }

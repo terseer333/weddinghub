@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Password hashing uses PBKDF2-HMAC-SHA256 implemented on the standard library so the
@@ -56,6 +58,12 @@ func HashPassword(password string) (string, error) {
 // VerifyPassword reports whether password matches the stored hash. The comparison is
 // constant time and a malformed record is rejected rather than treated as a match.
 func VerifyPassword(encoded, password string) error {
+	if strings.HasPrefix(encoded, "$2a$") || strings.HasPrefix(encoded, "$2b$") || strings.HasPrefix(encoded, "$2y$") {
+		if err := bcrypt.CompareHashAndPassword([]byte(encoded), []byte(password)); err != nil {
+			return ErrPasswordMismatch
+		}
+		return nil
+	}
 	parts := strings.Split(encoded, "$")
 	if len(parts) != 4 || parts[0] != passwordAlgorithm {
 		return ErrInvalidPasswordHash

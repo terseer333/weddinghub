@@ -404,6 +404,22 @@
   async function adminMe() {
     return request("/api/admin/me", { headers: sessionHeader() });
   }
+  async function adminDashboard() { return request("/api/admin/dashboard", { headers: sessionHeader() }); }
+  async function adminUsers(search = "", status = "") {
+    const query = new URLSearchParams({ search, status });
+    return request(`/api/admin/users?${query}`, { headers: sessionHeader() });
+  }
+  async function adminSetUserStatus(id, status) {
+    return request(`/api/admin/users/${encodeURIComponent(id)}/status`, { method: "PATCH", headers: sessionHeader(), body: JSON.stringify({ status }) });
+  }
+  async function adminDeleteUser(id) { return request(`/api/admin/users/${encodeURIComponent(id)}`, { method: "DELETE", headers: sessionHeader() }); }
+  async function adminWeddings() { return request("/api/admin/weddings", { headers: sessionHeader() }); }
+  async function adminSetWeddingStatus(id, status) {
+    return request(`/api/admin/weddings/${encodeURIComponent(id)}/status`, { method: "PATCH", headers: sessionHeader(), body: JSON.stringify({ status }) });
+  }
+  async function adminDeleteWedding(id) { return request(`/api/admin/weddings/${encodeURIComponent(id)}`, { method: "DELETE", headers: sessionHeader() }); }
+  async function adminAuditLogs() { return request("/api/admin/audit-logs", { headers: sessionHeader() }); }
+  async function adminLoginAttempts() { return request("/api/admin/login-attempts", { headers: sessionHeader() }); }
 
   async function adminOverview() {
     const id = localStorage.getItem(API_ID_KEY);
@@ -488,7 +504,8 @@
 
   window.WeddingHubAPI = { requireAPI, showFatalError, bootstrap, saveWedding, addGuest, sendInvitation, respond, updateRSVP, invitation, dashboard, sendMessage,
     signup, login, logout, currentUser, sessionToken, clearSession,
-    adminLogin, adminLogout, adminMe,
+    adminLogin, adminLogout, adminMe, adminDashboard, adminUsers, adminSetUserStatus, adminDeleteUser,
+    adminWeddings, adminSetWeddingStatus, adminDeleteWedding, adminAuditLogs, adminLoginAttempts,
     adminOverview, adminRoster, committeeDashboard, committeeChat, sendCommitteeMessage, createTask, updateTask, deleteTask,
     createAnnouncement, updateAnnouncement, deleteAnnouncement,
     saveCardConfig, getCardConfig, createCommitteeRole, deleteCommitteeRole, updateCommitteeMember, deleteCommitteeMember,

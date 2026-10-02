@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"weddinghub/api"
 	"weddinghub/config"
 	"weddinghub/repository"
@@ -40,6 +42,19 @@ func main() {
 		log.Fatalf("connect to PostgreSQL: %v", err)
 	}
 	defer repo.Close()
+	adminEmail := config.AdminEmail()
+	adminHash := strings.TrimSpace(os.Getenv("WEDDINGHUB_ADMIN_PASSWORD_HASH"))
+	if adminHash != "" {
+		if adminEmail == "" {
+			log.Fatal("WEDDINGHUB_ADMIN_EMAIL is required when WEDDINGHUB_ADMIN_PASSWORD_HASH is set")
+		}
+		if _, err := bcrypt.Cost([]byte(adminHash)); err != nil {
+			log.Fatal("WEDDINGHUB_ADMIN_PASSWORD_HASH must be a bcrypt hash")
+		}
+		if err := repo.EnsurePlatformAdmin(adminEmail, adminHash, time.Now().UTC()); err != nil {
+			log.Fatalf("configure platform administrator: %v", err)
+		}
+	}
 
 	apiHandler := api.New(repo)
 

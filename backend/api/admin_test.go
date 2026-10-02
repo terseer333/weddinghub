@@ -8,6 +8,9 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"weddinghub/models"
 	"weddinghub/repository"
@@ -120,6 +123,23 @@ func TestAdminLoginAcceptsOnlyTheConfiguredAdministrator(t *testing.T) {
 	}
 }
 
+func TestConfiguredBcryptAdminPasswordCanSignIn(t *testing.T) {
+	t.Setenv("WEDDINGHUB_ADMIN_EMAIL", adminAddress)
+	hash, err := bcrypt.GenerateFromPassword([]byte(adminSecret), bcrypt.MinCost)
+	if err != nil {
+		t.Fatal(err)
+	}
+	repo := repository.NewMemoryRepository()
+	if err := repo.EnsurePlatformAdmin(adminAddress, string(hash), time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	handler := New(repo)
+	response := postJSON(handler, "/api/admin/login", adminLoginBody(adminAddress, adminSecret))
+	if response.Code != http.StatusOK {
+		t.Fatalf("configured hash admin login status = %d: %s", response.Code, response.Body)
+	}
+}
+
 func TestAdminEndpointsRefuseWithoutAnAdministratorConfigured(t *testing.T) {
 	t.Setenv("WEDDINGHUB_ADMIN_EMAIL", "")
 	handler := New(repository.NewMemoryRepository())
@@ -181,6 +201,47 @@ func TestAdminLogoutInvalidatesTheSession(t *testing.T) {
 	// The token cannot be replayed after signing out.
 	if response := adminRequest(handler, http.MethodGet, "/api/admin/me", token, "", ""); response.Code != http.StatusUnauthorized {
 		t.Fatalf("reused token after logout = %d, want 401: %s", response.Code, response.Body)
+	}
+}
+
+func TestAdminConsoleDashboardModerationAndAudit(t *testing.T) {
+	t.Setenv("WEDDINGHUB_ADMIN_EMAIL", adminAddress)
+	repo := repository.NewMemoryRepository()
+	handler := New(repo)
+	token := adminSession(t, handler)
+	userToken := signupSession(t, handler, "couple@example.com")
+	user, err := repo.UserByEmail("couple@example.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+	wedding := models.Wedding{ID: "wedding-one", Slug: "couple-day", Title: "Couple Day", PartnerOne: "Alex", PartnerTwo: "Sam", Status: models.StatusDraft, CreatedAt: time.Now().UTC(), UpdatedAt: time.Now().UTC(), Admins: []models.Admin{{UserID: user.ID, Role: models.RoleOwner}}}
+	if _, err := repo.CreateWedding(wedding); err != nil {
+		t.Fatal(err)
+	}
+
+	dashboard := adminRequest(handler, http.MethodGet, "/api/admin/dashboard", token, "", "")
+	if dashboard.Code != http.StatusOK || !strings.Contains(dashboard.Body.String(), `"total_users":1`) || !strings.Contains(dashboard.Body.String(), `"total_weddings":1`) {
+		t.Fatalf("dashboard status/body = %d %s", dashboard.Code, dashboard.Body)
+	}
+	users := adminRequest(handler, http.MethodGet, "/api/admin/users?search=couple", token, "", "")
+	if users.Code != http.StatusOK || !strings.Contains(users.Body.String(), "couple@example.com") || strings.Contains(users.Body.String(), "password_hash") {
+		t.Fatalf("users response = %d %s", users.Code, users.Body)
+	}
+	status := adminRequest(handler, http.MethodPatch, "/api/admin/users/"+user.ID+"/status", token, `{"status":"suspended"}`, "")
+	if status.Code != http.StatusOK {
+		t.Fatalf("suspend status = %d: %s", status.Code, status.Body)
+	}
+	me := adminRequest(handler, http.MethodGet, "/api/auth/me", userToken, "", "")
+	if me.Code != http.StatusUnauthorized {
+		t.Fatalf("suspended session status = %d", me.Code)
+	}
+	status = adminRequest(handler, http.MethodPatch, "/api/admin/weddings/"+wedding.ID+"/status", token, `{"status":"hidden"}`, "")
+	if status.Code != http.StatusOK || !strings.Contains(status.Body.String(), `"status":"hidden"`) {
+		t.Fatalf("hide wedding status/body = %d %s", status.Code, status.Body)
+	}
+	audit := adminRequest(handler, http.MethodGet, "/api/admin/audit-logs", token, "", "")
+	if audit.Code != http.StatusOK || !strings.Contains(audit.Body.String(), "user.status_changed") || !strings.Contains(audit.Body.String(), "wedding.status_changed") {
+		t.Fatalf("audit status/body = %d %s", audit.Code, audit.Body)
 	}
 }
 

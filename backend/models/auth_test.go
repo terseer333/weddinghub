@@ -4,6 +4,8 @@ import (
 	"encoding/base64"
 	"strings"
 	"testing"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // useFastHashing keeps the test suite quick while leaving the production work factor alone.
@@ -12,6 +14,19 @@ func useFastHashing(t *testing.T) {
 	previous := PasswordIterations
 	PasswordIterations = 1200
 	t.Cleanup(func() { PasswordIterations = previous })
+}
+
+func TestVerifyPasswordSupportsConfiguredBcryptHash(t *testing.T) {
+	hash, err := bcrypt.GenerateFromPassword([]byte("long-enough-admin-password"), bcrypt.MinCost)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyPassword(string(hash), "long-enough-admin-password"); err != nil {
+		t.Fatalf("bcrypt password rejected: %v", err)
+	}
+	if err := VerifyPassword(string(hash), "wrong-password"); err == nil {
+		t.Fatal("wrong password accepted for bcrypt hash")
+	}
 }
 
 func TestPasswordHashingRoundTrip(t *testing.T) {

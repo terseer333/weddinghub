@@ -156,7 +156,7 @@ func (a *API) requireUser(w http.ResponseWriter, r *http.Request) (models.User, 
 		return models.User{}, false
 	}
 	user, err := a.repo.UserByID(session.UserID)
-	if err != nil {
+	if err != nil || user.Status == "suspended" {
 		writeUnauthorized(w)
 		return models.User{}, false
 	}

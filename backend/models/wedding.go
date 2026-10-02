@@ -61,6 +61,7 @@ type User struct {
 	Email        string    `json:"email"`
 	DisplayName  string    `json:"display_name"`
 	Role         Role      `json:"role"`
+	Status       string    `json:"status"`
 	PasswordHash string    `json:"-"`
 	CreatedAt    time.Time `json:"created_at"`
 	// IsAdmin marks the platform administrator in an API response. It is computed per request

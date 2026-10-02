@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -26,6 +27,7 @@ const (
 type loginAttempt struct {
 	failures int
 	first    time.Time
+	last     time.Time
 	until    time.Time
 }
 
@@ -75,9 +77,35 @@ func (g *loginGuard) failed(key string) {
 		g.attempts[key] = attempt
 	}
 	attempt.failures++
+	attempt.last = now
 	if attempt.failures >= adminLoginMaxFailures {
 		attempt.until = now.Add(adminLoginLockout)
 	}
+}
+
+type loginAttemptSummary struct {
+	Email         string    `json:"email"`
+	Address       string    `json:"address"`
+	Attempts      int       `json:"attempts"`
+	LastAttemptAt time.Time `json:"last_attempt_at"`
+}
+
+func (g *loginGuard) recentAttempts(limit int) []loginAttemptSummary {
+	if limit < 1 || limit > 500 {
+		limit = 100
+	}
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	out := make([]loginAttemptSummary, 0, len(g.attempts))
+	for key, attempt := range g.attempts {
+		email, address, _ := strings.Cut(key, "|")
+		out = append(out, loginAttemptSummary{Email: email, Address: address, Attempts: attempt.failures, LastAttemptAt: attempt.last})
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].LastAttemptAt.After(out[j].LastAttemptAt) })
+	if len(out) > limit {
+		out = out[:limit]
+	}
+	return out
 }
 
 // succeeded clears the counter after a valid sign-in.
@@ -180,7 +208,7 @@ func (a *API) adminLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := a.repo.UserByEmail(email)
-	if err != nil || !a.isAdminEmail(user.Email) {
+	if err != nil || !a.isAdminEmail(user.Email) || user.Status == "suspended" {
 		refuse()
 		return
 	}

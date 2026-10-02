@@ -20,7 +20,7 @@ as Render is used and the server binds `0.0.0.0` on that port.
 
 `WEDDINGHUB_DATABASE_URL` is required and must be a PostgreSQL connection string, for example `postgres://weddinghub:secret@localhost:5432/weddinghub?sslmode=disable`. The process pings the database and applies the embedded migrations at startup, and it exits with a fatal error when the database is missing or unreachable.
 
-Development CORS permits browser origins on `localhost`, `127.0.0.1`, and other loopback IPs (with any port) by default. Set `WEDDINGHUB_ALLOWED_ORIGINS` to a comma-separated exact allowlist to replace that default, for example `https://app.example.test,http://localhost:5173`. The legacy single-value `WEDDINGHUB_ALLOWED_ORIGIN` is also supported when the plural setting is unset. CORS never uses a wildcard, and preflight requests are restricted to `GET`, `POST`, `PUT`, and `DELETE` with `Accept`, `Authorization`, and `Content-Type` request headers.
+Development CORS permits browser origins on `localhost`, `127.0.0.1`, and other loopback IPs (with any port) by default. Set `WEDDINGHUB_ALLOWED_ORIGINS` to a comma-separated exact allowlist to replace that default, for example `https://app.example.test,http://localhost:5173`. The legacy single-value `WEDDINGHUB_ALLOWED_ORIGIN` is also supported when the plural setting is unset. CORS never uses a wildcard, and preflight requests are restricted to `GET`, `POST`, `PUT`, `PATCH`, and `DELETE` with `Accept`, `Authorization`, and `Content-Type` request headers.
 
 ## API
 
@@ -33,6 +33,18 @@ All request and response bodies are JSON unless noted.
 | `POST` | `/api/auth/login` | Verify email and password and return a session token |
 | `POST` | `/api/auth/logout` | Invalidate the session token used for the request |
 | `GET` | `/api/auth/me` | Read the account behind a session token |
+| `POST` | `/api/admin/login` | Sign in as the configured platform administrator |
+| `POST` | `/api/admin/logout` | Invalidate the administrator session |
+| `GET` | `/api/admin/me` | Confirm the administrator session |
+| `GET` | `/api/admin/dashboard` | Real account and wedding statistics and recent records |
+| `GET` | `/api/admin/users` | Search and filter registered accounts |
+| `PATCH` | `/api/admin/users/{userID}/status` | Suspend or reactivate an account |
+| `DELETE` | `/api/admin/users/{userID}` | Delete an account |
+| `GET` | `/api/admin/weddings` | List wedding pages and linked owners |
+| `PATCH` | `/api/admin/weddings/{weddingID}/status` | Change wedding visibility |
+| `DELETE` | `/api/admin/weddings/{weddingID}` | Delete a wedding and its related records |
+| `GET` | `/api/admin/audit-logs` | Read administrator audit history |
+| `GET` | `/api/admin/login-attempts` | Read recent failed administrator sign-ins |
 | `POST` | `/api/weddings` | Create a wedding aggregate |
 | `GET` | `/api/weddings` | List weddings |
 | `GET` | `/api/weddings/{weddingID}` | Read a wedding aggregate |
@@ -135,20 +147,28 @@ Invitation creation uses `crypto/rand` to generate a 256-bit URL-safe opaque tok
 
 `POST /api/auth/login` takes `{"email":"...","password":"..."}` and returns the same shape with `200 OK`. A wrong password and an unknown address both return `401` with `{"error":"email or password is incorrect"}`; the unknown-address path still performs a password verification so response timing does not reveal which addresses have accounts. A duplicate signup returns `409`.
 
-Sessions last 30 days. `GET /api/auth/me` requires `Authorization: Bearer <session_token>` and returns the account; `POST /api/auth/logout` invalidates that one session. Session tokens are generated with the same 256-bit `crypto/rand` scheme as invitations and only their SHA-256 hash is stored.
+Sessions last 30 days. `GET /api/auth/me` requires `Authorization: Bearer <session_token>` and returns the account; `POST /api/auth/logout` invalidates that one session. Session tokens are generated with the same 256-bit `crypto/rand` scheme as invitations and only their SHA-256 hash is stored. Suspended accounts cannot use their sessions.
 
-Passwords are hashed with PBKDF2-HMAC-SHA256 (210,000 iterations, 16-byte random salt, 32-byte derived key) implemented on the standard library, so the only external dependency is the PostgreSQL driver. The stored record is self-describing — `pbkdf2-sha256$<iterations>$<salt>$<key>` — so `models.PasswordIterations` can be raised later without invalidating existing credentials. Verification is constant time and a malformed record never verifies.
+Signup passwords use PBKDF2-HMAC-SHA256 (210,000 iterations, 16-byte random salt, 32-byte derived key) implemented on the standard library. The configured platform administrator may use a bcrypt hash supplied with `WEDDINGHUB_ADMIN_PASSWORD_HASH`; verification supports both formats. Generate that hash from `backend/` with:
 
-Note that a user session is not yet a wedding role: wedding-scoped endpoints still authorize with the wedding admin capability token (or an accepted committee invitation), and the two credential types are deliberately kept separate. Linking accounts to `wedding.admins` is the next step for real per-user authorization.
+```sh
+read -r -s -p 'Admin password: ' ADMIN_PASSWORD; printf '\n'
+printf '%s' "$ADMIN_PASSWORD" | go run ./cmd/admin-hash
+unset ADMIN_PASSWORD
+```
+
+Set the printed hash alongside `WEDDINGHUB_ADMIN_EMAIL` in Render. Startup creates or updates that account and resets it to active. Admin account changes and wedding moderation actions are recorded in the append-only audit log. Failed admin sign-ins are rate-limited per email and address and exposed to the admin console.
+
+Account owners can restore and manage their linked wedding on another device with their session; high-entropy wedding capability tokens remain supported for legacy workspaces and invitation-based roles.
 
 ## Security and MVP limitations
 
 This is an API foundation, **not complete production authentication or authorization**.
 
-- Wedding endpoints authorize with the wedding admin capability token, and committee routes with an accepted committee invitation. Accounts and sessions exist (`/api/auth/*`), but a session is not yet bound to a wedding role: wedding CRUD, invitation creation, and admin overview still check the wedding token rather than a signed-in user. Bind accounts to `wedding.admins` before relying on login alone. Sessions are stored in PostgreSQL and survive restarts.
+- Wedding endpoints accept either the wedding admin capability token or an active owner account session linked to that wedding; committee access still requires the matching wedding token or an accepted committee invitation. Sessions are stored in PostgreSQL and survive restarts.
 - Guest links are bearer capabilities: anyone holding a valid invitation token can read that invitation's public projection and accept or decline it. Dashboard, RSVP, and message access additionally require the invitation to be accepted. Add revocation/rotation and rate limiting in production.
 - The API requires PostgreSQL and no longer runs on an in-memory repository. `repository.MemoryRepository` is kept only as a test double for the API and domain tests, and is never used by `cmd`.
-- SHA-256 is appropriate for high-entropy random invitation tokens, but not passwords. Password authentication should use a maintained password-hashing implementation such as Argon2id or bcrypt; no password endpoint is provided here.
+- SHA-256 is used only for high-entropy random session and invitation tokens. Signup passwords use PBKDF2; the configured platform administrator may use bcrypt.
 - Input body size, unknown JSON fields, server timeouts, cache behavior, and basic browser security headers are constrained, but validation, audit logging, abuse protection, observability, CSRF/origin policy, and TLS termination still need production design.
 - Photos are URL metadata only. Use private object storage, signed upload/download flows, MIME inspection, size limits, and malware scanning rather than accepting files into the API process.
 

@@ -249,8 +249,16 @@ func TestDevelopmentCORS(t *testing.T) {
 	badMethod.Header.Set("Access-Control-Request-Method", http.MethodPatch)
 	badMethodResponse := httptest.NewRecorder()
 	handler.ServeHTTP(badMethodResponse, badMethod)
-	if badMethodResponse.Code != http.StatusForbidden {
-		t.Fatalf("unsupported method status = %d", badMethodResponse.Code)
+	if badMethodResponse.Code != http.StatusNoContent || !strings.Contains(badMethodResponse.Header().Get("Access-Control-Allow-Methods"), http.MethodPatch) {
+		t.Fatalf("PATCH preflight response = %d, methods=%q", badMethodResponse.Code, badMethodResponse.Header().Get("Access-Control-Allow-Methods"))
+	}
+	unsupported := httptest.NewRequest(http.MethodOptions, "/api/weddings", nil)
+	unsupported.Header.Set("Origin", "http://127.0.0.1:3000")
+	unsupported.Header.Set("Access-Control-Request-Method", http.MethodTrace)
+	unsupportedResponse := httptest.NewRecorder()
+	handler.ServeHTTP(unsupportedResponse, unsupported)
+	if unsupportedResponse.Code != http.StatusForbidden {
+		t.Fatalf("unsupported method status = %d", unsupportedResponse.Code)
 	}
 }
 

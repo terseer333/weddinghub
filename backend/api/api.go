@@ -75,6 +75,15 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("POST /api/admin/login", a.adminLogin)
 	mux.HandleFunc("POST /api/admin/logout", a.adminLogout)
 	mux.HandleFunc("GET /api/admin/me", a.adminMe)
+	mux.HandleFunc("GET /api/admin/dashboard", a.adminDashboard)
+	mux.HandleFunc("GET /api/admin/users", a.adminUsers)
+	mux.HandleFunc("PATCH /api/admin/users/{userID}/status", a.adminSetUserStatus)
+	mux.HandleFunc("DELETE /api/admin/users/{userID}", a.adminDeleteUser)
+	mux.HandleFunc("GET /api/admin/weddings", a.adminWeddings)
+	mux.HandleFunc("PATCH /api/admin/weddings/{weddingID}/status", a.adminSetWeddingStatus)
+	mux.HandleFunc("DELETE /api/admin/weddings/{weddingID}", a.adminDeleteWedding)
+	mux.HandleFunc("GET /api/admin/audit-logs", a.adminAuditLogs)
+	mux.HandleFunc("GET /api/admin/login-attempts", a.adminLoginAttempts)
 	mux.HandleFunc("GET /api/weddings", a.listWeddings)
 	mux.HandleFunc("POST /api/weddings", a.createWedding)
 	mux.HandleFunc("GET /api/weddings/mine", a.myWeddings)
@@ -1594,10 +1603,10 @@ func loopbackOrigin(origin string) bool {
 
 func corsMiddleware(allowedOrigins map[string]struct{}, allowLoopback bool, next http.Handler) http.Handler {
 	const (
-		allowedMethods = "GET, POST, PUT, DELETE"
+		allowedMethods = "GET, POST, PUT, PATCH, DELETE"
 		allowedHeaders = "Accept, Authorization, Content-Type"
 	)
-	methods := map[string]bool{http.MethodGet: true, http.MethodPost: true, http.MethodPut: true, http.MethodDelete: true}
+	methods := map[string]bool{http.MethodGet: true, http.MethodPost: true, http.MethodPut: true, http.MethodPatch: true, http.MethodDelete: true}
 	requestHeaders := map[string]bool{"accept": true, "authorization": true, "content-type": true}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

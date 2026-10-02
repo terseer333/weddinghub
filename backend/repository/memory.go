@@ -3,6 +3,7 @@ package repository
 import (
 	"crypto/subtle"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -578,9 +579,131 @@ func (r *MemoryRepository) CreateUser(user models.User) (models.User, error) {
 		return models.User{}, ErrConflict
 	}
 	user.Email = email
+	if user.Status == "" {
+		user.Status = "active"
+	}
 	r.users[user.ID] = user
 	r.emails[email] = user.ID
 	return user, nil
+}
+
+func (r *MemoryRepository) ListUsers(search, status string) ([]models.User, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	search = strings.ToLower(strings.TrimSpace(search))
+	users := make([]models.User, 0, len(r.users))
+	for _, user := range r.users {
+		if status != "" && user.Status != status {
+			continue
+		}
+		if search != "" && !strings.Contains(strings.ToLower(user.Email), search) && !strings.Contains(strings.ToLower(user.DisplayName), search) {
+			continue
+		}
+		users = append(users, user)
+	}
+	sort.Slice(users, func(i, j int) bool { return users[i].CreatedAt.After(users[j].CreatedAt) })
+	if len(users) > 500 {
+		users = users[:500]
+	}
+	return users, nil
+}
+
+func (r *MemoryRepository) SetUserStatus(id, status string) (models.User, error) {
+	if status != "active" && status != "suspended" {
+		return models.User{}, ErrInvalidStatus
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	user, ok := r.users[id]
+	if !ok {
+		return models.User{}, ErrNotFound
+	}
+	user.Status = status
+	r.users[id] = user
+	if status == "suspended" {
+		for token, session := range r.sessions {
+			if session.UserID == id {
+				delete(r.sessions, token)
+			}
+		}
+	}
+	return user, nil
+}
+
+func (r *MemoryRepository) DeleteUser(id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	user, ok := r.users[id]
+	if !ok {
+		return ErrNotFound
+	}
+	delete(r.users, id)
+	delete(r.emails, user.Email)
+	for token, session := range r.sessions {
+		if session.UserID == id {
+			delete(r.sessions, token)
+		}
+	}
+	return nil
+}
+
+func (r *MemoryRepository) SetUserPasswordHash(id, hash string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	user, ok := r.users[id]
+	if !ok {
+		return ErrNotFound
+	}
+	user.PasswordHash, user.Status = hash, "active"
+	r.users[id] = user
+	return nil
+}
+
+func (r *MemoryRepository) EnsurePlatformAdmin(email, hash string, now time.Time) error {
+	email = models.NormalizeEmail(email)
+	if email == "" || hash == "" {
+		return ErrConflict
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if id, ok := r.emails[email]; ok {
+		user := r.users[id]
+		user.PasswordHash, user.Status = hash, "active"
+		r.users[id] = user
+		return nil
+	}
+	id, err := models.NewID()
+	if err != nil {
+		return err
+	}
+	user := models.User{ID: id, Email: email, DisplayName: "WeddingHub Owner", Role: models.RoleOwner, Status: "active", PasswordHash: hash, CreatedAt: now}
+	r.users[id], r.emails[email] = user, id
+	return nil
+}
+
+func (r *MemoryRepository) PlatformStats(adminEmail string, now time.Time) (PlatformStats, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	var stats PlatformStats
+	adminEmail = models.NormalizeEmail(adminEmail)
+	month := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.UTC)
+	for _, user := range r.users {
+		if user.Email == adminEmail {
+			continue
+		}
+		stats.TotalUsers++
+		if user.Status == "active" {
+			stats.ActiveUsers++
+		}
+		if user.Status == "suspended" {
+			stats.SuspendedUsers++
+		}
+		if !user.CreatedAt.Before(month) {
+			stats.NewUsersThisMonth++
+		}
+	}
+	stats.TotalWeddings = len(r.weddings)
+	return stats, nil
 }
 
 func (r *MemoryRepository) UserByEmail(email string) (models.User, error) {
