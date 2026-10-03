@@ -1,0 +1,51 @@
+/* Wedding owner's dashboard welcome cover. */
+.overview-welcome {
+  position: relative;
+  isolation: isolate;
+  min-height: 230px;
+  align-items: center;
+  overflow: hidden;
+  padding: 30px 34px;
+  border: 1px solid #dce5dd;
+  border-radius: 20px;
+  color: #fff;
+  background: linear-gradient(125deg, #314c3e, #73836a);
+  box-shadow: 0 16px 36px #263d3017;
+}
+
+.overview-welcome::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    linear-gradient(90deg, #182b22e8 0%, #1b3025ba 47%, #233a2b40 100%),
+    radial-gradient(ellipse at 85% 15%, #f4edd277 0, transparent 25%),
+    radial-gradient(ellipse at 72% 85%, #d7d5a24f 0, transparent 28%),
+    var(--overview-cover, radial-gradient(ellipse at 18% 90%, #8ba17a 0, transparent 42%), linear-gradient(135deg, #536f54, #b7ad83 55%, #52694d));
+  background-position: center;
+  background-size: cover;
+  content: "";
+}
+
+.overview-welcome.has-cover::before {
+  background-image: linear-gradient(90deg, #18271fe8 0%, #1b2c22bd 49%, #18271f42 100%), var(--overview-cover);
+}
+
+.overview-welcome .eyebrow { color: #e5c995; }
+.overview-welcome h1 { color: #fff; text-shadow: 0 2px 22px #101b1670; }
+.overview-welcome p:last-child { color: #f3f2e9d9; }
+.overview-welcome .heading-actions { position: relative; z-index: 1; flex-wrap: wrap; }
+.overview-welcome .button.secondary { border-color: #ffffff9c; color: #fff; background: #ffffff18; backdrop-filter: blur(10px); }
+.overview-welcome .button.primary { border: 1px solid #f4dfb4; color: #26372d; background: linear-gradient(135deg, #f6e9cd, #dfc493); box-shadow: 0 8px 22px #111c1640; }
+.photo-actions button[data-photo-action="cover"] { border-color: #f1d59b !important; color: #fff4d8; background: #263d32e8 !important; }
+.photo-actions button[data-photo-action="cover"]:disabled { opacity: .8; cursor: not-allowed; }
+
+@media (max-width: 700px) {
+  .overview-welcome { display: block; min-height: unset; padding: 27px 23px; }
+  .overview-welcome .heading-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 19px; }
+  .overview-welcome .heading-actions .button { width: 100%; padding: 0 10px; font-size: var(--text-xs); }
+}
+
+@media (max-width: 430px) {
+  .overview-welcome .heading-actions { grid-template-columns: 1fr; }
+}

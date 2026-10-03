@@ -77,6 +77,16 @@ function setupIdentity() {
   $('#adminName').textContent = name;
   paintAvatar($('#userAvatar'), name, data.myProfile?.avatar);
   $('#welcomeHeading').textContent = `Welcome back, ${firstName(name)}.`;
+  const overviewWelcome = $('.overview-welcome');
+  const coverImage = String(data.wedding.heroImage || '').trim();
+  const canUseCover = /^(https?:\/\/|data:image\/(?:jpeg|png|webp);base64,)/i.test(coverImage);
+  overviewWelcome.classList.toggle('has-cover', canUseCover);
+  if (canUseCover) {
+    const safeCover = coverImage.replace(/[\"()\\\n\r]/g, character => encodeURIComponent(character));
+    overviewWelcome.style.setProperty('--overview-cover', `url(\"${safeCover}\")`);
+  } else {
+    overviewWelcome.style.removeProperty('--overview-cover');
+  }
   $('#switcherNames').textContent = `${data.wedding.brideName} & ${data.wedding.groomName}`;
   $('#switcherDate').textContent = WH.formatDate(data.wedding.date);
   $('#coupleAvatar').textContent = `${initials(data.wedding.brideName)[0] || ''}&${initials(data.wedding.groomName)[0] || ''}`;
@@ -255,7 +265,7 @@ function renderCouplePortraitControls() {
 }
 function renderContent() {
   renderCouplePortraitControls();
-  $('#photoAdminGrid').innerHTML = data.photos.length ? data.photos.map((photo,index) => `<figure><img src="${photo.url}" alt="${WH.escape(photo.caption)}"><figcaption><span>${WH.escape(photo.caption)}</span><span class="photo-actions"><button data-photo-action="up" data-id="${photo.id}" aria-label="Move photo earlier" ${index===0?'disabled':''}>↑</button><button data-photo-action="down" data-id="${photo.id}" aria-label="Move photo later" ${index===data.photos.length-1?'disabled':''}>↓</button><button data-photo-action="replace" data-id="${photo.id}">Replace</button><button data-action="delete-photo" data-id="${photo.id}" aria-label="Delete photo">×</button></span></figcaption></figure>`).join('') : emptyState('No photos yet','Add photos to build your guest slideshow.');
+  $('#photoAdminGrid').innerHTML = data.photos.length ? data.photos.map((photo,index) => `<figure><img src="${photo.url}" alt="${WH.escape(photo.caption)}"><figcaption><span>${WH.escape(photo.caption)}</span><span class="photo-actions"><button data-photo-action="cover" data-id="${photo.id}" aria-label="${photo.url===data.wedding.heroImage?'Current dashboard cover':'Use as dashboard cover'}" ${photo.status!=='published'?'disabled':''}>${photo.url===data.wedding.heroImage?'Cover ✓':'Cover'}</button><button data-photo-action="up" data-id="${photo.id}" aria-label="Move photo earlier" ${index===0?'disabled':''}>↑</button><button data-photo-action="down" data-id="${photo.id}" aria-label="Move photo later" ${index===data.photos.length-1?'disabled':''}>↓</button><button data-photo-action="replace" data-id="${photo.id}">Replace</button><button data-action="delete-photo" data-id="${photo.id}" aria-label="Delete photo">×</button></span></figcaption></figure>`).join('') : emptyState('No photos yet','Add photos to build your guest slideshow.');
   $('#photoAdminPreview').innerHTML = data.photos.length ? `<div class="admin-gallery-stage">${data.photos.map((photo,index)=>`<img src="${photo.url}" alt="${WH.escape(photo.caption)}" class="${index===0?'active':''}">`).join('')}</div><p class="admin-gallery-caption">Guest view · ${data.photos.length} ${data.photos.length===1?'photo':'photos'} · transitions automatically</p>` : emptyState('Slideshow preview','Your guest gallery preview will appear here after you add photos.');
   clearInterval(window.adminGalleryTimer);
   if(data.photos.length>1){let previewIndex=0;window.adminGalleryTimer=setInterval(()=>{const slides=document.querySelectorAll('#photoAdminPreview .admin-gallery-stage img');if(!slides.length)return;slides[previewIndex].classList.remove('active');previewIndex=(previewIndex+1)%slides.length;slides[previewIndex].classList.add('active')},4200)}
