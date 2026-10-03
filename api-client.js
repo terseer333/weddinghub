@@ -129,6 +129,13 @@
     return response;
   }
 
+  async function forgotPassword(email) {
+    return request("/api/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) });
+  }
+  async function resetPassword(token, password) {
+    return request("/api/auth/reset-password", { method: "POST", body: JSON.stringify({ token, password }) });
+  }
+
   async function logout() {
     try {
       if (sessionToken()) await request("/api/auth/logout", { method: "POST", headers: sessionHeader() });
@@ -503,6 +510,7 @@
   }
 
   window.WeddingHubAPI = { requireAPI, showFatalError, bootstrap, saveWedding, addGuest, sendInvitation, respond, updateRSVP, invitation, dashboard, sendMessage,
+    forgotPassword, resetPassword,
     signup, login, logout, currentUser, sessionToken, clearSession,
     adminLogin, adminLogout, adminMe, adminDashboard, adminUsers, adminSetUserStatus, adminDeleteUser,
     adminWeddings, adminSetWeddingStatus, adminDeleteWedding, adminAuditLogs, adminLoginAttempts,

@@ -52,11 +52,16 @@ async function loadInvitation() {
           email: view.invitation.guest_email || "", category: "Guest",
           invitationStatus: view.invitation.status, token,
           rsvp: view.invitation.status === "accepted" ? "attending" : view.invitation.status === "declined" ? "declined" : "pending",
-          partySize: view.invitation.max_party_size > 0 ? view.invitation.max_party_size : 1
+          partySize: view.invitation.max_party_size > 0 ? view.invitation.max_party_size : 1,
+          maxPartySize: view.invitation.max_party_size > 0 ? view.invitation.max_party_size : 1
         };
         data.guests.push(guest);
-      } else if (view.invitation.status !== "pending") {
-        guest.invitationStatus = view.invitation.status;
+      } else {
+        guest.maxPartySize = view.invitation.max_party_size > 0 ? view.invitation.max_party_size : 1;
+        if (view.invitation.status !== "pending") {
+          guest.invitationStatus = view.invitation.status;
+          guest.rsvp = view.invitation.status === "accepted" ? "attending" : view.invitation.status === "declined" ? "declined" : guest.rsvp;
+        }
       }
     }
     if ((guest || member)?.invitationStatus === "sent") {
@@ -177,7 +182,7 @@ function openRSVP(mode) {
     content.innerHTML = `<p class="eyebrow">Your response</p><h2>${mode === "attending" ? "Wonderful, we can't wait!" : "We'll miss you"}</h2>
       <p>This response stays connected to your private invitation.</p><form id="rsvpForm" class="modal-form">
       <label>Your name<input value="${WH.escape(name)}" disabled></label>
-      ${mode === "attending" ? `<label>Number attending<select name="partySize">${[1,2,3,4].map(number => `<option ${guest.partySize === number ? "selected" : ""}>${number}</option>`).join("")}</select></label>` : ""}
+      ${mode === "attending" ? `<label>Number attending<select name="partySize">${Array.from({length:Math.min(guest.maxPartySize||guest.partySize||1,4)},(_,index)=>index+1).map(number => `<option value="${number}" ${guest.partySize === number ? "selected" : ""}>${number}</option>`).join("")}</select></label>` : ""}
       ${messageField}
       <button class="button primary">Confirm response</button></form>`;
   }
@@ -188,27 +193,43 @@ function openRSVP(mode) {
 async function submitResponse(event, mode, role = WeddingRoleSelector.selectedRole() || inviteeType()) {
   event.preventDefault();
   const form = new FormData(event.target);
-  const partySize = mode === "attending" && role === "guest" ? Number(form.get("partySize") || 1) : 0;
+  let partySize = mode === "attending" && role === "guest" ? Number(form.get("partySize") || 1) : 0;
   const message = String(form.get("message") || "").trim();
+  let response;
   try {
-    await API.respond(token, mode === "attending" ? "accept" : "decline", role);
-    if (mode === "attending" && role === "guest") {
-      await API.updateRSVP(token, "attending", partySize);
-      if (message) await API.sendMessage(token, message);
-    }
-    if (mode === "attending" && role === "committee") {
-      if (message) await API.sendCommitteeMessage(remoteWeddingID(), message, token);
-    }
+    response = await API.respond(token, mode === "attending" ? "accept" : "decline", role);
   } catch (error) {
     console.warn("Invitation response failed:", error);
-    WH.toast("We couldn't reach WeddingHub to save your response. Please try again.");
+    WH.toast(error.status === 410 ? "This invitation has expired." : error.status === 404 ? "This invitation link is invalid." : error.status === 403 ? "This invitation is not for the selected role." : error.status === 409 ? "This invitation has already been responded to." : "We couldn't save your response. Check your connection and try again.");
     return;
   }
+  // Acceptance is the primary state transition. Save optional RSVP details separately so a
+  // transient second request cannot make a successful acceptance appear to have failed.
+  const invitationStatus = response?.invitation?.status || (mode === "attending" ? "accepted" : "declined");
+  if (role === "committee" && member) member.invitationStatus = invitationStatus;
+  else if (guest) guest.invitationStatus = invitationStatus;
+  if (mode === "attending" && role === "guest") {
+    try {
+      const savedRSVP = await API.updateRSVP(token, "attending", partySize);
+      if (savedRSVP?.party_size) partySize = savedRSVP.party_size;
+    } catch (error) {
+      console.warn("RSVP details could not be saved after acceptance:", error);
+      WH.toast("Invitation accepted. Your party size could not be saved; you can update it from your dashboard.");
+    }
+    if (message) {
+      try { await API.sendMessage(token, message); }
+      catch (error) { console.warn("Guest message could not be saved:", error); }
+    }
+  }
+  if (mode === "attending" && role === "committee" && message) {
+    try { await API.sendCommitteeMessage(remoteWeddingID(), message, token); }
+    catch (error) { console.warn("Committee message could not be saved:", error); }
+  }
   if (role === "committee" && member) {
-    member.invitationStatus = mode === "attending" ? "accepted" : "declined";
+    member.invitationStatus = invitationStatus;
   } else if (guest) {
     guest.rsvp = mode;
-    guest.invitationStatus = mode === "attending" ? "accepted" : "declined";
+    guest.invitationStatus = invitationStatus;
     guest.partySize = partySize;
   }
   if (message && guest) data.messages.unshift({ id: `msg_${Date.now()}`, guestId: guest.id, name: (member || guest).name, message, status: "pending", date: new Date().toISOString().slice(0, 10) });

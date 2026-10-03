@@ -426,6 +426,54 @@ func TestPostgresUsersAndSessions(t *testing.T) {
 	}
 }
 
+func TestPostgresPasswordResetIsSingleUseAndRevokesSessions(t *testing.T) {
+	repo := newTestPostgres(t)
+	now := time.Now().UTC().Truncate(time.Microsecond)
+	passwordHash, err := models.HashPassword("old-password")
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, err := repo.CreateUser(models.User{ID: "password-reset-user", Email: "reset@example.com", Role: models.RoleOwner, Status: "active", PasswordHash: passwordHash, CreatedAt: now})
+	if err != nil {
+		t.Fatal(err)
+	}
+	sessionHash := "old-session-hash"
+	if err := repo.AddSession(models.Session{TokenHash: sessionHash, UserID: user.ID, CreatedAt: now, ExpiresAt: now.Add(time.Hour)}); err != nil {
+		t.Fatal(err)
+	}
+	first := models.PasswordResetToken{UserID: user.ID, TokenHash: "first-reset-hash", CreatedAt: now, ExpiresAt: now.Add(30 * time.Minute)}
+	second := models.PasswordResetToken{UserID: user.ID, TokenHash: "second-reset-hash", CreatedAt: now.Add(time.Second), ExpiresAt: now.Add(31 * time.Minute)}
+	if err := repo.CreatePasswordResetToken(first); err != nil {
+		t.Fatal(err)
+	}
+	if err := repo.CreatePasswordResetToken(second); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.CompletePasswordReset(first.TokenHash, "unused-hash", now.Add(2*time.Second)); !errors.Is(err, ErrResetTokenInvalid) {
+		t.Fatalf("superseded token error = %v", err)
+	}
+	updated, err := repo.CompletePasswordReset(second.TokenHash, "new-password-hash", now.Add(2*time.Second))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if updated.PasswordHash != "new-password-hash" {
+		t.Fatalf("password hash = %q", updated.PasswordHash)
+	}
+	if _, err := repo.SessionByHash(sessionHash); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("old session error = %v", err)
+	}
+	if _, err := repo.CompletePasswordReset(second.TokenHash, "reused-hash", now.Add(3*time.Second)); !errors.Is(err, ErrResetTokenInvalid) {
+		t.Fatalf("used token error = %v", err)
+	}
+	expired := models.PasswordResetToken{UserID: user.ID, TokenHash: "expired-reset-hash", CreatedAt: now, ExpiresAt: now.Add(time.Second)}
+	if err := repo.CreatePasswordResetToken(expired); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.CompletePasswordReset(expired.TokenHash, "unused-hash", now.Add(2*time.Second)); !errors.Is(err, ErrResetTokenExpired) {
+		t.Fatalf("expired token error = %v", err)
+	}
+}
+
 func TestPostgresProfiles(t *testing.T) {
 	repo := newTestPostgres(t)
 	now := time.Now().UTC().Truncate(time.Microsecond)

@@ -43,6 +43,15 @@ var (
 	ErrPasswordMismatch = errors.New("password does not match")
 )
 
+// PasswordResetToken is stored with its SHA-256 hash only; the raw capability is sent once by email.
+type PasswordResetToken struct {
+	UserID    string
+	TokenHash string
+	CreatedAt time.Time
+	ExpiresAt time.Time
+	UsedAt    *time.Time
+}
+
 // HashPassword derives a fresh salted hash for storage.
 func HashPassword(password string) (string, error) {
 	salt := make([]byte, passwordSaltBytes)

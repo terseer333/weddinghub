@@ -31,6 +31,8 @@ All request and response bodies are JSON unless noted.
 | `GET` | `/healthz` | Health check |
 | `POST` | `/api/auth/signup` | Create an account and return a session token once |
 | `POST` | `/api/auth/login` | Verify email and password and return a session token |
+| `POST` | `/api/auth/forgot-password` | Request a generic, rate-limited password reset email |
+| `POST` | `/api/auth/reset-password` | Set a new password using a one-time reset token |
 | `POST` | `/api/auth/logout` | Invalidate the session token used for the request |
 | `GET` | `/api/auth/me` | Read the account behind a session token |
 | `POST` | `/api/admin/login` | Sign in as the configured platform administrator |
@@ -150,6 +152,10 @@ Invitation creation uses `crypto/rand` to generate a 256-bit URL-safe opaque tok
 Sessions last 30 days. `GET /api/auth/me` requires `Authorization: Bearer <session_token>` and returns the account; `POST /api/auth/logout` invalidates that one session. Session tokens are generated with the same 256-bit `crypto/rand` scheme as invitations and only their SHA-256 hash is stored. Suspended accounts cannot use their sessions.
 
 Signup passwords use PBKDF2-HMAC-SHA256 (210,000 iterations, 16-byte random salt, 32-byte derived key) implemented on the standard library. The configured platform administrator may use a bcrypt hash supplied with `WEDDINGHUB_ADMIN_PASSWORD_HASH`; verification supports both formats. Generate that hash from `backend/` with:
+
+Password reset email is sent using Brevo's HTTP API and has a separate provider from invitation SMTP. Configure `BREVO_API_KEY`, a Brevo-verified `EMAIL_FROM`, optional `EMAIL_FROM_NAME` (defaults to `WeddingHub`), and the public origin in `APP_BASE_URL`. Missing mail settings disable reset email with a startup warning, but do not stop the API. The endpoints intentionally return a generic response for known and unknown accounts. A reset link expires in 30 minutes, can be used once, invalidates other reset links and active sessions, and triggers a password-changed notification. Brevo 401 responses usually indicate a bad key; 400 often indicates an unverified sender. Check spam and Brevo email logs if delivery is delayed. Brevo's free tier has a daily limit of about 300 emails and may add a footer.
+
+For Render, create a Brevo account, verify a sender under **Senders, Domains & Dedicated IPs → Senders**, and create an API key under **SMTP & API → API Keys**. Add the four environment variables above from the Render service's **Environment** page, then redeploy. Do not place real values in `.env.example` or commit them.
 
 ```sh
 read -r -s -p 'Admin password: ' ADMIN_PASSWORD; printf '\n'

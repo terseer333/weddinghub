@@ -18,22 +18,24 @@ type profileRef struct {
 
 // MemoryRepository is concurrency-safe. Returned aggregates are defensive copies.
 type MemoryRepository struct {
-	mu        sync.RWMutex
-	weddings  map[string]models.Wedding
-	users     map[string]models.User
-	emails    map[string]string
-	sessions  map[string]models.Session
-	profiles  map[profileRef]models.Profile
-	auditLogs []models.AuditLog
+	mu             sync.RWMutex
+	weddings       map[string]models.Wedding
+	users          map[string]models.User
+	emails         map[string]string
+	sessions       map[string]models.Session
+	passwordResets map[string]models.PasswordResetToken
+	profiles       map[profileRef]models.Profile
+	auditLogs      []models.AuditLog
 }
 
 func NewMemoryRepository() *MemoryRepository {
 	return &MemoryRepository{
-		weddings: make(map[string]models.Wedding),
-		users:    make(map[string]models.User),
-		emails:   make(map[string]string),
-		sessions: make(map[string]models.Session),
-		profiles: make(map[profileRef]models.Profile),
+		weddings:       make(map[string]models.Wedding),
+		users:          make(map[string]models.User),
+		emails:         make(map[string]string),
+		sessions:       make(map[string]models.Session),
+		passwordResets: make(map[string]models.PasswordResetToken),
+		profiles:       make(map[profileRef]models.Profile),
 	}
 }
 
@@ -639,6 +641,11 @@ func (r *MemoryRepository) DeleteUser(id string) error {
 	}
 	delete(r.users, id)
 	delete(r.emails, user.Email)
+	for hash, reset := range r.passwordResets {
+		if reset.UserID == id {
+			delete(r.passwordResets, hash)
+		}
+	}
 	for token, session := range r.sessions {
 		if session.UserID == id {
 			delete(r.sessions, token)
@@ -763,6 +770,57 @@ func (r *MemoryRepository) DeleteSession(hash string) error {
 	}
 	delete(r.sessions, hash)
 	return nil
+}
+
+func (r *MemoryRepository) CreatePasswordResetToken(token models.PasswordResetToken) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if token.UserID == "" || token.TokenHash == "" || token.ExpiresAt.IsZero() {
+		return ErrConflict
+	}
+	if _, ok := r.users[token.UserID]; !ok {
+		return ErrNotFound
+	}
+	for hash, existing := range r.passwordResets {
+		if existing.UserID == token.UserID && existing.UsedAt == nil {
+			usedAt := token.CreatedAt
+			existing.UsedAt = &usedAt
+			r.passwordResets[hash] = existing
+		}
+	}
+	r.passwordResets[token.TokenHash] = token
+	return nil
+}
+
+func (r *MemoryRepository) CompletePasswordReset(tokenHash, passwordHash string, at time.Time) (models.User, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	token, ok := r.passwordResets[tokenHash]
+	if !ok || token.UsedAt != nil {
+		return models.User{}, ErrResetTokenInvalid
+	}
+	if !at.Before(token.ExpiresAt) {
+		return models.User{}, ErrResetTokenExpired
+	}
+	user, ok := r.users[token.UserID]
+	if !ok {
+		return models.User{}, ErrResetTokenInvalid
+	}
+	user.PasswordHash = passwordHash
+	r.users[user.ID] = user
+	for hash, session := range r.sessions {
+		if session.UserID == user.ID {
+			delete(r.sessions, hash)
+		}
+	}
+	for hash, reset := range r.passwordResets {
+		if reset.UserID == user.ID && reset.UsedAt == nil {
+			usedAt := at
+			reset.UsedAt = &usedAt
+			r.passwordResets[hash] = reset
+		}
+	}
+	return user, nil
 }
 
 // AddAuditLog appends an audit entry. Oldest entries are dropped once the trail reaches

@@ -28,6 +28,44 @@ html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}body{f
 .role-selector-note{font-size:var(--text-sm);color:#88998f;text-align:center;margin:16px 0 0}
 @media(max-width:480px){.role-selector-card{padding:24px 18px}.role-selector-head h2{font-size:var(--text-3xl)}}
 
+/* Portrait uploads and narrow-screen table rows. */
+.couple-photo-upload-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 0 28px}
+.couple-photo-upload-grid h2{margin:5px 0 14px;font-family:var(--serif);font-weight:400}
+.portrait-upload-preview{display:block;width:min(100%,220px);aspect-ratio:1;object-fit:cover;border-radius:14px;margin-bottom:14px;background:#f2f3f1}
+.portrait-upload-empty{display:grid;width:min(100%,220px);aspect-ratio:1;place-items:center;padding:18px;border:1px dashed #cbd5cf;border-radius:14px;color:#718078;text-align:center;margin-bottom:14px}
+.portrait-upload-button{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:42px;cursor:pointer}
+.table-card{min-width:0;max-width:100%}
+img{max-width:100%}
+.story-copy img,.gallery-stage img,.detail-image{max-width:100%;object-fit:cover}
+.guest-body{overflow-x:hidden}
+.couple-card{padding:24px 18px 28px;border:1px solid #ebe5db;border-radius:22px;background:#fff;box-shadow:0 18px 45px #493d2c0b}
+.couple-portrait{box-shadow:0 8px 24px #493d2c12}
+.announcement-grid article{border:1px solid #e7ddd0;border-radius:16px;background:#faf8f3;box-shadow:0 12px 30px #493d2c0a}
+@media(max-width:700px){
+  .couple-photo-upload-grid{grid-template-columns:1fr}
+  .table-card{overflow:visible}
+  .guest-table{min-width:0}
+  .table-row.table-head{display:none}
+  .table-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:14px;border:1px solid #e6ebe7;border-radius:12px;margin:10px 0;background:#fff}
+  .table-row>span{min-width:0;overflow-wrap:anywhere}
+  .table-row>span:not(.guest-cell):not(.row-menu)::before{display:block;margin-bottom:3px;color:#839087;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  #guestTable .table-row>span:nth-child(2)::before{content:"Category"}
+  #guestTable .table-row>span:nth-child(3)::before{content:"Invitation"}
+  #guestTable .table-row>span:nth-child(4)::before{content:"RSVP"}
+  #guestTable .table-row>span:nth-child(5)::before{content:"Party"}
+  #guestTable .table-row .guest-cell{grid-column:1/-1}
+  #guestTable .table-row .row-menu{grid-column:1/-1;justify-content:flex-start}
+  #committeeTable .table-row>span:nth-child(2)::before{content:"Role"}
+  #committeeTable .table-row>span:nth-child(3)::before{content:"Invitation"}
+  #committeeTable .table-row>span:nth-child(4)::before{content:"Contact"}
+  #committeeTable .table-row .guest-cell,#committeeTable .table-row .row-menu{grid-column:1/-1}
+  .guest-toolbar{flex-wrap:wrap}
+  .guest-toolbar .top-search{flex-basis:100%}
+  .guest-toolbar>.button{width:100%}
+  .guest-hero-actions{flex-wrap:wrap;justify-content:center}
+  .couple-portrait{width:min(68vw,250px)}
+}
+
 /* ---------- Planning committee (admin) ---------- */
 .committee-admin-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:18px;align-items:start}
 .committee-admin-grid .manage-card{padding:13px 15px}

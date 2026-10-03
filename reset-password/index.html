@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Choose a new WeddingHub account password.">
+  <meta name="referrer" content="no-referrer">
+  <title>Reset password · WeddingHub</title>
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <meta name="theme-color" content="#59273a">
+  <link rel="stylesheet" href="../weddinghub.css">
+  <link rel="stylesheet" href="../landing.css">
+  <link rel="stylesheet" href="../theme.css">
+  <script src="../theme.js"></script>
+</head>
+<body class="auth-page">
+<a class="skip-link" href="#reset-form">Skip to password reset form</a>
+<main class="auth-layout">
+  <section class="auth-intro">
+    <a class="public-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">W</span><span>WeddingHub</span></a>
+    <div class="auth-intro-copy"><p class="landing-eyebrow">Secure account access</p><h1>Choose a new password.</h1><p>Reset your password to return to your WeddingHub workspace.</p></div>
+    <p class="auth-legal">WeddingHub</p>
+  </section>
+  <section class="auth-main" aria-labelledby="reset-title">
+    <div class="auth-card">
+      <a class="auth-back" href="../pages/login.html"><span aria-hidden="true">←</span> Back to login</a>
+      <p class="landing-eyebrow">Password recovery</p>
+      <h1 id="reset-title">Reset password</h1>
+      <p class="auth-subtitle">Choose a new password with at least 8 characters.</p>
+      <form class="auth-form" id="reset-form">
+        <div class="field"><label for="password">New password</label><input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required></div>
+        <div class="field"><label for="confirm-password">Confirm new password</label><input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+        <button class="auth-submit" type="submit">Reset Password</button>
+      </form>
+      <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+<script src="../api-client.js"></script><script src="../password-reset.js"></script>
+</body>
+</html>

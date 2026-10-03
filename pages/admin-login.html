@@ -29,14 +29,7 @@
         <div class="auth-intro-copy">
             <p class="landing-eyebrow">Platform administration</p>
             <h1 id="admin-intro-title">Site control, kept separate.</h1>
-            <p>This sign-in is for the WeddingHub administrator only. It is not the wedding workspace, and ordinary accounts cannot open it.</p>
-            <div class="auth-points" aria-label="Administrator area properties">
-                <span><i aria-hidden="true">✓</i> Restricted to the configured administrator address</span>
-                <span><i aria-hidden="true">✓</i> Verified on the server for every request</span>
-                <span><i aria-hidden="true">✓</i> Failed attempts are limited and recorded</span>
-            </div>
         </div>
-        <p class="auth-legal">Authorised personnel only</p>
     </section>
 
     <section class="auth-main" aria-labelledby="admin-login-title">
@@ -45,11 +38,6 @@
             <p class="landing-eyebrow">Administrator access</p>
             <h1 id="admin-login-title">Sign in</h1>
             <p class="auth-subtitle">Enter the administrator account to open the platform dashboard.</p>
-
-            <aside class="local-notice" aria-label="Administrator sign-in information">
-                <span aria-hidden="true">i</span>
-                <div>Only the account whose email is configured as the WeddingHub administrator can sign in here. Any other account is refused, even with a correct password.</div>
-            </aside>
 
             <form class="auth-form" id="admin-login-form" data-admin-login>
                 <div class="field">
@@ -60,6 +48,7 @@
                     <label for="adminPassword">Password</label>
                     <input id="adminPassword" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required>
                 </div>
+                <p class="auth-switch"><a href="forgot-password.html">Forgot password?</a></p>
                 <button class="auth-submit" type="submit">Open admin dashboard</button>
             </form>
             <p class="form-message" id="admin-form-message" role="status" aria-live="polite"></p>

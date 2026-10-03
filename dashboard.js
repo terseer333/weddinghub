@@ -245,7 +245,16 @@ function renderCommitteeRoles() {
     `;
   }).join('');
 }
+function renderCouplePortraitControls() {
+  for (const [key, label] of [['bride','Bride'],['groom','Groom']]) {
+    const mount = document.getElementById(`${key}PhotoControl`);
+    if (!mount) continue;
+    const photo = data.photos.find(item => item.portraitRole === key || item.caption === `${label} portrait`);
+    mount.innerHTML = `${photo ? `<img class="portrait-upload-preview" src="${WH.escape(photo.url)}" alt="${label} portrait preview">` : '<div class="portrait-upload-empty">Add a portrait to show guests.</div>'}<label class="button secondary portrait-upload-button">${photo ? 'Replace photo' : 'Upload photo'}<input type="file" accept="image/jpeg,image/png,image/webp" data-portrait-upload="${key}" hidden></label>${photo ? `<button class="text-button" type="button" data-portrait-remove="${key}">Remove photo</button>` : ''}`;
+  }
+}
 function renderContent() {
+  renderCouplePortraitControls();
   $('#photoAdminGrid').innerHTML = data.photos.length ? data.photos.map((photo,index) => `<figure><img src="${photo.url}" alt="${WH.escape(photo.caption)}"><figcaption><span>${WH.escape(photo.caption)}</span><span class="photo-actions"><button data-photo-action="up" data-id="${photo.id}" aria-label="Move photo earlier" ${index===0?'disabled':''}>↑</button><button data-photo-action="down" data-id="${photo.id}" aria-label="Move photo later" ${index===data.photos.length-1?'disabled':''}>↓</button><button data-photo-action="replace" data-id="${photo.id}">Replace</button><button data-action="delete-photo" data-id="${photo.id}" aria-label="Delete photo">×</button></span></figcaption></figure>`).join('') : emptyState('No photos yet','Add photos to build your guest slideshow.');
   $('#photoAdminPreview').innerHTML = data.photos.length ? `<div class="admin-gallery-stage">${data.photos.map((photo,index)=>`<img src="${photo.url}" alt="${WH.escape(photo.caption)}" class="${index===0?'active':''}">`).join('')}</div><p class="admin-gallery-caption">Guest view · ${data.photos.length} ${data.photos.length===1?'photo':'photos'} · transitions automatically</p>` : emptyState('Slideshow preview','Your guest gallery preview will appear here after you add photos.');
   clearInterval(window.adminGalleryTimer);

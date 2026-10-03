@@ -74,6 +74,17 @@ go vet ./...
 
 See [`backend/README.md`](backend/README.md) for endpoints, the database schema and migrations, security boundaries, and deployment notes.
 
+## Password recovery email
+
+The login page links to a password recovery form. Reset links are random, single-use, expire after 30 minutes, and are stored as SHA-256 hashes. Password recovery uses Brevo's HTTP API; it does not replace the existing SMTP invitation sender. Add these Render environment values to enable recovery mail:
+
+- `BREVO_API_KEY`: Brevo API key.
+- `EMAIL_FROM`: sender address verified in Brevo.
+- `EMAIL_FROM_NAME`: optional sender display name (defaults to `WeddingHub`).
+- `APP_BASE_URL`: public app origin, for example `https://your-app.onrender.com`.
+
+For Render setup: create a Brevo account, verify a sender under **Senders, Domains & Dedicated IPs → Senders**, then create an API key under **SMTP & API → API Keys**. In Render, open the service’s **Environment** settings, add the values above, and redeploy. The service applies the password-reset-token migration automatically at startup. A 401 from Brevo usually means the API key is wrong; a 400 often means the sender is not verified. If an email does not arrive, check spam and Brevo’s email logs. Brevo’s free tier has a daily sending limit (about 300 emails/day) and may add a footer. Without the settings, the API logs a startup warning and still returns the same generic recovery response without sending mail.
+
 ## Architecture boundary
 
 ```text

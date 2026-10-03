@@ -16,6 +16,7 @@ import (
 
 	"weddinghub/config"
 	"weddinghub/delivery"
+	"weddinghub/mailer"
 	"weddinghub/models"
 	"weddinghub/repository"
 )
@@ -33,7 +34,9 @@ type API struct {
 	// startup. Empty means no administrator is configured and every admin route refuses callers.
 	adminEmail string
 	// loginGuard throttles repeated admin login failures.
-	loginGuard *loginGuard
+	loginGuard     *loginGuard
+	passwordMailer mailer.PasswordMailer
+	resetLimiter   *passwordResetLimiter
 }
 
 func New(repo repository.Repository) http.Handler {
@@ -41,33 +44,48 @@ func New(repo repository.Repository) http.Handler {
 	if configured == "" {
 		configured = strings.TrimSpace(os.Getenv("WEDDINGHUB_ALLOWED_ORIGIN"))
 	}
-	return newHandler(repo, configured, configured == "", delivery.FromEnv())
+	passwordMailer, _ := mailer.FromEnv()
+	return newHandler(repo, configured, configured == "", delivery.FromEnv(), passwordMailer)
 }
 
 // NewWithAllowedOrigin builds a handler with an exact comma-separated origin allowlist.
 // An empty allowlist retains the development default of permitting loopback origins.
 func NewWithAllowedOrigin(repo repository.Repository, allowedOrigins string) http.Handler {
-	return newHandler(repo, allowedOrigins, strings.TrimSpace(allowedOrigins) == "", delivery.FromEnv())
+	return newHandler(repo, allowedOrigins, strings.TrimSpace(allowedOrigins) == "", delivery.FromEnv(), nil)
 }
 
 // NewWithSender builds a handler with an explicit delivery sender. Production callers
 // use delivery.FromEnv; tests inject a recording sender.
 func NewWithSender(repo repository.Repository, allowedOrigins string, sender delivery.Sender) http.Handler {
-	return newHandler(repo, allowedOrigins, strings.TrimSpace(allowedOrigins) == "", sender)
+	return newHandler(repo, allowedOrigins, strings.TrimSpace(allowedOrigins) == "", sender, nil)
 }
 
-func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback bool, sender delivery.Sender) http.Handler {
+// NewWithPasswordMailer uses the configured invitation provider and a separately injectable
+// password-recovery provider, keeping existing invitation delivery unchanged.
+func NewWithPasswordMailer(repo repository.Repository, passwordMailer mailer.PasswordMailer) http.Handler {
+	configured := strings.TrimSpace(os.Getenv("WEDDINGHUB_ALLOWED_ORIGINS"))
+	if configured == "" {
+		configured = strings.TrimSpace(os.Getenv("WEDDINGHUB_ALLOWED_ORIGIN"))
+	}
+	return newHandler(repo, configured, configured == "", delivery.FromEnv(), passwordMailer)
+}
+
+func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback bool, sender delivery.Sender, passwordMailer mailer.PasswordMailer) http.Handler {
 	a := &API{
-		repo:       repo,
-		sender:     sender,
-		now:        func() time.Time { return time.Now().UTC() },
-		adminEmail: config.AdminEmail(),
-		loginGuard: newLoginGuard(),
+		repo:           repo,
+		sender:         sender,
+		now:            func() time.Time { return time.Now().UTC() },
+		adminEmail:     config.AdminEmail(),
+		loginGuard:     newLoginGuard(),
+		passwordMailer: passwordMailer,
+		resetLimiter:   newPasswordResetLimiter(),
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", a.health)
 	mux.HandleFunc("POST /api/auth/signup", a.signup)
 	mux.HandleFunc("POST /api/auth/login", a.login)
+	mux.HandleFunc("POST /api/auth/forgot-password", a.forgotPassword)
+	mux.HandleFunc("POST /api/auth/reset-password", a.resetPassword)
 	mux.HandleFunc("POST /api/auth/logout", a.logout)
 	mux.HandleFunc("GET /api/auth/me", a.currentUser)
 	// Platform admin routes. Every one of these resolves the caller's session and confirms the

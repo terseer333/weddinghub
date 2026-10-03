@@ -94,10 +94,11 @@ function revealOnScroll() {
 }
 
 function renderGuestDashboard() {
-  const visibility = { story: WH.published(data.stories).length > 0, gallery: WH.published(data.photos).length > 0, events: WH.published(data.events).length > 0, announcements: WH.publicAnnouncements(data.announcements).length > 0 };
+  const galleryPhotos = WH.published(data.photos).filter(photo => !/^(bride|groom) portrait$/i.test(photo.caption || ''));
+  const visibility = { story: WH.published(data.stories).length > 0, gallery: galleryPhotos.length > 0, events: WH.published(data.events).length > 0, announcements: WH.publicAnnouncements(data.announcements).length > 0 };
   Object.entries(visibility).forEach(([id, visible]) => { const section=document.getElementById(id); if(section)section.hidden=!visible; const link=document.querySelector(`.guest-links a[href="#${id}"]`); if(link)link.hidden=!visible; });
   document.getElementById("guestHero").style.backgroundImage = `url('${wedding.heroImage}')`;
-  document.getElementById("detailImage").style.backgroundImage = `url('${data.photos[2]?.url || wedding.heroImage}')`;
+  document.getElementById("detailImage").style.backgroundImage = `url('${galleryPhotos[2]?.url || galleryPhotos[0]?.url || wedding.heroImage}')`;
   document.getElementById("welcomeName").textContent = `Welcome, ${guest.name.split(" ")[0]}`;
   document.getElementById("heroBride").textContent = wedding.brideName;
   document.getElementById("heroGroom").textContent = wedding.groomName;
@@ -113,9 +114,11 @@ function renderGuestDashboard() {
   document.getElementById("footerLogo").innerHTML = coupleMark(wedding.brideName, wedding.groomName);
   document.getElementById("coupleGroomName").textContent = wedding.groomName;
   document.getElementById("coupleBrideName").textContent = wedding.brideName;
-  const portraits = WH.published(data.photos).slice(1, 3);
-  document.getElementById("groomPortrait").innerHTML = portraitMarkup(wedding.groomName, portraits[0]);
-  document.getElementById("bridePortrait").innerHTML = portraitMarkup(wedding.brideName, portraits[1]);
+  const portraits = WH.published(data.photos);
+  const groomPhoto = portraits.find(photo => /^groom portrait$/i.test(photo.caption || ''));
+  const bridePhoto = portraits.find(photo => /^bride portrait$/i.test(photo.caption || ''));
+  document.getElementById("groomPortrait").innerHTML = portraitMarkup(wedding.groomName, groomPhoto);
+  document.getElementById("bridePortrait").innerHTML = portraitMarkup(wedding.brideName, bridePhoto);
   const verse = document.getElementById("coupleVerse");
   verse.textContent = wedding.verse || "";
   verse.hidden = !wedding.verse;
@@ -145,7 +148,7 @@ function renderGuestDashboard() {
 }
 
 function renderGallery() {
-  const photos = WH.published(data.photos);
+  const photos = WH.published(data.photos).filter(photo => !/^(bride|groom) portrait$/i.test(photo.caption || ''));
   if (!photos.length) return;
   let index = 0;
   const show = () => {

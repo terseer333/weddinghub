@@ -1297,6 +1297,62 @@ func (r *PostgresRepository) DeleteSession(hash string) error {
 	return nil
 }
 
+func (r *PostgresRepository) CreatePasswordResetToken(token models.PasswordResetToken) error {
+	if token.UserID == "" || token.TokenHash == "" || token.ExpiresAt.IsZero() {
+		return ErrConflict
+	}
+	ctx, cancel := r.ctx()
+	defer cancel()
+	err := r.withTx(ctx, func(tx *sql.Tx) error {
+		if _, err := tx.ExecContext(ctx, `UPDATE password_reset_tokens SET used_at = $2 WHERE user_id = $1 AND used_at IS NULL`, token.UserID, token.CreatedAt); err != nil {
+			return mapError(err)
+		}
+		_, err := tx.ExecContext(ctx, `INSERT INTO password_reset_tokens (token_hash, user_id, created_at, expires_at) VALUES ($1,$2,$3,$4)`,
+			token.TokenHash, token.UserID, token.CreatedAt, token.ExpiresAt)
+		return mapError(err)
+	})
+	return mapError(err)
+}
+
+func (r *PostgresRepository) CompletePasswordReset(tokenHash, passwordHash string, at time.Time) (models.User, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	var user models.User
+	err := r.withTx(ctx, func(tx *sql.Tx) error {
+		var userID string
+		var expiresAt time.Time
+		var usedAt *time.Time
+		if err := tx.QueryRowContext(ctx, `SELECT user_id, expires_at, used_at FROM password_reset_tokens WHERE token_hash = $1 FOR UPDATE`, tokenHash).
+			Scan(&userID, &expiresAt, &usedAt); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return ErrResetTokenInvalid
+			}
+			return mapError(err)
+		}
+		if usedAt != nil {
+			return ErrResetTokenInvalid
+		}
+		if !at.Before(expiresAt) {
+			return ErrResetTokenExpired
+		}
+		if err := tx.QueryRowContext(ctx, `UPDATE users SET password_hash = $2 WHERE id = $1 RETURNING id,email,display_name,role,password_hash,created_at,status`, userID, passwordHash).
+			Scan(&user.ID, &user.Email, &user.DisplayName, &user.Role, &user.PasswordHash, &user.CreatedAt, &user.Status); err != nil {
+			return mapError(err)
+		}
+		if _, err := tx.ExecContext(ctx, `DELETE FROM sessions WHERE user_id = $1`, userID); err != nil {
+			return mapError(err)
+		}
+		if _, err := tx.ExecContext(ctx, `UPDATE password_reset_tokens SET used_at = $2 WHERE user_id = $1 AND used_at IS NULL`, userID, at); err != nil {
+			return mapError(err)
+		}
+		return nil
+	})
+	if err != nil {
+		return models.User{}, mapError(err)
+	}
+	return user, nil
+}
+
 // IsWeddingAdmin reports whether an account appears in the wedding's admin roster.
 func (r *PostgresRepository) IsWeddingAdmin(weddingID, userID string) bool {
 	if weddingID == "" || userID == "" {

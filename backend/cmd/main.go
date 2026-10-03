@@ -14,6 +14,7 @@ import (
 
 	"weddinghub/api"
 	"weddinghub/config"
+	"weddinghub/mailer"
 	"weddinghub/repository"
 )
 
@@ -56,7 +57,11 @@ func main() {
 		}
 	}
 
-	apiHandler := api.New(repo)
+	passwordMailer, mailerErr := mailer.FromEnv()
+	if mailerErr != nil {
+		log.Printf("password recovery email is disabled: %v", mailerErr)
+	}
+	apiHandler := api.NewWithPasswordMailer(repo, passwordMailer)
 
 	// Static files directory (weddinghub root directory)
 	staticDir := os.Getenv("WEDDINGHUB_STATIC_DIR")

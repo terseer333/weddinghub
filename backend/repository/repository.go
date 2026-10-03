@@ -8,11 +8,13 @@ import (
 )
 
 var (
-	ErrNotFound      = errors.New("not found")
-	ErrConflict      = errors.New("conflict")
-	ErrExpired       = errors.New("invitation expired")
-	ErrInvalidStatus = errors.New("invalid status transition")
-	ErrWrongRole     = errors.New("invitation role mismatch")
+	ErrNotFound          = errors.New("not found")
+	ErrConflict          = errors.New("conflict")
+	ErrExpired           = errors.New("invitation expired")
+	ErrInvalidStatus     = errors.New("invalid status transition")
+	ErrWrongRole         = errors.New("invitation role mismatch")
+	ErrResetTokenInvalid = errors.New("password reset token is invalid or used")
+	ErrResetTokenExpired = errors.New("password reset token has expired")
 )
 
 type Repository interface {
@@ -64,6 +66,8 @@ type Repository interface {
 	AddSession(session models.Session) error
 	SessionByHash(hash string) (models.Session, error)
 	DeleteSession(hash string) error
+	CreatePasswordResetToken(token models.PasswordResetToken) error
+	CompletePasswordReset(tokenHash, passwordHash string, at time.Time) (models.User, error)
 	// Platform admin audit trail. AddAuditLog appends; ListAuditLogs returns the newest first.
 	// There is no update or delete: the trail is append-only by design.
 	AddAuditLog(entry models.AuditLog) error
