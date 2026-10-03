@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: weddinghub
+    runtime: go
+    buildCommand: cd backend && go build -tags netgo -ldflags "-s -w" -o app ./cmd
+    startCommand: cd backend && ./app
+    healthCheckPath: /healthz
+    envVars:
