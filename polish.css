@@ -101,3 +101,18 @@ img{max-width:100%}
 .admin-layout.sidebar-collapsed .admin-sidebar{transform:translateX(-105%)}
 .admin-layout.sidebar-collapsed .admin-main{margin-left:0}
 }
+
+/* Wedding-owner dashboard: fixed photo backdrop behind every dashboard view. */
+body.admin-body.owner-dashboard{--bg-overlay:rgba(247,249,247,.78);position:relative;isolation:isolate;background:transparent}
+body.owner-dashboard::before{position:fixed;z-index:-1;inset:0;content:"";pointer-events:none;background-image:linear-gradient(var(--bg-overlay),var(--bg-overlay)),url("/assets/wedding-bg.jpg");background-position:center,center;background-size:cover,cover;background-repeat:no-repeat,no-repeat}
+body.owner-dashboard .admin-layout{position:relative;z-index:0}
+html[data-theme="dark"] body.admin-body.owner-dashboard{--bg-overlay:rgba(7,13,10,.70);background:transparent}
+
+/* Keep the welcome content on a solid brand surface above the backdrop. */
+body.owner-dashboard .overview-welcome{min-height:220px;align-items:center;padding:30px 34px;border:1px solid #2d5644;border-radius:16px;color:#fff;background:#29483b}
+body.owner-dashboard .overview-welcome .eyebrow{color:#e5c995}
+body.owner-dashboard .overview-welcome h1{color:#fff}
+body.owner-dashboard .overview-welcome p:last-child{color:#edf2ee}
+body.owner-dashboard .overview-welcome .button.secondary{border-color:#ffffff9c;color:#fff;background:transparent}
+body.owner-dashboard .overview-welcome .button.primary{border-color:#f4dfb4;color:#26372d;background:#dfc493}
+@media(max-width:700px){body.owner-dashboard .overview-welcome{display:block;min-height:unset;padding:27px 23px}}
