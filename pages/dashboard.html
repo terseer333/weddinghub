@@ -1,13 +1,252 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wedding Admin · WeddingHub</title><link rel="icon" href="../favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"><link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"><link rel="icon" type="image/png" sizes="48x48" href="../assets/favicon-48.png"><link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"><meta name="theme-color" content="#59273a"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Marcellus&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Prata&display=swap" rel="stylesheet"><link rel="stylesheet" href="../weddinghub.css"><link rel="stylesheet" href="../template-themes.css"><link rel="stylesheet" href="../guest.css"><link rel="stylesheet" href="../polish.css"><link rel="stylesheet" href="../card-studio.css"><link rel="stylesheet" href="../card-layouts.css"><link rel="stylesheet" href="../theme.css"><link rel="stylesheet" href="../tour.css"><script src="../theme.js"></script></head><body class="admin-body owner-dashboard">
-<div class="admin-layout"><aside class="admin-sidebar" id="sidebar" aria-label="Wedding administration"><button class="sidebar-close" id="sidebarClose" type="button" aria-label="Close navigation">×</button><a class="brand admin-brand" href="../index.html"><span class="brand-mark">W</span><span>WeddingHub</span></a><div class="wedding-switcher"><span class="couple-avatar" id="coupleAvatar">W</span><div><strong id="switcherNames">Your wedding</strong><small id="switcherDate">Wedding date</small></div></div><nav class="side-nav"><button class="side-link active" data-view="overview">⌂ Dashboard</button><button class="side-link" data-view="information">◇ Wedding information</button><button class="side-link" data-view="designs">✦ Card Studio &amp; Templates <b>107</b></button><button class="side-link" data-view="events">◷ Events</button><button class="side-link" data-view="guests">♙ Guests & RSVP</button><button class="side-link" data-view="committee">◈ Planning committee</button><button class="side-link" data-view="content">▧ Photos & story</button><button class="side-link" data-view="announcements">◉ Announcements</button><button class="side-link" data-view="messages">✉ Guest messages</button></nav><div class="sidebar-bottom"><a class="preview-link" href="event.html?preview=admin" target="_blank">◉ Preview Card ↗</a><button class="side-link" data-view="settings">⚙ Settings</button><a class="side-link" id="siteAdminLink" href="admin.html" style="display:none">⛨ Site admin</a></div></aside><button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Close navigation"></button>
-<main class="admin-main"><header class="admin-topbar"><button class="mobile-menu" id="menuButton">☰</button><span></span><div class="top-actions"><button type="button" class="profile-trigger" id="profileButton" aria-label="Open my profile"><span class="user-avatar" id="userAvatar">WA</span><span class="profile-trigger-text"><strong id="adminName">Wedding Admin</strong><small>Wedding owner</small></span></button></div></header>
-<section class="admin-view active" id="view-overview"><div class="page-heading overview-welcome"><div><p class="eyebrow">Wedding overview</p><h1 id="welcomeHeading">Welcome back.</h1><p>Here’s what’s happening with your wedding today.</p></div><div class="heading-actions"><button class="button secondary" id="shareButton">↗ Share invitation</button><a class="button primary" href="event.html?preview=admin" target="_blank">Preview Card</a></div></div><div class="progress-card"><div class="progress-ring" id="progressRing"><strong id="progressValue">0%</strong></div><div><h3 id="progressTitle">Complete your wedding experience</h3><p id="progressMessage">Add your details and content to get ready for guests.</p><div class="progress-track"><i id="progressBar"></i></div></div><button class="text-button" data-jump="information">Continue setup →</button></div><div class="metric-grid"><article><span>♙</span><p>Total guests<strong id="metricGuests">0</strong><small>Managed invitations</small></p></article><article><span>✓</span><p>Attending<strong id="metricAttending">0</strong><small>Live RSVP status</small></p></article><article><span>◷</span><p>Awaiting reply<strong id="metricPending">0</strong><small>Send a reminder</small></p></article><article><span>◉</span><p>Invitation views<strong id="metricViews">0</strong><small>Opened and responded</small></p></article><article><span>◈</span><p>Committee members<strong id="metricCommittee">0</strong><small>Planning team</small></p></article></div><div class="overview-grid"><article class="admin-card"><div class="card-title"><div><p class="eyebrow">The big day</p><h2>Wedding countdown</h2></div></div><div class="countdown-row" id="adminCountdown"></div><div class="mini-event" id="nextEvent"></div></article><article class="admin-card"><div class="card-title"><div><p class="eyebrow">Live updates</p><h2>Recent activity</h2></div></div><div class="activity-list" id="activityList"></div></article></div><h2 class="section-label">Quick actions</h2><div class="quick-grid"><button data-jump="guests">＋ <span><strong>Add guests</strong><small>Invite someone special</small></span></button><button data-jump="content">▧ <span><strong>Upload photos</strong><small>Build your gallery</small></span></button><button data-jump="announcements">◉ <span><strong>Post update</strong><small>Notify your guests</small></span></button><button data-jump="designs">✦ <span><strong>Card Studio</strong><small>Customize 107 templates</small></span></button></div></section>
-<section class="admin-view" id="view-information"><div class="page-heading"><div><p class="eyebrow">Single source of truth</p><h1>Wedding information</h1><p>Changes here update the invitation and every guest dashboard.</p></div><button class="button primary" form="weddingForm">Save changes</button></div><form id="weddingForm" class="admin-card editor-form"><h2>Couple & celebration</h2><div class="form-grid"><label>Bride's name<input name="brideName" required></label><label>Groom's name<input name="groomName" required></label><label>Wedding date & time<input name="date" type="datetime-local" required></label><label>Main venue<input name="venue" required></label><label>Reception venue<input name="receptionVenue"></label><label>City<input name="city"></label><label>State<input name="state"></label></div><h2>Guest-facing details</h2><label>Invitation message<textarea name="message" rows="4"></textarea></label><div class="form-grid"><label>Verse or quote<input name="verse"></label><label>Dress code<input name="dressCode"></label></div><div class="publish-note">✓ <span><strong>Published changes go live instantly</strong><small>All guest experiences use this same record.</small></span></div></form></section>
-<section class="admin-view" id="view-designs"><div class="page-heading"><div><p class="eyebrow">Interactive 3-Panel Studio</p><h1>Card Studio &amp; Templates</h1><p>Explore 107+ luxury stationery templates, customize fonts, colors, and artwork, and live preview in real time.</p></div></div><div id="cardStudioContainer"></div></section>
-<section class="admin-view" id="view-events"><div class="page-heading"><div><p class="eyebrow">Wedding schedule</p><h1>Events</h1><p>Only published events appear for guests.</p></div><button class="button primary" id="addEvent">＋ Add event</button></div><div id="eventAdminList" class="manage-list"></div></section>
-<section class="admin-view" id="view-guests"><div class="page-heading"><div><p class="eyebrow">Invitations & RSVP</p><h1>Guest management</h1><p>Personalize, send and track every invitation.</p></div><button class="button primary" id="addGuest">＋ Add guest</button></div><div class="guest-toolbar"><div class="top-search">⌕ <input id="guestSearch" placeholder="Search guests"></div><button class="button secondary" id="emailAllGuests">✉ Email all guests</button></div><div class="admin-card table-card"><div class="guest-table" id="guestTable"></div></div></section>
-<section class="admin-view" id="view-committee"><div class="page-heading"><div><p class="eyebrow">Admin + committee only</p><h1>Planning committee</h1><p>Invite the people helping plan this wedding. Members get a private workspace with tasks and chat.</p></div><div class="heading-actions"><button class="button secondary" id="addCommitteeRoleBtn">＋ Add Committee Role</button><button class="button primary" id="addCommitteeMember">＋ Invite member</button></div></div><div class="committee-admin-grid"><article class="admin-card"><div class="card-title"><div><p class="eyebrow">Committee roster</p><h2>Members</h2></div></div><div class="guest-table" id="committeeTable"></div></article><article class="admin-card"><div class="card-title"><div><p class="eyebrow">Shared planning board</p><h2>Planning tasks</h2></div></div><div class="manage-list" id="adminTaskList"></div></article></div><article class="admin-card" style="margin-top: 1.5rem;"><div class="card-title" style="display: flex; justify-content: space-between; align-items: center;"><div><p class="eyebrow">Dynamic Role Hierarchy</p><h2>Committee Roles</h2></div></div><div id="committeeRolesList" class="role-cards-grid"></div></article></section>
-<section class="admin-view" id="view-content"><div class="page-heading"><div><p class="eyebrow">Published experience</p><h1>Photos & our story</h1><p>Build an emotional, visual experience for accepted guests.</p></div></div><div class="couple-photo-upload-grid"><article class="admin-card"><p class="eyebrow">Couple portraits</p><h2>Bride's photo</h2><div id="bridePhotoControl"></div></article><article class="admin-card"><p class="eyebrow">Couple portraits</p><h2>Groom's photo</h2><div id="groomPhotoControl"></div></article></div><div class="content-columns"><div><div class="content-heading"><h2>Our moments</h2><button class="button secondary" id="addPhoto">＋ Add photos</button></div><div class="admin-card photo-preview-card"><div class="content-heading"><div><p class="eyebrow">Guest view</p><h3>Slideshow preview</h3></div></div><div id="photoAdminPreview"></div></div><div class="photo-admin-grid" id="photoAdminGrid"></div></div><div><div class="content-heading"><h2>Love story</h2><button class="button secondary" id="addStory">＋ Add chapter</button></div><div class="story-admin-list" id="storyAdminList"></div></div></div></section>
-<section class="admin-view" id="view-announcements"><div class="page-heading"><div><p class="eyebrow">Keep guests informed</p><h1>Announcements</h1><p>Published updates appear instantly in guest dashboards.</p></div><button class="button primary" id="newAnnouncement">＋ New announcement</button></div><div class="manage-list" id="announcementList"></div></section>
-<section class="admin-view" id="view-messages"><div class="page-heading"><div><p class="eyebrow">Wishes & blessings</p><h1>Guest messages</h1><p>Review and moderate messages left for the couple.</p></div></div><div class="manage-list" id="messageList"></div></section><section class="admin-view" id="view-settings"><div class="page-heading"><div><p class="eyebrow">Workspace preferences</p><h1>Settings</h1></div></div><div class="settings-grid"><article class="admin-card"><h2>My profile</h2><p>Add a profile photo and set the display name shown across your workspace and in committee chat.</p><button class="button primary" id="openProfile">Edit my profile</button></article><article class="admin-card"><h2>Getting started</h2><p>Replay the guided tour that walks through every WeddingHub feature.</p><button class="button secondary" id="startTour">Take the tour</button></article><article class="admin-card"><h2>Account &amp; session</h2><p>Sign out of WeddingHub on this device. Your wedding data stays saved in this browser.</p><button class="button primary" id="signOut">Sign out</button></article></div></section></main></div>
-<div class="modal-backdrop" id="modal"><div class="modal"><button class="modal-close" id="modalClose">×</button><div id="modalContent"></div></div></div><script src="../templates/templates-data.js"></script><script src="../app.js"></script><script src="../api-client.js"></script><script src="../template-engine.js"></script><script src="../invitation-card.js"></script><script src="../card-studio.js"></script><script src="../dashboard.js"></script><script src="../dashboard-workspace-actions.js"></script><script src="../dashboard-guest-actions.js"></script><script src="../dashboard-content-actions.js"></script><script src="../tour.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard · WeddingHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
+  <script>
+    // Set the saved/system theme before first paint to avoid a flash
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("weddinghub-theme"); } catch (e) {}
+      if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <!-- Icon sprite: icons are used with <use href="#i-name"> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+    <symbol id="i-committee" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0M5 8H2M22 8h-3"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 14v-3ZM11.6 16.1 13 21H7l-1-6"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM14 21h-4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  </svg>
+
+  <div class="app">
+    <button class="sidebar-scrim" id="sidebar-scrim" aria-label="Close menu" hidden></button>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row">
+        <div class="brand-mark">W</div>
+        <div class="brand-name">WeddingHub</div>
+        <button class="icon-button sidebar-close" id="sidebar-close" aria-label="Close navigation"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="couple-card">
+        <div class="couple-monogram" id="couple-monogram">T<span>&amp;</span>L</div>
+        <div><strong id="couple-names">Couple names</strong><small id="couple-date">Date</small></div>
+      </div>
+      <nav class="nav" aria-label="Main">
+        <div class="nav-group">
+          <div class="nav-label">Overview</div>
+          <a class="nav-item active" aria-current="page" href="dashboard.html"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Invitations</div>
+          <a class="nav-item" href="dashboard.old.html#information"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg><span>Wedding information</span></a>
+          <a class="nav-item" href="dashboard.old.html#designs"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-card"/></svg><span>Card Studio &amp; Templates</span></a>
+          <a class="nav-item" href="event.html?preview=admin"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg><span>Preview Card</span></a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Guests</div>
+          <a class="nav-item" href="dashboard.old.html#guests"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg><span>Guests &amp; RSVP</span></a>
+          <a class="nav-item" href="dashboard.old.html#messages"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-message"/></svg><span>Guest messages</span><b id="unread-badge" hidden></b></a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Planning</div>
+          <a class="nav-item" href="dashboard.old.html#events"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg><span>Events</span></a>
+          <a class="nav-item" href="dashboard.old.html#committee"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-committee"/></svg><span>Planning committee</span></a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Content</div>
+          <a class="nav-item" href="dashboard.old.html#content"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-image"/></svg><span>Photos &amp; story</span></a>
+          <a class="nav-item" href="dashboard.old.html#announcements"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-megaphone"/></svg><span>Announcements</span></a>
+        </div>
+      </nav>
+      <a class="sidebar-help" href="#" style="text-decoration:none;color:inherit">
+        <div class="help-icon"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></div>
+        <div><strong>Need a hand?</strong><small>Visit the help centre</small></div>
+        <svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chevron"/></svg>
+      </a>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="sidebar-open" aria-label="Open navigation"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-menu"/></svg></button>
+        <div class="mobile-brand"><div class="brand-mark">W</div><span>WeddingHub</span></div>
+        <div class="search"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg><input id="search-input" aria-label="Search" placeholder="Search guests, events, messages…"><kbd>⌘ K</kbd></div>
+        <div class="top-actions">
+          <button class="icon-button theme-toggle" id="theme-toggle" aria-label="Use dark mode"><svg class="icon i-moon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg><svg class="icon i-sun" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg></button>
+          <button class="icon-button notification" aria-label="Notifications"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg><span></span></button>
+          <div class="profile">
+            <div class="avatar rose" id="user-initials">AJ</div>
+            <div><strong id="user-name">Name</strong><small id="user-role">Wedding owner</small></div>
+            <svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chevron"/></svg>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="welcome">
+          <div>
+            <span class="eyebrow" id="today-date"></span>
+            <div role="heading" aria-level="1" class="heading heading-1">Welcome back, <span id="user-first-name">there</span></div>
+            <p id="welcome-sub"></p>
+          </div>
+          <div class="welcome-actions">
+            <a class="button button-secondary" href="event.html?preview=admin" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg>Preview card</a>
+            <button class="button button-primary" id="share-btn"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-share"/></svg>Share invitation</button>
+          </div>
+        </section>
+
+        <section class="stats-grid" aria-label="Wedding statistics">
+      <section class="card stat-card featured">
+        <div class="stat-label">Days until wedding</div>
+        <div class="stat-bottom"><div class="stat-value" id="stat-days">0</div><div class="days-word" id="days-word">days</div></div>
+        <div class="stat-note" id="stat-days-note"></div>
+      </section>
+      <section class="card stat-card">
+        <div class="stat-label">Total guests</div>
+        <div class="stat-bottom"><div class="stat-value" id="stat-guests">0</div></div>
+        <div class="stat-note" id="stat-guests-note"></div>
+      </section>
+      <section class="card stat-card">
+        <div class="stat-label">Attending</div>
+        <div class="stat-bottom"><div class="stat-value" id="stat-attending">0</div></div>
+        <div class="stat-note green" id="stat-attending-note"></div>
+      </section>
+      <section class="card stat-card">
+        <div class="stat-label">Awaiting reply</div>
+        <div class="stat-bottom"><div class="stat-value" id="stat-pending">0</div></div>
+        <div class="stat-note gold" id="stat-pending-note"></div>
+      </section>
+      <section class="card stat-card">
+        <div class="stat-label">Invitation views</div>
+        <div class="stat-bottom"><div class="stat-value" id="stat-views">0</div></div>
+        <div class="stat-note" id="stat-views-note"></div>
+      </section>
+      <section class="card stat-card">
+        <div class="stat-label">Committee</div>
+        <div class="stat-bottom"><div class="stat-value" id="stat-committee">0</div></div>
+        <div class="stat-note" id="stat-committee-note"></div>
+      </section>
+        </section>
+
+        <section class="card setup-card">
+          <div class="progress-ring" id="setup-ring"><div><strong id="setup-percent">0%</strong><small>complete</small></div></div>
+          <div class="setup-copy">
+            <span class="eyebrow">Your wedding space</span>
+            <div role="heading" aria-level="2" class="heading heading-2" id="setup-title">You’re almost ready to share</div>
+            <p id="setup-text"></p>
+            <div class="progress-track" id="setup-track"><span></span></div>
+          </div>
+          <div class="setup-steps" id="setup-steps"></div>
+          <a class="button button-primary" href="dashboard.old.html#information" style="text-decoration:none">Continue setup<svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="card rsvp-card">
+            <div class="section-header">
+              <div role="heading" aria-level="2" class="heading heading-2">RSVP overview</div>
+              <a class="text-action" href="dashboard.old.html#guests" style="text-decoration:none">View guests<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+            <div class="rsvp-content">
+              <div class="donut" id="donut"><div><strong id="donut-total">0</strong><small>invited</small></div></div>
+              <div class="legend">
+                <div><span class="dot attending"></span><p>Attending<small id="lg-att-n"></small></p><strong id="lg-att-p"></strong></div>
+                <div><span class="dot pending"></span><p>Pending<small id="lg-pen-n"></small></p><strong id="lg-pen-p"></strong></div>
+                <div><span class="dot declined"></span><p>Declined<small id="lg-dec-n"></small></p><strong id="lg-dec-p"></strong></div>
+              </div>
+            </div>
+            <div class="response-note"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg><span><strong id="recent-responses">0 responses</strong> received in the last 7 days</span></div>
+          </section>
+
+          <section class="card activity-card">
+            <div class="section-header">
+              <div role="heading" aria-level="2" class="heading heading-2">Recent guest activity</div>
+              <a class="text-action" href="dashboard.old.html#guests" style="text-decoration:none">See all activity<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+            <div class="activity-list" id="activity-list"></div>
+          </section>
+
+          <section class="card events-card">
+            <div class="section-header">
+              <div role="heading" aria-level="2" class="heading heading-2">Upcoming events</div>
+              <a class="text-action" href="dashboard.old.html#events" style="text-decoration:none">All events<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+            <div id="events-list"></div>
+            <a class="button button-secondary" href="dashboard.old.html#events" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add event</a>
+          </section>
+
+          <section class="card committee-card">
+            <div class="section-header">
+              <div role="heading" aria-level="2" class="heading heading-2">Planning committee</div>
+              <a class="text-action" href="dashboard.old.html#committee" style="text-decoration:none">Manage<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+            <div class="member-stack" id="member-stack"></div>
+            <p class="committee-copy"><strong id="committee-count">0 people</strong> are helping make the day special.</p>
+            <div class="task-progress">
+              <div><span>Tasks completed</span><strong id="tasks-text"></strong></div>
+              <div class="progress-track" id="tasks-track"><span></span></div>
+            </div>
+            <div class="next-task" id="next-task" hidden><svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg><p><strong id="next-task-title"></strong><small id="next-task-meta"></small></p></div>
+          </section>
+
+
+          <section class="card announcement-card">
+            <div class="section-header"><div role="heading" aria-level="2" class="heading heading-2">Announcements</div></div>
+            <div id="announcement-list"></div>
+            <a class="button button-secondary" href="dashboard.old.html#announcements" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>New announcement</a>
+          </section>
+
+          <section class="card story-card">
+            <img id="story-img" src="../assets/wedding-bg.jpg" alt="Wedding aisle">
+            <div class="story-overlay">
+              <span class="eyebrow">Photos &amp; story</span>
+              <div role="heading" aria-level="2" class="heading heading-2">The beginning of us</div>
+              <p>Share your favourite moments with the people you love.</p>
+              <a class="story-link" href="dashboard.old.html#content" style="text-decoration:none">Edit your story<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </section>
+        </div>
+
+        <!-- Shown by JS only when the wedding has no guests yet -->
+        <div class="sample-set" id="empty-guests" hidden>
+          <section class="card empty-state">
+            <div class="empty-icon"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg></div>
+            <div><div role="heading" aria-level="3" class="heading heading-3">No guests yet?</div><p>Add your first guest and start collecting RSVPs.</p></div>
+            <a class="button button-secondary" href="dashboard.old.html#guests" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add guest</a>
+          </section>
+        </div>
+
+        <footer>WeddingHub <span>·</span> Made for your best day yet.</footer>
+      </div>
+    </main>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
