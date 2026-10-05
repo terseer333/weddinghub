@@ -88,6 +88,7 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("POST /api/auth/reset-password", a.resetPassword)
 	mux.HandleFunc("POST /api/auth/logout", a.logout)
 	mux.HandleFunc("GET /api/auth/me", a.currentUser)
+	mux.HandleFunc("GET /api/dashboard", a.dashboard)
 	// Platform admin routes. Every one of these resolves the caller's session and confirms the
 	// account is the configured administrator on the server before doing anything else.
 	mux.HandleFunc("POST /api/admin/login", a.adminLogin)
@@ -219,8 +220,10 @@ func (a *API) myWeddings(w http.ResponseWriter, r *http.Request) {
 	weddings := a.repo.WeddingsForUser(user.ID)
 	out := make([]weddingSummary, 0, len(weddings))
 	for _, wedding := range weddings {
-		out = append(out, weddingSummary{ID: wedding.ID, Slug: wedding.Slug, Title: wedding.Title,
-			PartnerOne: wedding.PartnerOne, PartnerTwo: wedding.PartnerTwo, Date: wedding.Date, Status: wedding.Status})
+		out = append(out, weddingSummary{
+			ID: wedding.ID, Slug: wedding.Slug, Title: wedding.Title,
+			PartnerOne: wedding.PartnerOne, PartnerTwo: wedding.PartnerTwo, Date: wedding.Date, Status: wedding.Status,
+		})
 	}
 	writeJSON(w, http.StatusOK, out)
 }
@@ -231,8 +234,10 @@ func (a *API) listWeddings(w http.ResponseWriter, _ *http.Request) {
 	weddings := a.repo.ListWeddings()
 	out := make([]weddingSummary, 0, len(weddings))
 	for _, wedding := range weddings {
-		out = append(out, weddingSummary{ID: wedding.ID, Slug: wedding.Slug, Title: wedding.Title,
-			PartnerOne: wedding.PartnerOne, PartnerTwo: wedding.PartnerTwo, Date: wedding.Date, Status: wedding.Status})
+		out = append(out, weddingSummary{
+			ID: wedding.ID, Slug: wedding.Slug, Title: wedding.Title,
+			PartnerOne: wedding.PartnerOne, PartnerTwo: wedding.PartnerTwo, Date: wedding.Date, Status: wedding.Status,
+		})
 	}
 	writeJSON(w, http.StatusOK, out)
 }
@@ -341,9 +346,11 @@ func (a *API) createInvitation(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "could not generate invitation")
 		return
 	}
-	inv := models.Invitation{ID: id, Type: invitationType, GuestName: input.GuestName, GuestEmail: strings.TrimSpace(input.GuestEmail),
+	inv := models.Invitation{
+		ID: id, Type: invitationType, GuestName: input.GuestName, GuestEmail: strings.TrimSpace(input.GuestEmail),
 		GuestPhone: strings.TrimSpace(input.GuestPhone), CommitteeTitle: strings.TrimSpace(input.CommitteeTitle),
-		MaxPartySize: input.MaxPartySize, Status: models.InvitationPending, TokenHash: hash, ExpiresAt: input.ExpiresAt, CreatedAt: a.now()}
+		MaxPartySize: input.MaxPartySize, Status: models.InvitationPending, TokenHash: hash, ExpiresAt: input.ExpiresAt, CreatedAt: a.now(),
+	}
 	created, err := a.repo.AddInvitation(wedding.ID, inv)
 	if err != nil {
 		writeRepositoryError(w, err)
@@ -914,8 +921,10 @@ func (a *API) updateProfile(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "avatar must be a small base64 image data URL")
 		return
 	}
-	profile := models.Profile{WeddingID: wedding.ID, ID: profileKey(actor), Role: actor.Role,
-		DisplayName: displayName, Avatar: input.Avatar, UpdatedAt: a.now()}
+	profile := models.Profile{
+		WeddingID: wedding.ID, ID: profileKey(actor), Role: actor.Role,
+		DisplayName: displayName, Avatar: input.Avatar, UpdatedAt: a.now(),
+	}
 	saved, err := a.repo.UpsertProfile(profile)
 	if err != nil {
 		writeRepositoryError(w, err)
@@ -1062,8 +1071,10 @@ func (a *API) createCommitteeTask(w http.ResponseWriter, r *http.Request) {
 	if taskID == "" {
 		return
 	}
-	task := models.PlanningTask{ID: taskID, Title: input.Title, Details: input.Details, AssignedTo: input.AssignedTo,
-		DueOn: input.DueOn, Status: input.Status, CreatedBy: actor.Name, CreatedAt: now, UpdatedAt: now}
+	task := models.PlanningTask{
+		ID: taskID, Title: input.Title, Details: input.Details, AssignedTo: input.AssignedTo,
+		DueOn: input.DueOn, Status: input.Status, CreatedBy: actor.Name, CreatedAt: now, UpdatedAt: now,
+	}
 	created, err := a.repo.AddPlanningTask(wedding.ID, task)
 	if err != nil {
 		writeRepositoryError(w, err)
@@ -1082,8 +1093,10 @@ func (a *API) updateCommitteeTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	now := a.now()
-	task := models.PlanningTask{ID: r.PathValue("taskID"), Title: input.Title, Details: input.Details, AssignedTo: input.AssignedTo,
-		DueOn: input.DueOn, Status: input.Status, UpdatedAt: now}
+	task := models.PlanningTask{
+		ID: r.PathValue("taskID"), Title: input.Title, Details: input.Details, AssignedTo: input.AssignedTo,
+		DueOn: input.DueOn, Status: input.Status, UpdatedAt: now,
+	}
 	updated, err := a.repo.UpdatePlanningTask(wedding.ID, task)
 	if err != nil {
 		writeRepositoryError(w, err)
@@ -1182,8 +1195,10 @@ func (a *API) createCommitteeAnnouncement(w http.ResponseWriter, r *http.Request
 		value := now
 		publishedAt = &value
 	}
-	announcement := models.Announcement{ID: announcementID, Title: input.Title, Body: input.Body,
-		Audience: input.Audience.Normalized(), Status: input.Status, PublishedAt: publishedAt, AuthorName: actor.Name, CreatedAt: now}
+	announcement := models.Announcement{
+		ID: announcementID, Title: input.Title, Body: input.Body,
+		Audience: input.Audience.Normalized(), Status: input.Status, PublishedAt: publishedAt, AuthorName: actor.Name, CreatedAt: now,
+	}
 	created, err := a.repo.AddAnnouncement(wedding.ID, announcement)
 	if err != nil {
 		writeRepositoryError(w, err)
@@ -1207,8 +1222,10 @@ func (a *API) updateCommitteeAnnouncement(w http.ResponseWriter, r *http.Request
 		value := now
 		publishedAt = &value
 	}
-	announcement := models.Announcement{ID: r.PathValue("announcementID"), Title: input.Title, Body: input.Body,
-		Audience: input.Audience.Normalized(), Status: input.Status, PublishedAt: publishedAt}
+	announcement := models.Announcement{
+		ID: r.PathValue("announcementID"), Title: input.Title, Body: input.Body,
+		Audience: input.Audience.Normalized(), Status: input.Status, PublishedAt: publishedAt,
+	}
 	updated, err := a.repo.UpdateAnnouncement(wedding.ID, announcement)
 	if err != nil {
 		writeRepositoryError(w, err)
