@@ -253,4 +253,5 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
 .couple-monogram { display: flex; align-items: center; justify-content: center; }
 .story-card { grid-column: 1 / -1; min-height: 240px; }
 .story-overlay { width: min(60%, 520px); }
+.setup-card, .dashboard-grid > .card, #empty-guests { scroll-margin-top: 22px; }
 @media (max-width: 1150px) { .announcement-card { grid-column: 1 / -1; } }

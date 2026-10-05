@@ -1,5 +1,7 @@
 (() => {
   const API_URL = "/api/dashboard";
+  const API = window.WeddingHubAPI;
+  const WH = window.WeddingHub;
   const SAMPLE_DATA = {
     user: { name: "Wedding owner", role: "owner" },
     couple: { names: "Your wedding", date: "" }, unreadMessages: 0,
@@ -110,16 +112,33 @@
     });
     const search = $("search-input");
     search.addEventListener("keydown", event => { if (event.key === "Escape") search.blur(); });
+    document.querySelectorAll(".nav-item[href*='#']").forEach(link => link.addEventListener("click", close));
+    const updateActiveLink = () => {
+      const currentHash = location.hash;
+      document.querySelectorAll(".nav-item").forEach(link => {
+        const selected = currentHash ? new URL(link.href).hash === currentHash : !new URL(link.href).hash;
+        link.classList.toggle("active", selected);
+        if (selected) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      });
+    };
+    window.addEventListener("hashchange", updateActiveLink);
+    updateActiveLink();
   }
 
   async function load() {
     wireNavigation();
     if (!token) { location.replace("login.html"); return; }
     try {
+      if (!API || !WH) throw new Error("WeddingHub could not load its API client.");
+      if (!await API.currentUser()) { location.replace("login.html"); return; }
+      const linked = await API.bootstrap(WH.getData());
+      if (linked?.data) WH.saveData(linked.data);
       const response = await fetch(API_URL, { headers: { Authorization: `Bearer ${token}` }, credentials: "same-origin" });
       if (response.status === 401) { location.replace("login.html"); return; }
       if (!response.ok) throw new Error(`Dashboard request failed: ${response.status}`);
       render(await response.json());
+      if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "start" });
     } catch (error) {
       console.error(error);
       render(dataFallback());
