@@ -254,4 +254,5 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
 .story-card { grid-column: 1 / -1; min-height: 240px; }
 .story-overlay { width: min(60%, 520px); }
 .setup-card, .dashboard-grid > .card, #empty-guests { scroll-margin-top: 22px; }
+.empty-inline { margin: 14px 0; color: var(--muted); font-size: 8px; line-height: 1.5; }
 @media (max-width: 1150px) { .announcement-card { grid-column: 1 / -1; } }

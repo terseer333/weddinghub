@@ -80,7 +80,9 @@
     $("events-list").innerHTML = (data.events || []).length ? data.events.map(item => `<article class="event"><span class="event-date"><strong>${esc(item.day)}</strong><span>${esc(item.month)}</span></span><div><strong>${esc(item.title)}</strong><p>${esc(item.time)} · ${esc(item.place)}</p></div></article>`).join("") : '<p class="empty-inline">Add a published event to build your schedule.</p>';
     const committee = data.committee || SAMPLE_DATA.committee;
     $("member-stack").innerHTML = (committee.members || []).slice(0, 5).map(member => `<span class="avatar ${esc(member.color)}">${esc(member.initials)}</span>`).join("");
-    $("committee-count").textContent = `${committee.count || 0} ${committee.count === 1 ? "person" : "people"}`;
+    const memberCount = committee.count || 0;
+    $("committee-count").textContent = `${memberCount} ${memberCount === 1 ? "person" : "people"}`;
+    document.querySelector(".committee-copy").lastChild.textContent = ` ${memberCount === 1 ? "is" : "are"} helping make the day special.`;
     $("tasks-text").textContent = `${committee.tasksDone || 0} of ${committee.tasksTotal || 0}`;
     $("tasks-track").firstElementChild.style.width = committee.tasksTotal ? `${committee.tasksDone / committee.tasksTotal * 100}%` : "0%";
     if (committee.nextTask) {

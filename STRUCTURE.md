@@ -13,6 +13,7 @@
 - `pages/dashboard.js`: dashboard fetch, display, theme, mobile navigation, and empty-state behavior.
 - `pages/dashboard.old.html`: backup of the prior owner dashboard.
 - `backend/api/dashboard.go`: authenticated `GET /api/dashboard` response construction.
+- Dashboard sidebar targets existing dashboard anchors or the guest-facing invitation preview until the standalone owner pages are built.
 
 The dashboard JSON contains `user`, `couple`, `unreadMessages`, `guests`, `views`,
 `setup`, `committee`, `activity`, `events`, and `announcements`. The optional additions
