@@ -57,10 +57,6 @@
   }
 
   async function resolveWeddingID() {
-    if (token && (!weddingID || weddingID === data.wedding?.id)) {
-      const view = await API.invitation(token);
-      if (view?.wedding?.id) weddingID = view.wedding.id;
-    }
     if (!weddingID) weddingID = data.wedding?.id || "";
     return weddingID;
   }
@@ -81,11 +77,15 @@
   // cleared storage). The server still authorizes access below; this only supplies the
   // identity the page needs before actor() can describe it.
   async function hydrateMemberFromInvitation() {
-    if (member || !token) return;
+    if (!token) return;
     const view = await API.invitation(token);
+    if (view?.wedding?.id) {
+      weddingID = view.wedding.id;
+      localStorage.setItem("weddinghub_api_wedding_id", weddingID);
+    }
     const invitation = view?.invitation;
     if (!invitation || invitation.type !== "committee") return;
-    member = data.committeeMembers?.find(item => item.token === token || item.apiInvitationId === invitation.id);
+    member = data.committeeMembers?.find(item => item.token === token || item.apiInvitationId === invitation.id) || member;
     if (member) {
       if (invitation.status !== "pending") member.invitationStatus = invitation.status;
       return;
@@ -102,15 +102,9 @@
 
   async function initialize() {
     try {
-      await API.requireAPI();
-    } catch (error) {
-      API.showFatalError(error.message);
-      return;
-    }
-    $("committeeApiStatus").textContent = "● API connected";
-    $("committeeApiStatus").classList.add("online");
-    try {
-      await hydrateMemberFromInvitation();
+      // Most returning members already have the wedding id. The dashboard endpoint
+      // can identify them from the token, so avoid a separate invitation lookup.
+      if (token && !weddingID) await hydrateMemberFromInvitation();
       await resolveWeddingID();
     } catch (_) {
       return showGate("We could not verify this invitation link. Reopen it from your invitation email.");
@@ -118,6 +112,25 @@
     if (!weddingID) return showGate("We could not find this wedding. Reopen it from your invitation link.");
     try {
       const view = await API.committeeDashboard(weddingID, token);
+      $("committeeApiStatus").textContent = "● API connected";
+      $("committeeApiStatus").classList.add("online");
+      if (!member && view.actor?.role === "committee_member") {
+        const remoteMember = (view.committee_members || []).find(item => item.invitation_id === view.actor.invitation_id || item.id === view.actor.member_id);
+        const role = (view.committee_roles || []).find(item => item.id === remoteMember?.role_id);
+        member = {
+          id: remoteMember?.id || view.actor.invitation_id,
+          apiMembershipId: remoteMember?.id || "",
+          apiInvitationId: view.actor.invitation_id || "",
+          name: view.actor.name,
+          title: remoteMember?.title || role?.name || "Committee member",
+          roleId: remoteMember?.role_id || "",
+          token,
+          type: "committee",
+          invitationStatus: "accepted"
+        };
+        data.committeeMembers = data.committeeMembers || [];
+        data.committeeMembers.push(member);
+      }
       data = API.mergeAPI(data, view);
       WH.saveData(data);
       guestStats = view.guest_stats || computeGuestStats();
@@ -161,11 +174,15 @@
     $("committeeSidebar").classList.add("open");
     $("committeeBackdrop").classList.add("open");
     document.body.classList.add("menu-open");
+    $("committeeMenuButton").setAttribute("aria-expanded", "true");
+    $("committeeMenuButton").setAttribute("aria-label", "Close navigation");
   }
   function closeSidebar() {
     $("committeeSidebar").classList.remove("open");
     $("committeeBackdrop").classList.remove("open");
     document.body.classList.remove("menu-open");
+    $("committeeMenuButton").setAttribute("aria-expanded", "false");
+    $("committeeMenuButton").setAttribute("aria-label", "Open navigation");
   }
 
   function renderAll() { renderOverview(); renderInformation(); renderEvents(); renderTasks(); renderAnnouncements(); renderPhotos(); renderChat(); renderProfile(); }
@@ -427,7 +444,10 @@
   // Event wiring
   $$(".committee-link[data-view]").forEach(link => link.onclick = () => openView(link.dataset.view));
   $$("[data-jump]").forEach(button => button.onclick = () => openView(button.dataset.jump));
-  $("committeeMenuButton").onclick = openSidebar;
+  $("committeeMenuButton").onclick = () => {
+    if ($("committeeSidebar").classList.contains("open")) closeSidebar();
+    else openSidebar();
+  };
   $("committeeSidebarClose").onclick = closeSidebar;
   $("committeeBackdrop").onclick = closeSidebar;
   document.addEventListener("keydown", event => { if (event.key === "Escape") closeSidebar(); });

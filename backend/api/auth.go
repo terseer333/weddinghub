@@ -77,51 +77,50 @@ func (a *API) requireCommittee(w http.ResponseWriter, r *http.Request, weddingID
 		writeUnauthorized(w)
 		return models.Wedding{}, actor{}, false
 	}
+	hash := models.HashToken(token)
+	inviteWedding, invitation, err := a.repo.InvitationByHash(hash)
+	if err == nil {
+		if inviteWedding.ID != weddingID || invitation.Type.Normalized() != models.InvitationCommittee {
+			writeError(w, http.StatusForbidden, "committee access requires an accepted committee invitation for this wedding")
+			return models.Wedding{}, actor{}, false
+		}
+		if invitation.Status != models.InvitationAccepted {
+			writeError(w, http.StatusForbidden, "accept your committee invitation to use the planning workspace")
+			return models.Wedding{}, actor{}, false
+		}
+		resolved := actor{Role: models.RoleCommitteeMember, WeddingID: inviteWedding.ID, InvitationID: invitation.ID, Name: invitation.GuestName}
+		for _, member := range inviteWedding.CommitteeMembers {
+			if member.InvitationID == invitation.ID {
+				resolved.MemberID = member.ID
+				if strings.TrimSpace(member.Name) != "" {
+					resolved.Name = member.Name
+				}
+				break
+			}
+		}
+		return inviteWedding, resolved, true
+	}
+	if !errors.Is(err, repository.ErrNotFound) {
+		writeRepositoryError(w, err)
+		return models.Wedding{}, actor{}, false
+	}
+
+	// Admin tokens and sessions are not invitation records, so resolve the wedding
+	// only on this less common path. Committee invitation lookups already returned
+	// the full wedding aggregate and can authorize in one database read.
 	wedding, err := a.repo.GetWedding(weddingID)
 	if err != nil {
 		writeRepositoryError(w, err)
 		return models.Wedding{}, actor{}, false
 	}
-	hash := models.HashToken(token)
-
 	if constantTimeMatch(wedding.AdminTokenHash, hash) {
 		return wedding, actor{Role: models.RoleAdmin, WeddingID: wedding.ID, Name: weddingAdminName(wedding)}, true
 	}
-	// An account that administers the wedding acts as its admin without the capability token.
 	if user, ok := a.sessionUser(token); ok && a.repo.IsWeddingAdmin(weddingID, user.ID) {
 		return wedding, actor{Role: models.RoleAdmin, WeddingID: wedding.ID, Name: weddingAdminName(wedding)}, true
 	}
-
-	inviteWedding, invitation, err := a.repo.InvitationByHash(hash)
-	if err != nil {
-		if errors.Is(err, repository.ErrNotFound) {
-			// An unknown token is not told apart from a token for another wedding.
-			writeError(w, http.StatusForbidden, "committee access requires an accepted committee invitation for this wedding")
-			return models.Wedding{}, actor{}, false
-		}
-		writeRepositoryError(w, err)
-		return models.Wedding{}, actor{}, false
-	}
-	if inviteWedding.ID != wedding.ID || invitation.Type.Normalized() != models.InvitationCommittee {
-		writeError(w, http.StatusForbidden, "committee access requires an accepted committee invitation for this wedding")
-		return models.Wedding{}, actor{}, false
-	}
-	if invitation.Status != models.InvitationAccepted {
-		writeError(w, http.StatusForbidden, "accept your committee invitation to use the planning workspace")
-		return models.Wedding{}, actor{}, false
-	}
-
-	resolved := actor{Role: models.RoleCommitteeMember, WeddingID: wedding.ID, InvitationID: invitation.ID, Name: invitation.GuestName}
-	for _, member := range wedding.CommitteeMembers {
-		if member.InvitationID == invitation.ID {
-			resolved.MemberID = member.ID
-			if strings.TrimSpace(member.Name) != "" {
-				resolved.Name = member.Name
-			}
-			break
-		}
-	}
-	return wedding, resolved, true
+	writeError(w, http.StatusForbidden, "committee access requires an accepted committee invitation for this wedding")
+	return models.Wedding{}, actor{}, false
 }
 
 // sessionUser resolves a browser session token to its account without writing a response.

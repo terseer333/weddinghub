@@ -10,6 +10,7 @@ import (
 	"io/fs"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/lib/pq"
@@ -45,7 +46,7 @@ func NewPostgresRepository(ctx context.Context, dsn string) (*PostgresRepository
 		return nil, fmt.Errorf("open postgres: %w", err)
 	}
 	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
+	db.SetMaxIdleConns(10)
 	db.SetConnMaxLifetime(30 * time.Minute)
 	db.SetConnMaxIdleTime(5 * time.Minute)
 	if err := db.PingContext(ctx); err != nil {
@@ -190,6 +191,34 @@ func loadWedding(ctx context.Context, q querier, id string) (models.Wedding, err
 	w, err := scanWedding(q.QueryRowContext(ctx, `SELECT `+weddingColumns+` FROM weddings WHERE id = $1`, id))
 	if err != nil {
 		return models.Wedding{}, err
+	}
+	// A normal database-backed read can load each independent child collection at
+	// the same time. This matters when PostgreSQL is remote: the old serial path
+	// paid one network round trip per collection. Keep the transaction path
+	// sequential because a transaction owns one database connection.
+	if _, isDB := q.(*sql.DB); isDB {
+		loaders := []func(context.Context, *models.Wedding) error{
+			loadAdmins, loadGuests, loadCommitteeMembers, loadCommitteeRoles,
+			loadInvitations, loadEvents, loadPhotos, loadStorySections,
+			loadAnnouncements, loadPlanningTasks, loadCommitteeChat, loadRSVPs,
+			loadGuestMessages,
+		}
+		errs := make([]error, len(loaders))
+		var wg sync.WaitGroup
+		wg.Add(len(loaders))
+		for i, loader := range loaders {
+			go func(index int, load func(context.Context, *models.Wedding) error) {
+				defer wg.Done()
+				errs[index] = load(ctx, &w)
+			}(i, loader)
+		}
+		wg.Wait()
+		for _, err := range errs {
+			if err != nil {
+				return models.Wedding{}, err
+			}
+		}
+		return w, nil
 	}
 	if err := loadAdmins(ctx, q, &w); err != nil {
 		return models.Wedding{}, err

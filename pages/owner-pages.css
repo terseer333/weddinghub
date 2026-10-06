@@ -90,3 +90,51 @@ html[data-theme="dark"] .owner-button.danger { color: #e7a49b; }
 @keyframes owner-pulse { to { opacity: .45; } }
 @media(max-width:850px) { .owner-card.half,.owner-card.third,.owner-card[style*="span 8"],.owner-card[style*="span 4"] { grid-column: span 12 !important; }.template-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media(max-width:600px) { .page-intro { align-items: flex-start; flex-direction: column; }.page-intro h1 { font-size: 34px; }.owner-card { padding: 18px; }.owner-form { grid-template-columns: 1fr; }.owner-form .wide { grid-column: auto; }.owner-stat-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.owner-row { align-items: flex-start; flex-wrap: wrap; }.owner-row-actions { justify-content: flex-start; width: 100%; }.template-grid { grid-template-columns: 1fr 1fr; }.invitation-preview { min-height: 300px; padding: 28px 14px; } }
+
+/* Card Studio uses the available workspace height, with independent scrolling
+   for designs and controls so the live preview stays in view while editing. */
+body[data-page="card-studio"] .content { padding: 18px 22px; }
+body[data-page="card-studio"] .page-intro { max-width: none; margin: 0 0 14px; align-items: center; }
+body[data-page="card-studio"] .page-intro h1 { font-size: 32px; }
+body[data-page="card-studio"] .owner-state { margin: 6px 0; }
+.card-studio-page { max-width: none; height: calc(100dvh - 154px); min-height: 500px; grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr); gap: 14px; }
+.card-studio-page[hidden] { display: none; }
+.card-studio-page > .owner-card { min-width: 0; min-height: 0; grid-column: auto; padding: 18px; display: flex; flex-direction: column; overflow: hidden; }
+.card-studio-page .owner-card-head { margin-bottom: 12px; align-items: center; }
+.card-studio-page .owner-card-head h2 { font-size: 20px; }
+.card-studio-page .owner-card-head p { max-width: 440px; }
+.card-studio-page .owner-card-head > .owner-field { min-width: 150px; }
+.studio-search-field { margin-bottom: 10px; }
+.studio-search-field input { min-height: 38px; }
+.card-studio-page .template-grid { flex: 1; min-height: 0; overflow-y: auto; align-content: start; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); padding: 2px 4px 2px 0; }
+.card-studio-page .template-choice { padding: 8px; }
+.card-studio-page .template-choice .template-swatch { height: clamp(82px, 14vh, 145px); }
+.card-studio-page .studio-edit-card { overflow-y: auto; }
+.card-studio-page .invitation-preview#card-mini-preview { flex: 1; min-height: 220px; display: grid; place-items: center; margin: 0 0 10px; padding: 4px; }
+.card-studio-page .invitation-preview .luxury-invitation-card { width: auto; height: min(42vh, 430px); max-width: 100%; aspect-ratio: 3 / 4; }
+.card-studio-page .studio-form-heading { grid-column: 1 / -1; margin: 4px 0 -4px; color: var(--text-primary); font: 17px/1.2 var(--serif); }
+.card-studio-page .owner-form { flex: none; gap: 10px 12px; }
+.card-studio-page .owner-form .owner-field { gap: 5px; }
+.card-studio-page .owner-form .owner-field input,
+.card-studio-page .owner-form .owner-field select { min-height: 38px; }
+.card-studio-page .owner-form .owner-actions { margin-top: 2px; }
+@media (max-width: 1050px) {
+  body[data-page="card-studio"] .content { padding: 16px; }
+  .card-studio-page { height: auto; min-height: 0; grid-template-columns: minmax(0, 1fr); }
+  .card-studio-page > .owner-card { overflow: visible; }
+  .card-studio-page .template-grid { flex: none; max-height: 52vh; }
+  .card-studio-page .studio-edit-card { display: grid; grid-template-columns: minmax(240px, .85fr) minmax(0, 1fr); align-items: start; column-gap: 18px; }
+  .card-studio-page .studio-edit-card > .owner-card-head { grid-column: 1 / -1; }
+  .card-studio-page .invitation-preview#card-mini-preview { grid-row: span 2; }
+  .card-studio-page .owner-form { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  body[data-page="card-studio"] .content { padding: 12px; }
+  body[data-page="card-studio"] .page-intro { align-items: flex-start; }
+  .card-studio-page .owner-card-head { align-items: flex-start; flex-direction: column; }
+  .card-studio-page .owner-card-head > .owner-field { width: 100%; }
+  .card-studio-page .template-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 58vh; }
+  .card-studio-page .studio-edit-card { display: flex; }
+  .card-studio-page .invitation-preview#card-mini-preview { min-height: 300px; }
+  .card-studio-page .invitation-preview .luxury-invitation-card { height: min(48vh, 390px); }
+}

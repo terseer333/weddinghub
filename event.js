@@ -21,12 +21,6 @@ function invitee() { return member || guest; }
 async function loadInvitation() {
   if (!token) return startInvitationFlow();
   try {
-    await API.requireAPI();
-  } catch (error) {
-    API.showFatalError(error.message);
-    return;
-  }
-  try {
     const view = await API.invitation(token);
     data = API.mergeAPI(data, view);
     wedding = data.wedding;

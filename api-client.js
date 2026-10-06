@@ -75,7 +75,10 @@
     try {
       response = await fetch(endpoint + path, {
         ...options,
-        headers: { "Content-Type": "application/json", ...(options.headers || {}) }
+        // Content-Type is not CORS-safelisted. Adding it to bodyless GET requests
+        // forces a preflight round trip when the frontend and API use different
+        // origins (common in local development and split hosting).
+        headers: { ...(options.body !== undefined ? { "Content-Type": "application/json" } : {}), ...(options.headers || {}) }
       });
     } catch (_) {
       const error = new Error("WeddingHub API is unreachable at " + endpoint + ". Start the API server and reload.");
@@ -276,7 +279,6 @@
   // bootstrap loads the wedding from the API and seeds it on first run. It throws when
   // the API is unreachable; there is no local demo fallback.
   async function bootstrap(data) {
-    await requireAPI();
     const working = data.wedding || (data.wedding = {});
     // Signup is the only place a slug is ever written, so a working copy that lost it (a seed
     // reset, cleared storage, or a second device) cannot be matched against the API at all.

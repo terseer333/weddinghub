@@ -37,8 +37,19 @@
     catch (error) { if (error.status === 401) login(); throw error; }
   };
   window.WeddingHubOwner = { api, esc, toast, loading, fail, loadWorkspace, saveWorkspace };
-  const closeSidebar = () => { app.querySelector("#sidebar").classList.remove("is-open"); app.querySelector("#sidebar-scrim").hidden = true; document.body.classList.remove("menu-open"); };
-  app.querySelector("#sidebar-open").addEventListener("click", () => { app.querySelector("#sidebar").classList.add("is-open"); app.querySelector("#sidebar-scrim").hidden = false; document.body.classList.add("menu-open"); });
+  const menuButton = app.querySelector("#sidebar-open");
+  const sidebar = app.querySelector("#sidebar");
+  const closeSidebar = () => { sidebar.classList.remove("is-open"); app.querySelector("#sidebar-scrim").hidden = true; document.body.classList.remove("menu-open"); menuButton.setAttribute("aria-expanded", "false"); menuButton.setAttribute("aria-label", "Open navigation"); };
+  menuButton.setAttribute("aria-controls", "sidebar");
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.addEventListener("click", () => {
+    if (sidebar.classList.contains("is-open")) { closeSidebar(); return; }
+    sidebar.classList.add("is-open");
+    app.querySelector("#sidebar-scrim").hidden = false;
+    document.body.classList.add("menu-open");
+    menuButton.setAttribute("aria-expanded", "true");
+    menuButton.setAttribute("aria-label", "Close navigation");
+  });
   app.querySelector("#sidebar-close").addEventListener("click", closeSidebar);
   app.querySelector("#sidebar-scrim").addEventListener("click", closeSidebar);
   document.addEventListener("keydown", event => { if (event.key === "Escape") closeSidebar(); });
