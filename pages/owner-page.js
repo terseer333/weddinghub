@@ -92,7 +92,7 @@
       const templates = await templatesResponse.json();
       const fonts = await fontsResponse.json();
       let selected = templates.find(template => template.id === (data.card_config?.template_id || data.template_id)) || templates[0] || null;
-      let config = data.card_config || (selected ? { template_id: selected.id, fonts: selected.fonts, colors: selected.colors, decorations: selected.decorations || {} } : { template_id: "", fonts: {}, colors: {}, decorations: {} });
+      let config = data.card_config || (selected ? { template_id: selected.id, fonts: selected.fonts, colors: selected.colors, decorations: { ...(selected.decorations || {}), background: selected.background?.style || "solid" } } : { template_id: "", fonts: {}, colors: {}, decorations: {} });
       document.getElementById("page-main").hidden = false;
       setState("ready");
       const form = document.getElementById("card-form");
@@ -126,7 +126,7 @@
         const button = event.target.closest("[data-template]");
         if (!button) return;
         selected = templates.find(template => template.id === button.dataset.template) || selected;
-        config = { ...config, template_id: selected.id, fonts: { ...selected.fonts }, colors: { ...selected.colors }, decorations: { ...selected.decorations }, background: { ...selected.background } };
+        config = { ...config, template_id: selected.id, fonts: { ...selected.fonts }, colors: { ...selected.colors }, decorations: { ...selected.decorations, background: selected.background?.style || "solid" } };
         for (const key of ["couple", "heading", "body"]) if (selected.fonts?.[key]) form.elements[`font-${key}`].value = selected.fonts[key];
         for (const key of ["background", "text", "accent"]) form.elements[`color-${key}`].value = safeColor(selected.colors?.[key]);
         draw();
