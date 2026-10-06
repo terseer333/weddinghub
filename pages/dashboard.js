@@ -101,17 +101,6 @@
   }
 
   function wireNavigation() {
-    const sidebar = $("sidebar"), scrim = $("sidebar-scrim");
-    const close = () => { sidebar.classList.remove("is-open"); scrim.hidden = true; document.body.classList.remove("menu-open"); };
-    $("sidebar-open").addEventListener("click", () => { sidebar.classList.add("is-open"); scrim.hidden = false; document.body.classList.add("menu-open"); });
-    $("sidebar-close").addEventListener("click", close);
-    scrim.addEventListener("click", close);
-    document.addEventListener("keydown", event => { if (event.key === "Escape") close(); });
-    $("theme-toggle").addEventListener("click", () => {
-      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
-      try { localStorage.setItem("weddinghub-theme", next); } catch (_) {}
-    });
     const search = $("search-input");
     search.addEventListener("keydown", event => { if (event.key === "Escape") search.blur(); });
     document.querySelectorAll(".nav-item[href*='#']").forEach(link => link.addEventListener("click", close));

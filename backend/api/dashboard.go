@@ -177,6 +177,9 @@ func buildDashboard(user models.User, wedding models.Wedding, now time.Time) das
 		}, response.UpdatedAt})
 	}
 	for _, message := range wedding.GuestMessages {
+		if !message.Read {
+			result.UnreadMessages++
+		}
 		invitation := guestInvitations[message.InvitationID]
 		activities = append(activities, timedActivity{dashboardActivity{
 			Initials: nameInitials(invitation.GuestName), Name: invitation.GuestName,

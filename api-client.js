@@ -362,6 +362,54 @@
     const remote = await request(`/api/weddings/${id}`, { method: "PUT", body: JSON.stringify(toAPI(data)), headers: authHeader() });
     return mergeAPI(data, remote);
   }
+  async function ownerWorkspace() {
+    return request("/api/owner/workspace", { headers: sessionHeader() });
+  }
+  async function saveOwnerWorkspace(data) {
+    return request("/api/owner/workspace", { method: "PUT", headers: sessionHeader(), body: JSON.stringify(data) });
+  }
+  async function createOwnerInvitation(invitation) {
+    return request("/api/owner/invitations", { method: "POST", headers: sessionHeader(), body: JSON.stringify(invitation) });
+  }
+  async function updateOwnerInvitation(id, invitation) {
+    return request(`/api/owner/invitations/${encodeURIComponent(id)}`, { method: "PUT", headers: sessionHeader(), body: JSON.stringify(invitation) });
+  }
+  async function deleteOwnerInvitation(id) {
+    return request(`/api/owner/invitations/${encodeURIComponent(id)}`, { method: "DELETE", headers: sessionHeader() });
+  }
+  async function refreshOwnerInvitationLink(id) {
+    return request(`/api/owner/invitations/${encodeURIComponent(id)}/refresh-link`, { method: "POST", headers: sessionHeader() });
+  }
+  async function sendOwnerInvitation(id, token, channels) {
+    return request(`/api/owner/invitations/${encodeURIComponent(id)}/send`, { method: "POST", headers: sessionHeader(), body: JSON.stringify({ token, channels }) });
+  }
+  async function createOwnerTask(task) {
+    return request("/api/owner/tasks", { method: "POST", headers: sessionHeader(), body: JSON.stringify(task) });
+  }
+  async function updateOwnerTask(id, task) {
+    return request(`/api/owner/tasks/${encodeURIComponent(id)}`, { method: "PUT", headers: sessionHeader(), body: JSON.stringify(task) });
+  }
+  async function deleteOwnerTask(id) {
+    return request(`/api/owner/tasks/${encodeURIComponent(id)}`, { method: "DELETE", headers: sessionHeader() });
+  }
+  async function createOwnerCommitteeRole(role) {
+    return request("/api/owner/committee/roles", { method: "POST", headers: sessionHeader(), body: JSON.stringify(role) });
+  }
+  async function deleteOwnerCommitteeRole(id) {
+    return request(`/api/owner/committee/roles/${encodeURIComponent(id)}`, { method: "DELETE", headers: sessionHeader() });
+  }
+  async function updateOwnerCommitteeMember(id, member) {
+    return request(`/api/owner/committee/members/${encodeURIComponent(id)}`, { method: "PUT", headers: sessionHeader(), body: JSON.stringify(member) });
+  }
+  async function deleteOwnerCommitteeMember(id) {
+    return request(`/api/owner/committee/members/${encodeURIComponent(id)}`, { method: "DELETE", headers: sessionHeader() });
+  }
+  async function setOwnerMessageRead(id, read) {
+    return request(`/api/owner/messages/${encodeURIComponent(id)}`, { method: "PATCH", headers: sessionHeader(), body: JSON.stringify({ read }) });
+  }
+  async function deleteOwnerMessage(id) {
+    return request(`/api/owner/messages/${encodeURIComponent(id)}`, { method: "DELETE", headers: sessionHeader() });
+  }
   async function createInvitation(id, guest) {
     return request(`/api/weddings/${id}/invitations`, { method: "POST", headers: authHeader(), body: JSON.stringify({
       type: guest.type || "guest",
@@ -509,7 +557,11 @@
     return request(`/api/weddings/${encodeURIComponent(id)}/committee/members/${encodeURIComponent(memberID)}`, { method: "DELETE", headers: authHeader() });
   }
 
-  window.WeddingHubAPI = { requireAPI, showFatalError, bootstrap, saveWedding, addGuest, sendInvitation, respond, updateRSVP, invitation, dashboard, sendMessage,
+  window.WeddingHubAPI = { requireAPI, showFatalError, bootstrap, saveWedding, ownerWorkspace, saveOwnerWorkspace,
+    createOwnerInvitation, updateOwnerInvitation, deleteOwnerInvitation, refreshOwnerInvitationLink, sendOwnerInvitation,
+    createOwnerTask, updateOwnerTask, deleteOwnerTask, setOwnerMessageRead, deleteOwnerMessage,
+    createOwnerCommitteeRole, deleteOwnerCommitteeRole, updateOwnerCommitteeMember, deleteOwnerCommitteeMember,
+    addGuest, sendInvitation, respond, updateRSVP, invitation, dashboard, sendMessage,
     forgotPassword, resetPassword,
     signup, login, logout, currentUser, sessionToken, clearSession,
     adminLogin, adminLogout, adminMe, adminDashboard, adminUsers, adminSetUserStatus, adminDeleteUser,

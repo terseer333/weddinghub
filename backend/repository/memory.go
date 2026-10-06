@@ -181,6 +181,90 @@ func (r *MemoryRepository) AddInvitation(weddingID string, inv models.Invitation
 	return inv, nil
 }
 
+func (r *MemoryRepository) UpdateInvitation(weddingID string, inv models.Invitation) (models.Invitation, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.Invitation{}, ErrNotFound
+	}
+	for i := range w.Invitations {
+		if w.Invitations[i].ID == inv.ID {
+			inv.Status = w.Invitations[i].Status
+			inv.RespondedAt = w.Invitations[i].RespondedAt
+			inv.CreatedAt = w.Invitations[i].CreatedAt
+			w.Invitations[i] = inv
+			w.UpdatedAt = time.Now().UTC()
+			r.weddings[weddingID] = cloneWedding(w)
+			return inv, nil
+		}
+	}
+	return models.Invitation{}, ErrNotFound
+}
+
+func (r *MemoryRepository) DeleteInvitation(weddingID, invitationID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return ErrNotFound
+	}
+	for i := range w.Invitations {
+		if w.Invitations[i].ID != invitationID {
+			continue
+		}
+		w.Invitations = append(w.Invitations[:i:i], w.Invitations[i+1:]...)
+		w.Guests = filterGuests(w.Guests, invitationID)
+		w.CommitteeMembers = filterCommitteeMembers(w.CommitteeMembers, invitationID)
+		w.RSVPs = filterRSVPs(w.RSVPs, invitationID)
+		w.GuestMessages = filterGuestMessages(w.GuestMessages, invitationID)
+		w.UpdatedAt = time.Now().UTC()
+		r.weddings[weddingID] = cloneWedding(w)
+		return nil
+	}
+	return ErrNotFound
+}
+
+func filterGuests(items []models.Guest, invitationID string) []models.Guest {
+	out := items[:0]
+	for _, item := range items {
+		if item.InvitationID != invitationID {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
+func filterCommitteeMembers(items []models.CommitteeMember, invitationID string) []models.CommitteeMember {
+	out := items[:0]
+	for _, item := range items {
+		if item.InvitationID != invitationID {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
+func filterRSVPs(items []models.RSVP, invitationID string) []models.RSVP {
+	out := items[:0]
+	for _, item := range items {
+		if item.InvitationID != invitationID {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
+func filterGuestMessages(items []models.GuestMessage, invitationID string) []models.GuestMessage {
+	out := items[:0]
+	for _, item := range items {
+		if item.InvitationID != invitationID {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
 func (r *MemoryRepository) InvitationByHash(hash string) (models.Wedding, models.Invitation, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -227,8 +311,10 @@ func (r *MemoryRepository) RespondToInvitation(hash string, status models.Invita
 				if err != nil {
 					return models.Wedding{}, models.Invitation{}, err
 				}
-				w.CommitteeMembers = append(w.CommitteeMembers, models.CommitteeMember{ID: memberID, InvitationID: inv.ID,
-					Name: inv.GuestName, Email: inv.GuestEmail, Phone: inv.GuestPhone, Title: inv.CommitteeTitle, JoinedAt: at})
+				w.CommitteeMembers = append(w.CommitteeMembers, models.CommitteeMember{
+					ID: memberID, InvitationID: inv.ID,
+					Name: inv.GuestName, Email: inv.GuestEmail, Phone: inv.GuestPhone, Title: inv.CommitteeTitle, JoinedAt: at,
+				})
 			}
 		} else if !hasGuest(w.Guests, inv.ID) {
 			guestID, err := models.NewID()
@@ -292,6 +378,40 @@ func (r *MemoryRepository) AddGuestMessage(hash string, message models.GuestMess
 	w.UpdatedAt = message.CreatedAt
 	r.weddings[w.ID] = cloneWedding(w)
 	return cloneWedding(w), message, nil
+}
+
+func (r *MemoryRepository) SetGuestMessageRead(weddingID, messageID string, read bool) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return ErrNotFound
+	}
+	for i := range w.GuestMessages {
+		if w.GuestMessages[i].ID == messageID {
+			w.GuestMessages[i].Read = read
+			r.weddings[weddingID] = cloneWedding(w)
+			return nil
+		}
+	}
+	return ErrNotFound
+}
+
+func (r *MemoryRepository) DeleteGuestMessage(weddingID, messageID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return ErrNotFound
+	}
+	for i := range w.GuestMessages {
+		if w.GuestMessages[i].ID == messageID {
+			w.GuestMessages = append(w.GuestMessages[:i:i], w.GuestMessages[i+1:]...)
+			r.weddings[weddingID] = cloneWedding(w)
+			return nil
+		}
+	}
+	return ErrNotFound
 }
 
 // AddCommitteeMessage stores a private planning message. Authorization happens in the API layer;
@@ -384,6 +504,19 @@ func (r *MemoryRepository) DeletePlanningTask(weddingID, taskID string) error {
 		return nil
 	}
 	return ErrNotFound
+}
+
+func (r *MemoryRepository) ReplacePlanningTasks(weddingID string, tasks []models.PlanningTask) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return ErrNotFound
+	}
+	w.PlanningTasks = append([]models.PlanningTask{}, tasks...)
+	w.UpdatedAt = time.Now().UTC()
+	r.weddings[weddingID] = cloneWedding(w)
+	return nil
 }
 
 // AddAnnouncement stores an announcement (public or committee-only) in the wedding aggregate.
