@@ -28,8 +28,13 @@
       const box = document.getElementById("extra-main");
       const key = announcements ? "announcements" : "story_sections";
       const list = () => data[key] || [];
+      const photos = () => data.photos || [];
       function draw() {
-        box.innerHTML = `<div class="owner-card-head"><div><h2>${announcements ? "Updates" : "Story sections"}</h2><p>Draft items stay private until published.</p></div></div><div class="owner-list">${list().length ? list().map(item => `<article class="owner-row"><div class="owner-row-main"><strong>${esc(item.title)}</strong><p>${esc(announcements ? item.body : item.body)}</p><small>${announcements ? esc(item.audience || "public") : esc(item.photo_url || "")}</small></div><span class="owner-badge ${esc(item.status)}">${esc(item.status)}</span><div class="owner-row-actions"><button data-edit="${esc(item.id)}">Edit</button><button data-toggle="${esc(item.id)}">${item.status === "published" ? "Unpublish" : "Publish"}</button><button data-remove="${esc(item.id)}">Delete</button></div></article>`).join("") : '<p class="owner-empty">Nothing here yet. Add your first item above.</p>'}</div>`;
+        box.innerHTML = `${announcements ? "" : `<article class="owner-card"><div class="owner-card-head"><div><h2>Couple photos</h2><p>Published photos appear in your guests’ gallery. Portraits also fill the couple section, and a photo appears on your admin overview.</p></div></div><form id="couple-photo-form" class="owner-form"><label class="owner-field">Where should it appear?<select name="placement"><option value="gallery">Guest photo gallery</option><option value="bride">Bride portrait</option><option value="groom">Groom portrait</option></select></label><label class="owner-field">Caption<input name="caption" maxlength="400" placeholder="A moment from our celebration"></label><label class="owner-field wide">Choose a photo<input name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></label><div class="owner-actions wide"><button class="owner-button primary" type="submit">Upload and publish photo</button><span class="owner-hint" id="photo-upload-status" aria-live="polite"></span></div></form><div class="owner-list" id="couple-photo-list"></div></article>`}<article class="owner-card"><div class="owner-card-head"><div><h2>${announcements ? "Updates" : "Story sections"}</h2><p>Draft items stay private until published.</p></div></div><div class="owner-list">${list().length ? list().map(item => `<article class="owner-row"><div class="owner-row-main"><strong>${esc(item.title)}</strong><p>${esc(item.body)}</p><small>${announcements ? esc(item.audience || "public") : esc(item.photo_url || "")}</small></div><span class="owner-badge ${esc(item.status)}">${esc(item.status)}</span><div class="owner-row-actions"><button data-edit="${esc(item.id)}">Edit</button><button data-toggle="${esc(item.id)}">${item.status === "published" ? "Unpublish" : "Publish"}</button><button data-remove="${esc(item.id)}">Delete</button></div></article>`).join("") : '<p class="owner-empty">Nothing here yet. Add your first item above.</p>'}</div></article>`;
+        if (!announcements) {
+          const photoList = document.getElementById("couple-photo-list");
+          photoList.innerHTML = photos().length ? photos().map(photo => `<article class="owner-row"><img src="${esc(photo.url)}" alt="${esc(photo.caption || "Wedding photo")}" style="width:76px;height:76px;object-fit:cover;border-radius:9px"><div class="owner-row-main"><strong>${esc(photo.caption || "Wedding photo")}</strong><p>${/^bride portrait$/i.test(photo.caption || "") ? "Bride portrait" : /^groom portrait$/i.test(photo.caption || "") ? "Groom portrait" : "Guest gallery"}</p></div><span class="owner-badge ${esc(photo.status)}">${esc(photo.status)}</span><div class="owner-row-actions"><button type="button" data-photo-toggle="${esc(photo.id)}">${photo.status === "published" ? "Unpublish" : "Publish"}</button><button type="button" data-photo-remove="${esc(photo.id)}">Delete</button></div></article>`).join("") : '<p class="owner-empty">No couple photos yet. Upload a photo to show it on your wedding page.</p>';
+        }
       }
       function onClick(event) {
         const edit = event.target.closest("[data-edit]"), toggle = event.target.closest("[data-toggle]"), remove = event.target.closest("[data-remove]");
@@ -38,6 +43,46 @@
         else if (remove && confirm("Delete this item?")) { data[key] = list().filter(x => x.id !== remove.dataset.remove); save(); }
       }
       async function save() { try { data = await owner.saveWorkspace(data); draw(); owner.toast("Content saved."); } catch (e) { owner.toast(e.message || "Could not save content.", "error"); } }
+      async function savePhotos() { try { data = await owner.saveWorkspace(data); draw(); owner.toast("Photo changes saved."); } catch (e) { owner.toast(e.message || "Could not save photos.", "error"); } }
+      if (!announcements) {
+        box.addEventListener("submit", async event => {
+          if (event.target.id !== "couple-photo-form") return;
+          event.preventDefault();
+          const form = event.target, button = form.querySelector("button[type=submit]"), status = document.getElementById("photo-upload-status");
+          const file = form.elements.photo.files[0];
+          if (!file) return;
+          button.disabled = true; status.textContent = "Preparing photo…";
+          try {
+            let url = "";
+            for (const [size, quality] of [[1000, 0.72], [800, 0.64], [640, 0.55]]) {
+              url = await window.WeddingHub.resizeImage(file, size, quality);
+              if (url.length <= 660000) break;
+              url = "";
+            }
+            if (!url) throw new Error("This image is too large to upload. Please choose a smaller photo.");
+            const placement = form.elements.placement.value;
+            const caption = placement === "bride" ? "Bride portrait" : placement === "groom" ? "Groom portrait" : (form.elements.caption.value.trim() || "Wedding photo");
+            const existing = placement === "bride" || placement === "groom" ? photos().find(photo => photo.caption === caption) : null;
+            const item = { id: existing?.id || "", url, caption, alt_text: caption, sort_order: existing?.sort_order ?? photos().length + 1, status: "published" };
+            data.photos = existing ? photos().map(photo => photo.id === existing.id ? item : photo) : [...photos(), item];
+            data = await owner.saveWorkspace(data);
+            draw(); owner.toast("Photo uploaded and published.");
+          } catch (error) {
+            status.textContent = error.message || "Could not upload this photo.";
+            owner.toast(error.message || "Could not upload this photo.", "error");
+          } finally {
+            const liveButton = document.querySelector('#couple-photo-form button[type="submit"]');
+            if (liveButton) liveButton.disabled = false;
+          }
+        });
+        box.addEventListener("click", async event => {
+          const toggle = event.target.closest("[data-photo-toggle]"), remove = event.target.closest("[data-photo-remove]");
+          if (!toggle && !remove) return;
+          if (remove && !confirm("Delete this photo?")) return;
+          data.photos = remove ? photos().filter(photo => photo.id !== remove.dataset.photoRemove) : photos().map(photo => photo.id === toggle.dataset.photoToggle ? { ...photo, status: photo.status === "published" ? "draft" : "published" } : photo);
+          await savePhotos();
+        });
+      }
       function formFor(item = {}) {
         const dialog = document.createElement("dialog"); dialog.className = "owner-dialog";
         dialog.innerHTML = `<form method="dialog"><div class="owner-card-head"><h2>${item.id ? "Edit" : "Add"} ${announcements ? "announcement" : "story section"}</h2><button type="button" class="owner-button" data-close>Close</button></div><div class="owner-form"><label class="owner-field">Title<input name="title" maxlength="${announcements ? 200 : 160}" required></label>${announcements ? '<label class="owner-field">Audience<select name="audience"><option value="public">Guests</option><option value="committee">Committee</option></select></label>' : '<label class="owner-field">Photo URL<input name="photo_url" placeholder="https://…"></label>'}<label class="owner-field wide">${announcements ? "Message" : "Story"}<textarea name="body" required></textarea></label><div class="owner-actions wide"><button class="owner-button primary" type="submit">Save</button></div></div></form>`;

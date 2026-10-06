@@ -253,16 +253,20 @@ func buildDashboard(user models.User, wedding models.Wedding, now time.Time) das
 	if len(result.Announcements) > 3 {
 		result.Announcements = result.Announcements[:3]
 	}
+	photoImageFound := false
 	for _, photo := range wedding.Photos {
 		if photo.URL != "" {
 			result.StoryImage = photo.URL
+			photoImageFound = true
 			break
 		}
 	}
-	for _, story := range wedding.StorySections {
-		if story.PhotoURL != "" {
-			result.StoryImage = story.PhotoURL
-			break
+	if !photoImageFound {
+		for _, story := range wedding.StorySections {
+			if story.PhotoURL != "" {
+				result.StoryImage = story.PhotoURL
+				break
+			}
 		}
 	}
 

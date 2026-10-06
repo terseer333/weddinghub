@@ -108,16 +108,17 @@
         document.getElementById("template-grid").innerHTML = templates.filter(template => {
           const text = `${template.name} ${template.category}`.toLowerCase();
           return (!document.getElementById("template-filter").value || template.category === document.getElementById("template-filter").value) && text.includes(document.getElementById("template-search").value.toLowerCase());
-        }).map(template => `<button class="template-choice" type="button" data-template="${escape(template.id)}" aria-pressed="${selected?.id === template.id}"><span class="template-swatch" style="background:linear-gradient(145deg,${safeColor(template.colors?.background)},${safeColor(template.colors?.accent)})"></span><strong>${escape(template.name)}</strong><small>${escape(template.category || "Wedding")}</small></button>`).join("");
+        }).map(template => {
+          const floralStyle = template.decorations?.floralStyle || "minimalist-frame";
+          const floralAsset = floralStyle === "minimal" ? "minimalist-frame" : floralStyle;
+          return `<button class="template-choice" type="button" data-template="${escape(template.id)}" aria-pressed="${selected?.id === template.id}"><span class="template-swatch" style="--swatch-bg:${safeColor(template.colors?.background)};--swatch-accent:${safeColor(template.colors?.accent)};--swatch-art:url('../assets/templates/${escape(floralAsset)}.svg')"></span><strong>${escape(template.name)}</strong><small>${escape(template.category || "Wedding")}</small></button>`;
+        }).join("");
         document.getElementById("templates-empty").hidden = Boolean(document.getElementById("template-grid").children.length);
-        document.getElementById("preview-couple").textContent = `${data.partner_one || "Partner one"} & ${data.partner_two || "Partner two"}`;
-        document.getElementById("preview-date").textContent = data.date ? new Date(data.date).toLocaleDateString() : "Wedding date";
-        document.getElementById("preview-venue").textContent = data.venue || "Celebration venue";
         const card = document.getElementById("card-mini-preview");
-        card.style.background = safeColor(config.colors?.background);
-        card.style.color = safeColor(config.colors?.text);
-        card.style.borderColor = safeColor(config.colors?.accent);
-        document.getElementById("preview-couple").style.fontFamily = config.fonts?.couple || "var(--serif)";
+        const wedding = { brideName: data.partner_one, groomName: data.partner_two, date: data.date, venue: data.venue, address: data.address, city: data.city, state: data.state, message: data.message, dressCode: data.dress_code, cardConfig: config };
+        card.innerHTML = window.WeddingInvitation
+          ? window.WeddingInvitation.card({ wedding, events: [] }, selected?.id, "owner-card-preview", config)
+          : `<div class="card-preview-fallback" style="background:${safeColor(config.colors?.background)};color:${safeColor(config.colors?.text)};border-color:${safeColor(config.colors?.accent)}"><strong>${escape(data.partner_one || "Partner one")} &amp; ${escape(data.partner_two || "Partner two")}</strong><span>${escape(selected?.name || "Wedding invitation")}</span></div>`;
       }
       for (const key of ["couple", "heading", "body"]) form.elements[`font-${key}`].value = config.fonts?.[key] || "";
       for (const key of ["background", "text", "accent"]) form.elements[`color-${key}`].value = safeColor(config.colors?.[key]);
@@ -125,7 +126,7 @@
         const button = event.target.closest("[data-template]");
         if (!button) return;
         selected = templates.find(template => template.id === button.dataset.template) || selected;
-        config = { ...config, template_id: selected.id, fonts: { ...selected.fonts, ...config.fonts }, colors: { ...selected.colors, ...config.colors }, decorations: selected.decorations || config.decorations };
+        config = { ...config, template_id: selected.id, fonts: { ...selected.fonts }, colors: { ...selected.colors }, decorations: { ...selected.decorations }, background: { ...selected.background } };
         for (const key of ["couple", "heading", "body"]) if (selected.fonts?.[key]) form.elements[`font-${key}`].value = selected.fonts[key];
         for (const key of ["background", "text", "accent"]) form.elements[`color-${key}`].value = safeColor(selected.colors?.[key]);
         draw();
@@ -151,7 +152,7 @@
   }
 
   async function cardPreview() {
-    root.innerHTML = `${intro("Invitations", "Preview your invitation", "See the guest-facing card with the design currently saved for your wedding.")} ${stateMarkup()}<section id="page-main" class="owner-card" hidden><div class="owner-card-head"><div><h2>Guest preview</h2><p>The card uses the saved template and wedding details.</p></div><div class="owner-actions"><button class="owner-button" type="button" data-preview-size="desktop">Desktop</button><button class="owner-button" type="button" data-preview-size="mobile">Mobile</button></div></div><div class="preview-frame"><iframe id="guest-preview" title="Guest invitation card preview" src="about:blank"></iframe></div><div class="owner-form" style="margin-top:18px"><label class="owner-field wide">Guest link to copy or share<select id="preview-invitation" class="owner-control"></select></label><div class="owner-actions wide"><button class="owner-button primary" id="copy-invitation" type="button">Generate & copy guest link</button><button class="owner-button" id="share-invitation" type="button">Share link</button></div><p class="owner-hint wide">For security, invitation links are stored as one-way hashes. Generating a replacement link invalidates the previous link for that guest.</p></div></section>`;
+    root.innerHTML = `${intro("Invitations", "Preview your invitation", "See the guest-facing card with the design currently saved for your wedding.", '<a class="owner-button" href="card-studio.html">← Back to Card Studio</a>')} ${stateMarkup()}<section id="page-main" class="owner-card" hidden><div class="owner-card-head"><div><h2>Guest preview</h2><p>The card uses the saved template and wedding details.</p></div><div class="owner-actions"><button class="owner-button" type="button" data-preview-size="desktop">Desktop</button><button class="owner-button" type="button" data-preview-size="mobile">Mobile</button></div></div><div class="preview-frame"><iframe id="guest-preview" title="Guest invitation card preview" src="about:blank"></iframe></div><div class="owner-form" style="margin-top:18px"><label class="owner-field wide">Guest link to copy or share<select id="preview-invitation" class="owner-control"></select></label><div class="owner-actions wide"><button class="owner-button primary" id="copy-invitation" type="button">Generate & copy guest link</button><button class="owner-button" id="share-invitation" type="button">Share link</button></div><p class="owner-hint wide">For security, invitation links are stored as one-way hashes. Generating a replacement link invalidates the previous link for that guest.</p></div></section>`;
     setState("loading");
     try {
       const data = await owner.loadWorkspace();
