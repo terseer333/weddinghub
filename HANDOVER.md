@@ -12,6 +12,19 @@ first wedding linked to the authenticated user through `wedding_admins`; it does
 accept a wedding identifier from the browser. Session validation and owner lookup use
 the existing auth and repository methods.
 
+### Sidebar navigation check
+
+The current sidebar routes dashboard sections to the matching anchors on
+`/pages/dashboard.html`; the invitation preview opens `/pages/event.html?preview=admin`
+and its return button goes back to the dashboard. Existing `rsvps.html` and
+`create-event.html` aliases redirect to the new dashboard. Dashboard requests retain
+the browser session token and redirect to `login.html` after a `401`.
+
+Standalone owner pages for messages, events, committee, photos/story, announcements,
+Card Studio, and Help do not exist yet. Their sidebar entries currently point to the
+matching dashboard section as a temporary destination. The Help centre link remains
+`#` until a real help page or support address exists.
+
 The response is assembled from the existing wedding aggregate: invitations, RSVP
 records, committee members and tasks, events, published announcements, photos, story
 sections, guest messages, wedding details, and the owner's profile. Date/time activity

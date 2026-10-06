@@ -31,10 +31,14 @@ type Repository interface {
 	// WeddingsForUser returns the weddings an account administers.
 	WeddingsForUser(userID string) []models.Wedding
 	AddInvitation(weddingID string, invitation models.Invitation) (models.Invitation, error)
+	UpdateInvitation(weddingID string, invitation models.Invitation) (models.Invitation, error)
+	DeleteInvitation(weddingID, invitationID string) error
 	InvitationByHash(hash string) (models.Wedding, models.Invitation, error)
 	RespondToInvitation(hash string, status models.InvitationStatus, at time.Time) (models.Wedding, models.Invitation, error)
 	UpdateRSVP(hash string, rsvp models.RSVP) (models.Wedding, models.RSVP, error)
 	AddGuestMessage(hash string, message models.GuestMessage) (models.Wedding, models.GuestMessage, error)
+	SetGuestMessageRead(weddingID, messageID string, read bool) error
+	DeleteGuestMessage(weddingID, messageID string) error
 	// AddCommitteeMessage appends to the private committee conversation for a wedding.
 	AddCommitteeMessage(weddingID string, message models.CommitteeMessage) (models.CommitteeMessage, error)
 	// CommitteeMessages returns the conversation ordered oldest first, optionally only messages created after since.
@@ -42,6 +46,7 @@ type Repository interface {
 	AddPlanningTask(weddingID string, task models.PlanningTask) (models.PlanningTask, error)
 	UpdatePlanningTask(weddingID string, task models.PlanningTask) (models.PlanningTask, error)
 	DeletePlanningTask(weddingID, taskID string) error
+	ReplacePlanningTasks(weddingID string, tasks []models.PlanningTask) error
 	// AddAnnouncement stores a new published or draft update for the wedding.
 	AddAnnouncement(weddingID string, announcement models.Announcement) (models.Announcement, error)
 	UpdateAnnouncement(weddingID string, announcement models.Announcement) (models.Announcement, error)

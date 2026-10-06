@@ -437,14 +437,14 @@ func loadRSVPs(ctx context.Context, q querier, w *models.Wedding) error {
 }
 
 func loadGuestMessages(ctx context.Context, q querier, w *models.Wedding) error {
-	rows, err := q.QueryContext(ctx, `SELECT id, wedding_id, invitation_id, body, created_at FROM guest_messages WHERE wedding_id = $1 ORDER BY created_at, id`, w.ID)
+	rows, err := q.QueryContext(ctx, `SELECT id, wedding_id, invitation_id, body, created_at, is_read FROM guest_messages WHERE wedding_id = $1 ORDER BY created_at, id`, w.ID)
 	if err != nil {
 		return mapError(err)
 	}
 	defer rows.Close()
 	for rows.Next() {
 		message := models.GuestMessage{WeddingID: w.ID}
-		if err := rows.Scan(&message.ID, &message.WeddingID, &message.InvitationID, &message.Body, &message.CreatedAt); err != nil {
+		if err := rows.Scan(&message.ID, &message.WeddingID, &message.InvitationID, &message.Body, &message.CreatedAt, &message.Read); err != nil {
 			return mapError(err)
 		}
 		w.GuestMessages = append(w.GuestMessages, message)
@@ -630,6 +630,52 @@ func (r *PostgresRepository) AddInvitation(weddingID string, invitation models.I
 		return models.Invitation{}, err
 	}
 	return invitation, nil
+}
+
+func (r *PostgresRepository) UpdateInvitation(weddingID string, invitation models.Invitation) (models.Invitation, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	result, err := r.db.ExecContext(ctx, `UPDATE invitations SET guest_name=$3, guest_email=$4, guest_phone=$5,
+		committee_title=$6, max_party_size=$7, token_hash=$8 WHERE id=$1 AND wedding_id=$2`,
+		invitation.ID, weddingID, invitation.GuestName, invitation.GuestEmail, invitation.GuestPhone,
+		invitation.CommitteeTitle, invitation.MaxPartySize, invitation.TokenHash)
+	if err != nil {
+		return models.Invitation{}, mapError(err)
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return models.Invitation{}, err
+	}
+	if affected == 0 {
+		return models.Invitation{}, ErrNotFound
+	}
+	return invitation, nil
+}
+
+func (r *PostgresRepository) DeleteInvitation(weddingID, invitationID string) error {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	return r.withTx(ctx, func(tx *sql.Tx) error {
+		for _, table := range []string{"guest_messages", "rsvps", "guests", "committee_members"} {
+			query := fmt.Sprintf(`DELETE FROM %s WHERE wedding_id=$1 AND invitation_id=$2`, table)
+			if _, err := tx.ExecContext(ctx, query, weddingID, invitationID); err != nil {
+				return mapError(err)
+			}
+		}
+		result, err := tx.ExecContext(ctx, `DELETE FROM invitations WHERE id=$1 AND wedding_id=$2`, invitationID, weddingID)
+		if err != nil {
+			return mapError(err)
+		}
+		affected, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if affected == 0 {
+			return ErrNotFound
+		}
+		_, err = tx.ExecContext(ctx, `UPDATE weddings SET updated_at=$2 WHERE id=$1`, weddingID, time.Now().UTC())
+		return mapError(err)
+	})
 }
 
 func invitationByHash(ctx context.Context, q querier, hash string) (string, models.Invitation, error) {
@@ -836,8 +882,8 @@ func (r *PostgresRepository) AddGuestMessage(hash string, message models.GuestMe
 		}
 		message.WeddingID = weddingID
 		message.InvitationID = invitationID
-		if _, err := tx.ExecContext(ctx, `INSERT INTO guest_messages (id, wedding_id, invitation_id, body, created_at) VALUES ($1,$2,$3,$4,$5)`,
-			message.ID, weddingID, invitationID, message.Body, message.CreatedAt); err != nil {
+		if _, err := tx.ExecContext(ctx, `INSERT INTO guest_messages (id, wedding_id, invitation_id, body, created_at, is_read) VALUES ($1,$2,$3,$4,$5,$6)`,
+			message.ID, weddingID, invitationID, message.Body, message.CreatedAt, message.Read); err != nil {
 			return mapError(err)
 		}
 		_, err := tx.ExecContext(ctx, `UPDATE weddings SET updated_at = $2 WHERE id = $1`, weddingID, message.CreatedAt)
@@ -851,6 +897,40 @@ func (r *PostgresRepository) AddGuestMessage(hash string, message models.GuestMe
 		return models.Wedding{}, models.GuestMessage{}, err
 	}
 	return w, message, nil
+}
+
+func (r *PostgresRepository) SetGuestMessageRead(weddingID, messageID string, read bool) error {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	result, err := r.db.ExecContext(ctx, `UPDATE guest_messages SET is_read=$3 WHERE id=$1 AND wedding_id=$2`, messageID, weddingID, read)
+	if err != nil {
+		return mapError(err)
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+func (r *PostgresRepository) DeleteGuestMessage(weddingID, messageID string) error {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	result, err := r.db.ExecContext(ctx, `DELETE FROM guest_messages WHERE id=$1 AND wedding_id=$2`, messageID, weddingID)
+	if err != nil {
+		return mapError(err)
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (r *PostgresRepository) AddCommitteeMessage(weddingID string, message models.CommitteeMessage) (models.CommitteeMessage, error) {
@@ -965,6 +1045,26 @@ func (r *PostgresRepository) DeletePlanningTask(weddingID, taskID string) error 
 			return ErrNotFound
 		}
 		_, err = tx.ExecContext(ctx, `UPDATE weddings SET updated_at = $2 WHERE id = $1`, weddingID, time.Now().UTC())
+		return mapError(err)
+	})
+}
+
+func (r *PostgresRepository) ReplacePlanningTasks(weddingID string, tasks []models.PlanningTask) error {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	return r.withTx(ctx, func(tx *sql.Tx) error {
+		if err := ensureWedding(ctx, tx, weddingID); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(ctx, `DELETE FROM planning_tasks WHERE wedding_id=$1`, weddingID); err != nil {
+			return mapError(err)
+		}
+		for i, task := range tasks {
+			if err := insertPlanningTask(ctx, tx, weddingID, task, i); err != nil {
+				return err
+			}
+		}
+		_, err := tx.ExecContext(ctx, `UPDATE weddings SET updated_at=$2 WHERE id=$1`, weddingID, time.Now().UTC())
 		return mapError(err)
 	})
 }
@@ -1456,8 +1556,8 @@ func insertAllChildren(ctx context.Context, tx *sql.Tx, w models.Wedding) error 
 		}
 	}
 	for _, message := range w.GuestMessages {
-		if _, err := tx.ExecContext(ctx, `INSERT INTO guest_messages (id, wedding_id, invitation_id, body, created_at) VALUES ($1,$2,$3,$4,$5)`,
-			message.ID, w.ID, message.InvitationID, message.Body, message.CreatedAt); err != nil {
+		if _, err := tx.ExecContext(ctx, `INSERT INTO guest_messages (id, wedding_id, invitation_id, body, created_at, is_read) VALUES ($1,$2,$3,$4,$5,$6)`,
+			message.ID, w.ID, message.InvitationID, message.Body, message.CreatedAt, message.Read); err != nil {
 			return mapError(err)
 		}
 	}

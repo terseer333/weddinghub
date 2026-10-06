@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,108 +8,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dashboard.css">
-  <script>
-    // Set the saved/system theme before first paint to avoid a flash
-    (function () {
-      var t = null;
-      try { t = localStorage.getItem("weddinghub-theme"); } catch (e) {}
-      if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      document.documentElement.setAttribute("data-theme", t);
-    })();
-  </script>
+  <link rel="stylesheet" href="owner-pages.css">
+  <script>(function(){var t=null;try{t=localStorage.getItem("weddinghub-theme")}catch(e){}if(!t)t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)})();</script>
 </head>
-<body>
-  <!-- Icon sprite: icons are used with <use href="#i-name"> -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
-    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></symbol>
-    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></symbol>
-    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
-    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
-    <symbol id="i-committee" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0M5 8H2M22 8h-3"/></symbol>
-    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></symbol>
-    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 14v-3ZM11.6 16.1 13 21H7l-1-6"/></symbol>
-    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></symbol>
-    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
-    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
-    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM14 21h-4"/></symbol>
-    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></symbol>
-    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
-    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
-    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
-    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
-    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
-    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
-    <symbol id="i-map" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
-    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
-  </svg>
-
-  <div class="app">
-    <button class="sidebar-scrim" id="sidebar-scrim" aria-label="Close menu" hidden></button>
-
-    <aside class="sidebar" id="sidebar">
-      <div class="brand-row">
-        <div class="brand-mark">W</div>
-        <div class="brand-name">WeddingHub</div>
-        <button class="icon-button sidebar-close" id="sidebar-close" aria-label="Close navigation"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
-      </div>
-      <div class="couple-card">
-        <div class="couple-monogram" id="couple-monogram">T<span>&amp;</span>L</div>
-        <div><strong id="couple-names">Couple names</strong><small id="couple-date">Date</small></div>
-      </div>
-      <nav class="nav" aria-label="Main">
-        <div class="nav-group">
-          <div class="nav-label">Overview</div>
-          <a class="nav-item active" aria-current="page" href="dashboard.html"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-grid"/></svg><span>Dashboard</span></a>
-        </div>
-        <div class="nav-group">
-          <div class="nav-label">Invitations</div>
-          <a class="nav-item" href="dashboard.html#setup-card"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg><span>Wedding information</span></a>
-          <a class="nav-item" href="dashboard.html#setup-card"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-card"/></svg><span>Card Studio &amp; Templates</span></a>
-          <a class="nav-item" href="event.html?preview=admin"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg><span>Preview Card</span></a>
-        </div>
-        <div class="nav-group">
-          <div class="nav-label">Guests</div>
-          <a class="nav-item" href="dashboard.html#rsvp-card"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg><span>Guests &amp; RSVP</span></a>
-          <a class="nav-item" href="dashboard.html#activity-card"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-message"/></svg><span>Guest messages</span><b id="unread-badge" hidden></b></a>
-        </div>
-        <div class="nav-group">
-          <div class="nav-label">Planning</div>
-          <a class="nav-item" href="dashboard.html#events-card"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg><span>Events</span></a>
-          <a class="nav-item" href="dashboard.html#committee-card"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-committee"/></svg><span>Planning committee</span></a>
-        </div>
-        <div class="nav-group">
-          <div class="nav-label">Content</div>
-          <a class="nav-item" href="dashboard.html#story-card"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-image"/></svg><span>Photos &amp; story</span></a>
-          <a class="nav-item" href="dashboard.html#announcement-card"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-megaphone"/></svg><span>Announcements</span></a>
-        </div>
-      </nav>
-      <a class="sidebar-help" href="#" style="text-decoration:none;color:inherit">
-        <div class="help-icon"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></div>
-        <div><strong>Need a hand?</strong><small>Visit the help centre</small></div>
-        <svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chevron"/></svg>
-      </a>
-    </aside>
-
-    <main class="main">
-      <header class="topbar">
-        <button class="icon-button mobile-menu" id="sidebar-open" aria-label="Open navigation"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-menu"/></svg></button>
-        <div class="mobile-brand"><div class="brand-mark">W</div><span>WeddingHub</span></div>
-        <div class="search"><svg class="icon" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-search"/></svg><input id="search-input" aria-label="Search" placeholder="Search guests, events, messages…"><kbd>⌘ K</kbd></div>
-        <div class="top-actions">
-          <button class="icon-button theme-toggle" id="theme-toggle" aria-label="Use dark mode"><svg class="icon i-moon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-moon"/></svg><svg class="icon i-sun" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sun"/></svg></button>
-          <button class="icon-button notification" aria-label="Notifications"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg><span></span></button>
-          <div class="profile">
-            <div class="avatar rose" id="user-initials">AJ</div>
-            <div><strong id="user-name">Name</strong><small id="user-role">Wedding owner</small></div>
-            <svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chevron"/></svg>
-          </div>
-        </div>
-      </header>
-
-      <div class="content">
+<body data-page="dashboard">
+  <div id="app-shell"></div>
+  <template id="page-template">
         <section class="welcome">
           <div>
             <span class="eyebrow" id="today-date"></span>
@@ -117,7 +21,7 @@
             <p id="welcome-sub"></p>
           </div>
           <div class="welcome-actions">
-            <a class="button button-secondary" href="event.html?preview=admin" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg>Preview card</a>
+            <a class="button button-secondary" href="preview-card.html" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eye"/></svg>Preview card</a>
             <button class="button button-primary" id="share-btn"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-share"/></svg>Share invitation</button>
           </div>
         </section>
@@ -164,14 +68,14 @@
             <div class="progress-track" id="setup-track"><span></span></div>
           </div>
           <div class="setup-steps" id="setup-steps"></div>
-          <a class="button button-primary" href="dashboard.html#setup-card" style="text-decoration:none">Continue setup<svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <a class="button button-primary" href="wedding-info.html" style="text-decoration:none">Continue setup<svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         </section>
 
         <div class="dashboard-grid">
           <section class="card rsvp-card" id="rsvp-card">
             <div class="section-header">
               <div role="heading" aria-level="2" class="heading heading-2">RSVP overview</div>
-              <a class="text-action" href="dashboard.html#rsvp-card" style="text-decoration:none">View guests<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+              <a class="text-action" href="guests.html" style="text-decoration:none">View guests<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
             </div>
             <div class="rsvp-content">
               <div class="donut" id="donut"><div><strong id="donut-total">0</strong><small>invited</small></div></div>
@@ -187,7 +91,7 @@
           <section class="card activity-card" id="activity-card">
             <div class="section-header">
               <div role="heading" aria-level="2" class="heading heading-2">Recent guest activity</div>
-              <a class="text-action" href="dashboard.html#activity-card" style="text-decoration:none">See all activity<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+              <a class="text-action" href="messages.html" style="text-decoration:none">See all activity<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
             </div>
             <div class="activity-list" id="activity-list"></div>
           </section>
@@ -195,16 +99,16 @@
           <section class="card events-card" id="events-card">
             <div class="section-header">
               <div role="heading" aria-level="2" class="heading heading-2">Upcoming events</div>
-              <a class="text-action" href="dashboard.html#events-card" style="text-decoration:none">All events<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+              <a class="text-action" href="events.html" style="text-decoration:none">All events<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
             </div>
             <div id="events-list"></div>
-            <a class="button button-secondary" href="dashboard.html#events-card" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add event</a>
+            <a class="button button-secondary" href="events.html" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add event</a>
           </section>
 
           <section class="card committee-card" id="committee-card">
             <div class="section-header">
               <div role="heading" aria-level="2" class="heading heading-2">Planning committee</div>
-              <a class="text-action" href="dashboard.html#committee-card" style="text-decoration:none">Manage<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+              <a class="text-action" href="committee.html" style="text-decoration:none">Manage<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
             </div>
             <div class="member-stack" id="member-stack"></div>
             <p class="committee-copy"><strong id="committee-count">0 people</strong> are helping make the day special.</p>
@@ -219,7 +123,7 @@
           <section class="card announcement-card" id="announcement-card">
             <div class="section-header"><div role="heading" aria-level="2" class="heading heading-2">Announcements</div></div>
             <div id="announcement-list"></div>
-            <a class="button button-secondary" href="dashboard.html#announcement-card" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>New announcement</a>
+            <a class="button button-secondary" href="announcements.html" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>New announcement</a>
           </section>
 
           <section class="card story-card" id="story-card">
@@ -228,7 +132,7 @@
               <span class="eyebrow">Photos &amp; story</span>
               <div role="heading" aria-level="2" class="heading heading-2">The beginning of us</div>
               <p>Share your favourite moments with the people you love.</p>
-              <a class="story-link" href="dashboard.html#story-card" style="text-decoration:none">Edit your story<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+              <a class="story-link" href="story.html" style="text-decoration:none">Edit your story<svg class="icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow"/></svg></a>
             </div>
           </section>
         </div>
@@ -238,17 +142,15 @@
           <section class="card empty-state">
             <div class="empty-icon"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg></div>
             <div><div role="heading" aria-level="3" class="heading heading-3">No guests yet?</div><p>Add your first guest and start collecting RSVPs.</p></div>
-            <a class="button button-secondary" href="dashboard.html#rsvp-card" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add guest</a>
+            <a class="button button-secondary" href="guests.html" style="text-decoration:none"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Add guest</a>
           </section>
         </div>
 
         <footer>WeddingHub <span>·</span> Made for your best day yet.</footer>
-      </div>
-    </main>
-  </div>
-
+      </template>
   <script src="../app.js"></script>
   <script src="../api-client.js"></script>
+  <script src="owner-shell.js"></script>
   <script src="dashboard.js"></script>
 </body>
 </html>

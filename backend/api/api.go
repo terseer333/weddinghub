@@ -89,6 +89,22 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("POST /api/auth/logout", a.logout)
 	mux.HandleFunc("GET /api/auth/me", a.currentUser)
 	mux.HandleFunc("GET /api/dashboard", a.dashboard)
+	mux.HandleFunc("GET /api/owner/workspace", a.ownerWorkspace)
+	mux.HandleFunc("PUT /api/owner/workspace", a.updateOwnerWorkspace)
+	mux.HandleFunc("POST /api/owner/invitations", a.createOwnerInvitation)
+	mux.HandleFunc("PUT /api/owner/invitations/{invitationID}", a.updateOwnerInvitation)
+	mux.HandleFunc("DELETE /api/owner/invitations/{invitationID}", a.deleteOwnerInvitation)
+	mux.HandleFunc("POST /api/owner/invitations/{invitationID}/refresh-link", a.refreshOwnerInvitationLink)
+	mux.HandleFunc("POST /api/owner/invitations/{invitationID}/send", a.sendOwnerInvitation)
+	mux.HandleFunc("POST /api/owner/tasks", a.createOwnerTask)
+	mux.HandleFunc("PUT /api/owner/tasks/{taskID}", a.updateOwnerTask)
+	mux.HandleFunc("DELETE /api/owner/tasks/{taskID}", a.deleteOwnerTask)
+	mux.HandleFunc("POST /api/owner/committee/roles", a.createOwnerCommitteeRole)
+	mux.HandleFunc("DELETE /api/owner/committee/roles/{roleID}", a.deleteOwnerCommitteeRole)
+	mux.HandleFunc("PUT /api/owner/committee/members/{memberID}", a.updateOwnerCommitteeMember)
+	mux.HandleFunc("DELETE /api/owner/committee/members/{memberID}", a.deleteOwnerCommitteeMember)
+	mux.HandleFunc("PATCH /api/owner/messages/{messageID}", a.setOwnerMessageRead)
+	mux.HandleFunc("DELETE /api/owner/messages/{messageID}", a.deleteOwnerMessage)
 	// Platform admin routes. Every one of these resolves the caller's session and confirms the
 	// account is the configured administrator on the server before doing anything else.
 	mux.HandleFunc("POST /api/admin/login", a.adminLogin)
@@ -1511,39 +1527,93 @@ func prepareWedding(w *models.Wedding) error {
 	if w.Slug == "" || w.Title == "" || !w.Status.Valid() {
 		return errors.New("slug, title, and a valid status are required")
 	}
+	if !ownerTextLength(w.PartnerOne, 100) || !ownerTextLength(w.PartnerTwo, 100) ||
+		!ownerTextLength(w.Venue, 250) || !ownerTextLength(w.Address, 500) || !ownerTextLength(w.City, 120) ||
+		!ownerTextLength(w.State, 120) || !ownerTextLength(w.Country, 120) || !ownerTextLength(w.DressCode, 500) ||
+		!ownerTextLength(w.Message, 10000) || !ownerTextLength(w.Verse, 5000) {
+		return errors.New("wedding information contains a field that is too long")
+	}
+	if !safeOwnerImageURL(w.HeroImage) {
+		return errors.New("hero image must use an http, https, or local image URL")
+	}
+	if len(w.Events) > 100 || len(w.Photos) > 100 || len(w.StorySections) > 100 || len(w.Announcements) > 100 {
+		return errors.New("a wedding can contain at most 100 items of each content type")
+	}
 	for i := range w.Events {
-		if !w.Events[i].Status.Valid() {
-			return errors.New("every event requires a valid status")
+		item := &w.Events[i]
+		if !item.Status.Valid() || strings.TrimSpace(item.Name) == "" || item.StartsAt.IsZero() {
+			return errors.New("every event requires a name, date, and valid status")
 		}
-		if err := ensureID(&w.Events[i].ID); err != nil {
+		if !ownerTextLength(item.Name, 160) || !ownerTextLength(item.Description, 4000) || !ownerTextLength(item.Venue, 250) || !ownerTextLength(item.Address, 500) {
+			return errors.New("event information contains a field that is too long")
+		}
+		if err := ensureID(&item.ID); err != nil {
 			return err
 		}
 	}
 	for i := range w.Photos {
-		if !w.Photos[i].Status.Valid() {
+		item := &w.Photos[i]
+		if !item.Status.Valid() || !safeOwnerImageURL(item.URL) {
 			return errors.New("every photo requires a valid status")
 		}
-		if err := ensureID(&w.Photos[i].ID); err != nil {
+		if !ownerTextLength(item.Caption, 400) || !ownerTextLength(item.AltText, 400) {
+			return errors.New("photo caption is too long")
+		}
+		if err := ensureID(&item.ID); err != nil {
 			return err
 		}
 	}
 	for i := range w.StorySections {
-		if !w.StorySections[i].Status.Valid() {
+		item := &w.StorySections[i]
+		if !item.Status.Valid() || strings.TrimSpace(item.Title) == "" || !safeOwnerImageURL(item.PhotoURL) {
 			return errors.New("every story section requires a valid status")
 		}
-		if err := ensureID(&w.StorySections[i].ID); err != nil {
+		if !ownerTextLength(item.Title, 160) || !ownerTextLength(item.Body, 12000) {
+			return errors.New("story text contains a field that is too long")
+		}
+		if err := ensureID(&item.ID); err != nil {
 			return err
 		}
 	}
 	for i := range w.Announcements {
-		if !w.Announcements[i].Status.Valid() {
+		item := &w.Announcements[i]
+		if !item.Status.Valid() || strings.TrimSpace(item.Title) == "" {
 			return errors.New("every announcement requires a valid status")
 		}
-		if err := ensureID(&w.Announcements[i].ID); err != nil {
+		if !ownerTextLength(item.Title, 200) || !ownerTextLength(item.Body, 8000) || !ownerTextLength(item.AuthorName, 100) {
+			return errors.New("announcement text contains a field that is too long")
+		}
+		if err := ensureID(&item.ID); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func ownerTextLength(value string, max int) bool {
+	return utf8.RuneCountInString(value) <= max
+}
+
+func safeOwnerImageURL(value string) bool {
+	if value == "" {
+		return true
+	}
+	if len(value) > 700000 {
+		return false
+	}
+	const dataPrefix = "data:image/jpeg;base64,"
+	if strings.HasPrefix(value, dataPrefix) {
+		decoded, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(value, dataPrefix))
+		return err == nil && len(decoded) <= 500000
+	}
+	parsed, err := url.Parse(strings.TrimSpace(value))
+	if err != nil {
+		return false
+	}
+	if parsed.Scheme == "http" || parsed.Scheme == "https" {
+		return parsed.Host != "" && parsed.User == nil
+	}
+	return parsed.Scheme == "" && strings.HasPrefix(parsed.Path, "/assets/") && !strings.Contains(parsed.Path, "..")
 }
 
 func ensureID(id *string) error {

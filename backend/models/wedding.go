@@ -246,6 +246,7 @@ type GuestMessage struct {
 	InvitationID string    `json:"invitation_id"`
 	Body         string    `json:"body"`
 	CreatedAt    time.Time `json:"created_at"`
+	Read         bool      `json:"read"`
 }
 
 type CardFonts struct {
