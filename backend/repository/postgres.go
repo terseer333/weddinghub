@@ -197,7 +197,7 @@ func loadWedding(ctx context.Context, q querier, id string) (models.Wedding, err
 	// paid one network round trip per collection. Keep the transaction path
 	// sequential because a transaction owns one database connection.
 	if _, isDB := q.(*sql.DB); isDB {
-		loaders := []func(context.Context, *models.Wedding) error{
+		loaders := []func(context.Context, querier, *models.Wedding) error{
 			loadAdmins, loadGuests, loadCommitteeMembers, loadCommitteeRoles,
 			loadInvitations, loadEvents, loadPhotos, loadStorySections,
 			loadAnnouncements, loadPlanningTasks, loadCommitteeChat, loadRSVPs,
@@ -207,9 +207,9 @@ func loadWedding(ctx context.Context, q querier, id string) (models.Wedding, err
 		var wg sync.WaitGroup
 		wg.Add(len(loaders))
 		for i, loader := range loaders {
-			go func(index int, load func(context.Context, *models.Wedding) error) {
+			go func(index int, load func(context.Context, querier, *models.Wedding) error) {
 				defer wg.Done()
-				errs[index] = load(ctx, &w)
+				errs[index] = load(ctx, q, &w)
 			}(i, loader)
 		}
 		wg.Wait()
