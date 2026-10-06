@@ -71,19 +71,15 @@ async function loadInvitation() {
   startInvitationFlow();
 }
 
-// Every invitation link asks which role the person is joining as before the
-// invitation can be accepted. The selected role must match the invitation type.
 function startInvitationFlow() {
-  if (adminPreview) return renderInvitation();
+  // Committee invitation tokens already carry their assigned role; show the
+  // designed invitation directly instead of covering it with a role form.
+  if (adminPreview || inviteeType() === "committee") return renderInvitation();
   const inviteePerson = invitee();
-  if (!inviteePerson) return renderInvitation();
-  if (!token) return renderInvitation();
-  const role = inviteeType();
-  if ((role === "committee" && member?.invitationStatus === "accepted") ||
-      (role === "guest" && guest?.rsvp === "attending")) return renderInvitation();
-  const selected = WeddingRoleSelector.selectedRole();
-  if (selected === role) return renderInvitation();
-  WeddingRoleSelector.show({ invitationType: role, invitedName: inviteePerson.name, onSelected: () => renderInvitation() });
+  if (!inviteePerson || !token) return renderInvitation();
+  if (guest?.rsvp === "attending") return renderInvitation();
+  if (WeddingRoleSelector.selectedRole() === "guest") return renderInvitation();
+  WeddingRoleSelector.show({ invitationType: "guest", invitedName: inviteePerson.name, onSelected: renderInvitation });
 }
 
 function renderInvitation() {
@@ -92,13 +88,10 @@ function renderInvitation() {
   const note = document.getElementById("acceptedNote");
   const guestPanel = document.getElementById("guestPanel");
 
-  // The guest link presents only the designed invitation card plus the acceptance
-  // actions. Wedding details, schedule and countdown live in the guest space that
-  // opens once the invitation is accepted.
+  // The guest link presents the designed invitation card and RSVP actions.
+  // Wedding details, schedule and countdown live in the guest space after RSVP.
   if (adminPreview) {
     document.body.classList.add("invite-preview-mode");
-    const returnBtn = document.getElementById("previewReturnBtn");
-    if (returnBtn) returnBtn.hidden = false;
     if (guestPanel) guestPanel.hidden = true;
   } else if (!guest && !member) {
     if (greeting) greeting.textContent = "This invitation link is invalid or has expired.";

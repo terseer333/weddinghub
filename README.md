@@ -28,6 +28,10 @@ python3 -m http.server 5500
 
 Then open `http://localhost:5500`. The Admin Dashboard shows **API connected** when the Go service is available. On its first connection it creates the wedding aggregate and cryptographically secure invitation tokens in PostgreSQL. The API is mandatory: when it is unavailable, the UI blocks with an explicit error instead of falling back to a local browser workspace.
 
+### Render deployment
+
+The Render Blueprint deploys the frontend as a separate Static Site (`weddinghub-frontend`) and keeps the Go API in the `weddinghub` web service. Render serves the landing page from its CDN without waiting for the API service to start. The static build injects the API service URL into the frontend, and the API's exact CORS allowlist includes both Render service origins. If Render assigns a different frontend URL or you attach a custom domain, update `WEDDINGHUB_ALLOWED_ORIGINS` on the API service to include that exact origin.
+
 Recommended product journey:
 
 1. Open `pages/dashboard.html` to use the Wedding Admin workspace.

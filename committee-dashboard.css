@@ -18,7 +18,7 @@ html, body { max-width: 100%; }
 
 .committee-sidebar { background: var(--dark); color: var(--light); padding: 1.4rem 1rem; display: flex; flex-direction: column; gap: 1rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
 .committee-brand { color: var(--light); align-items: center; display: flex; gap: .7rem; font-weight: 700; font-size: var(--text-lg); text-decoration: none; }
-.brand-mark { width: 2.5rem; height: 2.5rem; display: inline-grid; place-items: center; border-radius: .9rem; background: var(--gold); color: var(--dark); font-weight: 800; }
+.brand-mark { width: 2.5rem; height: 2.5rem; display: inline-grid; place-items: center; border-radius: 8px; background: transparent url("assets/favicon-48.png") center/cover no-repeat; color: transparent; font-size: 0; font-weight: 800; }
 .committee-switcher { display: flex; gap: .75rem; align-items: center; padding: .7rem .5rem; border-radius: 1rem; background: rgba(255,255,255,.07); }
 .couple-avatar, .user-avatar { display: inline-grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--gold); color: var(--dark); font-weight: 800; font-size: var(--text-base); flex: none; }
 .committee-switcher strong { display: block; font-size: var(--text-md); }

@@ -5,7 +5,7 @@
   const SESSION_KEY = "weddinghub_session_token";
   const LOOPBACK_HOST = /^(localhost|0\.0\.0\.0|::1|\[::1\]|127(?:\.\d{1,3}){3})$/i;
   const baseURL = () => {
-      const configured = window.WEDDINGHUB_API_URL || localStorage.getItem(API_URL_KEY);
+      const configured = localStorage.getItem(API_URL_KEY) || window.WEDDINGHUB_API_URL;
       if (configured) return configured.replace(/\/$/, "");
       // A loopback page is usually fronted by a separate dev server (for example
       // `python3 -m http.server 5500`), so it falls back to the API's default port.
