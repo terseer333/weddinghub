@@ -63,6 +63,30 @@ func NewPostgresRepository(ctx context.Context, dsn string) (*PostgresRepository
 // Close releases the connection pool.
 func (r *PostgresRepository) Close() error { return r.db.Close() }
 
+func (r *PostgresRepository) SaveWeddingBanner(weddingID, version string, image []byte) error {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	_, err := r.db.ExecContext(ctx, `INSERT INTO wedding_banners (wedding_id,version,image,updated_at) VALUES ($1,$2,$3,now()) ON CONFLICT (wedding_id) DO UPDATE SET version=EXCLUDED.version,image=EXCLUDED.image,updated_at=now()`, weddingID, version, image)
+	return mapError(err)
+}
+
+func (r *PostgresRepository) WeddingBanner(weddingID string) (string, []byte, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	var version string
+	var image []byte
+	err := r.db.QueryRowContext(ctx, `SELECT version,image FROM wedding_banners WHERE wedding_id=$1`, weddingID).Scan(&version, &image)
+	return version, image, mapError(err)
+}
+
+func (r *PostgresRepository) WeddingBannerVersion(weddingID string) (string, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	var version string
+	err := r.db.QueryRowContext(ctx, `SELECT version FROM wedding_banners WHERE wedding_id=$1`, weddingID).Scan(&version)
+	return version, mapError(err)
+}
+
 // applyMigrations runs each embedded migration once, tracked in schema_migrations.
 func applyMigrations(ctx context.Context, db *sql.DB) error {
 	if _, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -328,7 +352,7 @@ func loadCommitteeRoles(ctx context.Context, q querier, w *models.Wedding) error
 
 func loadInvitations(ctx context.Context, q querier, w *models.Wedding) error {
 	rows, err := q.QueryContext(ctx, `SELECT id, invitation_type, guest_name, guest_email, guest_phone, committee_title,
-		max_party_size, status, token_hash, expires_at, created_at, responded_at
+		max_party_size, status, token_hash, short_code_hash, expires_at, created_at, responded_at, opened_at
 		FROM invitations WHERE wedding_id = $1 ORDER BY position, created_at, id`, w.ID)
 	if err != nil {
 		return mapError(err)
@@ -338,7 +362,7 @@ func loadInvitations(ctx context.Context, q querier, w *models.Wedding) error {
 		var invitation models.Invitation
 		if err := rows.Scan(&invitation.ID, &invitation.Type, &invitation.GuestName, &invitation.GuestEmail, &invitation.GuestPhone,
 			&invitation.CommitteeTitle, &invitation.MaxPartySize, &invitation.Status, &invitation.TokenHash,
-			&invitation.ExpiresAt, &invitation.CreatedAt, &invitation.RespondedAt); err != nil {
+			&invitation.ShortCodeHash, &invitation.ExpiresAt, &invitation.CreatedAt, &invitation.RespondedAt, &invitation.OpenedAt); err != nil {
 			return mapError(err)
 		}
 		w.Invitations = append(w.Invitations, invitation)
@@ -665,9 +689,9 @@ func (r *PostgresRepository) UpdateInvitation(weddingID string, invitation model
 	ctx, cancel := r.ctx()
 	defer cancel()
 	result, err := r.db.ExecContext(ctx, `UPDATE invitations SET guest_name=$3, guest_email=$4, guest_phone=$5,
-		committee_title=$6, max_party_size=$7, token_hash=$8 WHERE id=$1 AND wedding_id=$2`,
+		committee_title=$6, max_party_size=$7, token_hash=$8, short_code_hash=$9, opened_at=COALESCE(opened_at,$10) WHERE id=$1 AND wedding_id=$2`,
 		invitation.ID, weddingID, invitation.GuestName, invitation.GuestEmail, invitation.GuestPhone,
-		invitation.CommitteeTitle, invitation.MaxPartySize, invitation.TokenHash)
+		invitation.CommitteeTitle, invitation.MaxPartySize, invitation.TokenHash, invitation.ShortCodeHash, invitation.OpenedAt)
 	if err != nil {
 		return models.Invitation{}, mapError(err)
 	}
@@ -713,10 +737,10 @@ func invitationByHash(ctx context.Context, q querier, hash string) (string, mode
 		invitation models.Invitation
 	)
 	err := q.QueryRowContext(ctx, `SELECT wedding_id, id, invitation_type, guest_name, guest_email, guest_phone, committee_title,
-		max_party_size, status, token_hash, expires_at, created_at, responded_at FROM invitations WHERE token_hash = $1`, hash).
+		max_party_size, status, token_hash, expires_at, created_at, responded_at, opened_at FROM invitations WHERE token_hash = $1 OR short_code_hash = $1`, hash).
 		Scan(&weddingID, &invitation.ID, &invitation.Type, &invitation.GuestName, &invitation.GuestEmail, &invitation.GuestPhone,
 			&invitation.CommitteeTitle, &invitation.MaxPartySize, &invitation.Status, &invitation.TokenHash,
-			&invitation.ExpiresAt, &invitation.CreatedAt, &invitation.RespondedAt)
+			&invitation.ExpiresAt, &invitation.CreatedAt, &invitation.RespondedAt, &invitation.OpenedAt)
 	if err != nil {
 		return "", models.Invitation{}, mapError(err)
 	}
@@ -743,6 +767,61 @@ func (r *PostgresRepository) InvitationByHash(hash string) (models.Wedding, mode
 	return w, invitation, nil
 }
 
+func (r *PostgresRepository) InvitationByShortCodeHash(hash string) (models.Wedding, models.Invitation, error) {
+	if hash == "" {
+		return models.Wedding{}, models.Invitation{}, ErrNotFound
+	}
+	ctx, cancel := r.ctx()
+	defer cancel()
+	var weddingID string
+	var invitation models.Invitation
+	err := r.db.QueryRowContext(ctx, `SELECT wedding_id,id,invitation_type,guest_name,guest_email,guest_phone,committee_title,max_party_size,status,token_hash,short_code_hash,expires_at,created_at,responded_at,opened_at FROM invitations WHERE short_code_hash=$1 AND (expires_at IS NULL OR expires_at>$2) AND status NOT IN ('revoked','expired')`, hash, time.Now().UTC()).Scan(&weddingID, &invitation.ID, &invitation.Type, &invitation.GuestName, &invitation.GuestEmail, &invitation.GuestPhone, &invitation.CommitteeTitle, &invitation.MaxPartySize, &invitation.Status, &invitation.TokenHash, &invitation.ShortCodeHash, &invitation.ExpiresAt, &invitation.CreatedAt, &invitation.RespondedAt, &invitation.OpenedAt)
+	if err != nil {
+		return models.Wedding{}, models.Invitation{}, mapError(err)
+	}
+	w, err := loadWedding(ctx, r.db, weddingID)
+	return w, invitation, err
+}
+
+func (r *PostgresRepository) PreviewByShortCodeHash(hash string) (models.Wedding, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	var wedding models.Wedding
+	var cardConfig []byte
+	var date *time.Time
+	err := r.db.QueryRowContext(ctx, `SELECT w.id,w.partner_one,w.partner_two,w.date,w.status,w.venue,w.city,w.hero_image,w.card_config FROM invitations i JOIN weddings w ON w.id=i.wedding_id WHERE i.short_code_hash=$1 AND (i.expires_at IS NULL OR i.expires_at>$2) AND i.status NOT IN ('revoked','expired')`, hash, time.Now().UTC()).Scan(&wedding.ID, &wedding.PartnerOne, &wedding.PartnerTwo, &date, &wedding.Status, &wedding.Venue, &wedding.City, &wedding.HeroImage, &cardConfig)
+	wedding.Date = date
+	if len(cardConfig) > 0 {
+		var config models.CardConfig
+		if json.Unmarshal(cardConfig, &config) == nil {
+			wedding.CardConfig = &config
+		}
+	}
+	return wedding, mapError(err)
+}
+
+func (r *PostgresRepository) PublicWeddingPreview(weddingID string) (models.Wedding, error) {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	var wedding models.Wedding
+	var cardConfig []byte
+	err := r.db.QueryRowContext(ctx, `SELECT id,partner_one,partner_two,date,status,venue,city,hero_image,template_id,card_config FROM weddings WHERE id=$1`, weddingID).Scan(&wedding.ID, &wedding.PartnerOne, &wedding.PartnerTwo, &wedding.Date, &wedding.Status, &wedding.Venue, &wedding.City, &wedding.HeroImage, &wedding.TemplateID, &cardConfig)
+	if len(cardConfig) > 0 {
+		var config models.CardConfig
+		if json.Unmarshal(cardConfig, &config) == nil {
+			wedding.CardConfig = &config
+		}
+	}
+	return wedding, mapError(err)
+}
+
+func (r *PostgresRepository) RecordInvitationOpenByShortCodeHash(hash string, at time.Time) error {
+	ctx, cancel := r.ctx()
+	defer cancel()
+	_, err := r.db.ExecContext(ctx, `UPDATE invitations SET opened_at=$2 WHERE short_code_hash=$1 AND opened_at IS NULL AND (expires_at IS NULL OR expires_at>$2) AND status NOT IN ('revoked','expired')`, hash, at)
+	return mapError(err)
+}
+
 func (r *PostgresRepository) RespondToInvitation(hash string, status models.InvitationStatus, at time.Time) (models.Wedding, models.Invitation, error) {
 	if status != models.InvitationAccepted && status != models.InvitationDeclined {
 		return models.Wedding{}, models.Invitation{}, ErrInvalidStatus
@@ -764,7 +843,7 @@ func (r *PostgresRepository) RespondToInvitation(hash string, status models.Invi
 			expiresAt      *time.Time
 		)
 		if err := tx.QueryRowContext(ctx, `SELECT id, wedding_id, invitation_type, guest_name, guest_email, guest_phone, committee_title,
-			status, expires_at FROM invitations WHERE token_hash = $1 FOR UPDATE`, hash).
+			status, expires_at FROM invitations WHERE token_hash = $1 OR short_code_hash = $1 FOR UPDATE`, hash).
 			Scan(&invitationID, &weddingID, &invitationType, &guestName, &guestEmail, &guestPhone, &committeeTitle,
 				&currentStatus, &expiresAt); err != nil {
 			return mapError(err)
@@ -858,7 +937,7 @@ func (r *PostgresRepository) UpdateRSVP(hash string, response models.RSVP) (mode
 			currentStatus models.InvitationStatus
 			expiresAt     *time.Time
 		)
-		if err := tx.QueryRowContext(ctx, `SELECT id, wedding_id, status, expires_at FROM invitations WHERE token_hash = $1 FOR UPDATE`, hash).
+		if err := tx.QueryRowContext(ctx, `SELECT id, wedding_id, status, expires_at FROM invitations WHERE token_hash = $1 OR short_code_hash = $1 FOR UPDATE`, hash).
 			Scan(&invitationID, &weddingID, &currentStatus, &expiresAt); err != nil {
 			return mapError(err)
 		}
@@ -899,7 +978,7 @@ func (r *PostgresRepository) AddGuestMessage(hash string, message models.GuestMe
 			currentStatus models.InvitationStatus
 			expiresAt     *time.Time
 		)
-		if err := tx.QueryRowContext(ctx, `SELECT id, wedding_id, status, expires_at FROM invitations WHERE token_hash = $1 FOR UPDATE`, hash).
+		if err := tx.QueryRowContext(ctx, `SELECT id, wedding_id, status, expires_at FROM invitations WHERE token_hash = $1 OR short_code_hash = $1 FOR UPDATE`, hash).
 			Scan(&invitationID, &weddingID, &currentStatus, &expiresAt); err != nil {
 			return mapError(err)
 		}
@@ -1595,11 +1674,11 @@ func insertAllChildren(ctx context.Context, tx *sql.Tx, w models.Wedding) error 
 
 func insertInvitation(ctx context.Context, tx *sql.Tx, weddingID string, invitation models.Invitation, position int) error {
 	_, err := tx.ExecContext(ctx, `INSERT INTO invitations (id, wedding_id, invitation_type, guest_name, guest_email, guest_phone,
-		committee_title, max_party_size, status, token_hash, expires_at, created_at, responded_at, position)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+		committee_title, max_party_size, status, token_hash, short_code_hash, expires_at, created_at, responded_at, opened_at, position)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
 		invitation.ID, weddingID, invitation.Type, invitation.GuestName, invitation.GuestEmail, invitation.GuestPhone,
 		invitation.CommitteeTitle, invitation.MaxPartySize, invitation.Status, invitation.TokenHash,
-		invitation.ExpiresAt, invitation.CreatedAt, invitation.RespondedAt, position)
+		invitation.ShortCodeHash, invitation.ExpiresAt, invitation.CreatedAt, invitation.RespondedAt, invitation.OpenedAt, position)
 	return mapError(err)
 }
 

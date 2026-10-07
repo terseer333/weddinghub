@@ -4,7 +4,7 @@ let data = WH.getData();
 let guest = WH.guestByToken(data) || null;
 let member = WH.committeeMemberByToken(data) || null;
 let wedding = data.wedding;
-const token = WH.query("token");
+const token = WH.query("token") || WH.query("short");
 const adminPreview = WH.query("preview") === "admin";
 if (adminPreview && !guest) guest = { id: "preview", name: "Guest preview", token: "", rsvp: "pending", invitationStatus: "pending", partySize: 1, type: "guest" };
 const modal = document.getElementById("rsvpModal");

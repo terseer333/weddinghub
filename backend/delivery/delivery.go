@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"mime"
 	"net"
@@ -42,11 +43,12 @@ var ErrChannelUnavailable = errors.New("delivery channel is not configured")
 
 // Invitation is one personalized invitation message for one recipient.
 type Invitation struct {
-	Channel string
-	To      string
-	Name    string
-	Couple  string
-	Link    string
+	Channel   string
+	To        string
+	Name      string
+	Couple    string
+	Link      string
+	BannerURL string
 }
 
 // Sender routes invitation messages to the configured delivery channels.
@@ -179,7 +181,7 @@ func (s *SMTPSender) Send(ctx context.Context, invitation Invitation) error {
 		return fmt.Errorf("invalid recipient address: %w", err)
 	}
 	subject, body := invitationText(invitation)
-	message := buildEmail(from.Address, to.Address, subject, body)
+	message := buildInvitationEmail(from.Address, to.Address, subject, body, invitation.Link, invitation.BannerURL)
 
 	send := s.send
 	if send == nil {
@@ -202,6 +204,21 @@ func buildEmail(from, to, subject, body string) []byte {
 	message.WriteString("Content-Type: text/plain; charset=UTF-8\r\n")
 	message.WriteString("Content-Transfer-Encoding: 8bit\r\n\r\n")
 	message.WriteString(strings.ReplaceAll(body, "\n", "\r\n"))
+	return message.Bytes()
+}
+
+func buildInvitationEmail(from, to, subject, body, link, bannerURL string) []byte {
+	if bannerURL == "" {
+		return buildEmail(from, to, subject, body)
+	}
+	boundary := "WeddingHubAlternative"
+	var message bytes.Buffer
+	fmt.Fprintf(&message, "From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=%q\r\n\r\n", from, to, mime.QEncoding.Encode("utf-8", subject), boundary)
+	fmt.Fprintf(&message, "--%s\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n%s\r\n", boundary, strings.ReplaceAll(body, "\n", "\r\n"))
+	escapedBody := strings.ReplaceAll(html.EscapeString(body), "\r\n", "<br>")
+	escapedBody = strings.ReplaceAll(escapedBody, "\n", "<br>")
+	htmlBody := fmt.Sprintf(`<div style="max-width:640px;margin:auto;padding:24px;font-family:Arial,sans-serif;color:#2e4337"><img src="%s" alt="Wedding invitation banner" style="display:block;width:100%%;height:auto;border-radius:12px"><p>%s</p><p><a href="%s" style="display:inline-block;padding:14px 22px;border-radius:8px;background:#2e4337;color:#fff;text-decoration:none">View your invitation</a></p></div>`, html.EscapeString(bannerURL), escapedBody, html.EscapeString(link))
+	fmt.Fprintf(&message, "--%s\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n%s\r\n--%s--\r\n", boundary, htmlBody, boundary)
 	return message.Bytes()
 }
 

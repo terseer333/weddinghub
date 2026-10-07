@@ -25,7 +25,13 @@ type MemoryRepository struct {
 	sessions       map[string]models.Session
 	passwordResets map[string]models.PasswordResetToken
 	profiles       map[profileRef]models.Profile
+	banners        map[string]memoryBanner
 	auditLogs      []models.AuditLog
+}
+
+type memoryBanner struct {
+	version string
+	image   []byte
 }
 
 func NewMemoryRepository() *MemoryRepository {
@@ -36,7 +42,38 @@ func NewMemoryRepository() *MemoryRepository {
 		sessions:       make(map[string]models.Session),
 		passwordResets: make(map[string]models.PasswordResetToken),
 		profiles:       make(map[profileRef]models.Profile),
+		banners:        make(map[string]memoryBanner),
 	}
+}
+
+func (r *MemoryRepository) SaveWeddingBanner(weddingID, version string, image []byte) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.weddings[weddingID]; !ok {
+		return ErrNotFound
+	}
+	r.banners[weddingID] = memoryBanner{version: version, image: append([]byte(nil), image...)}
+	return nil
+}
+
+func (r *MemoryRepository) WeddingBanner(weddingID string) (string, []byte, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	b, ok := r.banners[weddingID]
+	if !ok {
+		return "", nil, ErrNotFound
+	}
+	return b.version, append([]byte(nil), b.image...), nil
+}
+
+func (r *MemoryRepository) WeddingBannerVersion(weddingID string) (string, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	b, ok := r.banners[weddingID]
+	if !ok {
+		return "", ErrNotFound
+	}
+	return b.version, nil
 }
 
 func (r *MemoryRepository) CreateWedding(w models.Wedding) (models.Wedding, error) {
@@ -276,6 +313,71 @@ func (r *MemoryRepository) InvitationByHash(hash string) (models.Wedding, models
 		return models.Wedding{}, models.Invitation{}, ErrExpired
 	}
 	return cloneWedding(w), inv, nil
+}
+
+func (r *MemoryRepository) InvitationByShortCodeHash(hash string) (models.Wedding, models.Invitation, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if hash == "" {
+		return models.Wedding{}, models.Invitation{}, ErrNotFound
+	}
+	for _, w := range r.weddings {
+		for _, inv := range w.Invitations {
+			if inv.ShortCodeHash == hash {
+				return cloneWedding(w), inv, nil
+			}
+		}
+	}
+	return models.Wedding{}, models.Invitation{}, ErrNotFound
+}
+
+func (r *MemoryRepository) PreviewByShortCodeHash(hash string) (models.Wedding, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	for _, wedding := range r.weddings {
+		for _, invitation := range wedding.Invitations {
+			if invitation.ShortCodeHash == hash {
+				if invitation.Status == models.InvitationExpired || string(invitation.Status) == "revoked" || invitation.ExpiresAt != nil && time.Now().UTC().After(*invitation.ExpiresAt) {
+					return models.Wedding{}, ErrNotFound
+				}
+				return models.Wedding{ID: wedding.ID, PartnerOne: wedding.PartnerOne, PartnerTwo: wedding.PartnerTwo, Date: wedding.Date, Status: wedding.Status, Venue: wedding.Venue, City: wedding.City, HeroImage: wedding.HeroImage, CardConfig: wedding.CardConfig}, nil
+			}
+		}
+	}
+	return models.Wedding{}, ErrNotFound
+}
+
+func (r *MemoryRepository) PublicWeddingPreview(weddingID string) (models.Wedding, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	w, ok := r.weddings[weddingID]
+	if !ok {
+		return models.Wedding{}, ErrNotFound
+	}
+	return models.Wedding{ID: w.ID, PartnerOne: w.PartnerOne, PartnerTwo: w.PartnerTwo, Date: w.Date, Status: w.Status, Venue: w.Venue, City: w.City, HeroImage: w.HeroImage, TemplateID: w.TemplateID, CardConfig: w.CardConfig}, nil
+}
+
+func (r *MemoryRepository) RecordInvitationOpenByShortCodeHash(hash string, at time.Time) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	for weddingID, wedding := range r.weddings {
+		for i := range wedding.Invitations {
+			invitation := &wedding.Invitations[i]
+			if invitation.ShortCodeHash != hash {
+				continue
+			}
+			if invitation.Status == models.InvitationExpired || string(invitation.Status) == "revoked" || invitation.ExpiresAt != nil && at.After(*invitation.ExpiresAt) {
+				return ErrNotFound
+			}
+			if invitation.OpenedAt == nil {
+				opened := at
+				invitation.OpenedAt = &opened
+				r.weddings[weddingID] = wedding
+			}
+			return nil
+		}
+	}
+	return ErrNotFound
 }
 
 func (r *MemoryRepository) RespondToInvitation(hash string, status models.InvitationStatus, at time.Time) (models.Wedding, models.Invitation, error) {
@@ -996,7 +1098,7 @@ func (r *MemoryRepository) findInvitation(hash string) (models.Wedding, models.I
 	}
 	for _, w := range r.weddings {
 		for _, inv := range w.Invitations {
-			if len(inv.TokenHash) == len(hash) && subtle.ConstantTimeCompare([]byte(inv.TokenHash), []byte(hash)) == 1 {
+			if len(inv.TokenHash) == len(hash) && subtle.ConstantTimeCompare([]byte(inv.TokenHash), []byte(hash)) == 1 || len(inv.ShortCodeHash) == len(hash) && subtle.ConstantTimeCompare([]byte(inv.ShortCodeHash), []byte(hash)) == 1 {
 				return w, inv, true
 			}
 		}

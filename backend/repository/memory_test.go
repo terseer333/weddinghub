@@ -217,8 +217,10 @@ func TestMemoryProfileLifecycle(t *testing.T) {
 	if _, err := repo.GetProfile("w1", models.ProfileKeyAdmin); !errors.Is(err, ErrNotFound) {
 		t.Fatalf("missing profile error = %v, want ErrNotFound", err)
 	}
-	saved, err := repo.UpsertProfile(models.Profile{WeddingID: "w1", ID: models.ProfileKeyAdmin, Role: models.RoleAdmin,
-		DisplayName: "Ada", Avatar: "data:image/png;base64,AAAA", UpdatedAt: time.Now().UTC()})
+	saved, err := repo.UpsertProfile(models.Profile{
+		WeddingID: "w1", ID: models.ProfileKeyAdmin, Role: models.RoleAdmin,
+		DisplayName: "Ada", Avatar: "data:image/png;base64,AAAA", UpdatedAt: time.Now().UTC(),
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

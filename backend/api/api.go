@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -18,6 +20,7 @@ import (
 	"weddinghub/delivery"
 	"weddinghub/mailer"
 	"weddinghub/models"
+	"weddinghub/preview"
 	"weddinghub/repository"
 )
 
@@ -37,6 +40,7 @@ type API struct {
 	loginGuard     *loginGuard
 	passwordMailer mailer.PasswordMailer
 	resetLimiter   *passwordResetLimiter
+	previewLookups *shortLinkLimiter
 }
 
 func New(repo repository.Repository) http.Handler {
@@ -79,9 +83,13 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 		loginGuard:     newLoginGuard(),
 		passwordMailer: passwordMailer,
 		resetLimiter:   newPasswordResetLimiter(),
+		previewLookups: newShortLinkLimiter(),
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", a.health)
+	mux.HandleFunc("GET /i/{code}", a.shortInvitation)
+	mux.HandleFunc("GET /og/{asset}", a.weddingBanner)
+	mux.HandleFunc("GET /static/og/weddinghub-default.png", a.defaultBanner)
 	mux.HandleFunc("POST /api/auth/signup", a.signup)
 	mux.HandleFunc("POST /api/auth/login", a.login)
 	mux.HandleFunc("POST /api/auth/forgot-password", a.forgotPassword)
@@ -132,13 +140,14 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 	mux.HandleFunc("GET /api/weddings/{weddingID}/admin/overview", a.adminOverview)
 	mux.HandleFunc("GET /api/weddings/{weddingID}/admin/roster", a.adminRoster)
 	// Invitation capability-token routes, open to the invitee who holds the link.
-	mux.HandleFunc("GET /api/invitations/{token}", a.getInvitation)
-	mux.HandleFunc("POST /api/invitations/{token}/accept", a.acceptInvitation)
-	mux.HandleFunc("POST /api/invitations/{token}/decline", a.declineInvitation)
+	mux.Handle("GET /api/invitations/{token}", a.limitShortCode(a.getInvitation))
+	mux.Handle("GET /api/invitations/short/{code}", a.limitShortCode(a.getShortInvitation))
+	mux.Handle("POST /api/invitations/{token}/accept", a.limitShortCode(a.acceptInvitation))
+	mux.Handle("POST /api/invitations/{token}/decline", a.limitShortCode(a.declineInvitation))
 	// Guest routes require an accepted guest-type invitation.
-	mux.HandleFunc("GET /api/guest/{token}/dashboard", a.guestDashboard)
-	mux.HandleFunc("PUT /api/guest/{token}/rsvp", a.updateRSVP)
-	mux.HandleFunc("POST /api/guest/{token}/messages", a.createGuestMessage)
+	mux.Handle("GET /api/guest/{token}/dashboard", a.limitShortCode(a.guestDashboard))
+	mux.Handle("PUT /api/guest/{token}/rsvp", a.limitShortCode(a.updateRSVP))
+	mux.Handle("POST /api/guest/{token}/messages", a.limitShortCode(a.createGuestMessage))
 	// Committee routes require the admin token or an accepted committee invitation.
 	mux.HandleFunc("GET /api/weddings/{weddingID}/committee/dashboard", a.committeeDashboard)
 	// Self-service profile: the admin edits the "admin" profile, a committee member
@@ -171,6 +180,199 @@ func newHandler(repo repository.Repository, allowedOrigins string, allowLoopback
 func (a *API) health(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
+
+func (a *API) shortInvitation(w http.ResponseWriter, r *http.Request) {
+	code := r.PathValue("code")
+	valid := len(code) == 12
+	for _, c := range code {
+		if !(c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z') {
+			valid = false
+			break
+		}
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	if !valid {
+		http.Error(w, `<title>Invitation</title><main>This invitation link is invalid or has expired.</main>`, http.StatusNotFound)
+		return
+	}
+	if !a.previewLookups.Allow(clientIP(r)) {
+		http.Error(w, "Please try again shortly.", http.StatusTooManyRequests)
+		return
+	}
+	wedding, err := a.repo.PreviewByShortCodeHash(models.HashToken(code))
+	if err != nil {
+		http.Error(w, `<title>Invitation</title><main>This invitation link is invalid or has expired.</main>`, http.StatusNotFound)
+		return
+	}
+	if !isPreviewBot(r.UserAgent()) {
+		_ = a.repo.RecordInvitationOpenByShortCodeHash(models.HashToken(code), a.now())
+	}
+	host := strings.TrimRight(os.Getenv("WEDDINGHUB_PUBLIC_BASE_URL"), "/")
+	if host == "" {
+		scheme := "https"
+		if r.TLS == nil {
+			scheme = "http"
+		}
+		if r.Header.Get("X-Forwarded-Proto") == "https" {
+			scheme = "https"
+		}
+		host = scheme + "://" + r.Host
+	}
+	version := bannerVersion(wedding)
+	imageURL := host + "/static/og/weddinghub-default.png"
+	if strings.TrimSpace(wedding.PartnerOne) != "" && strings.TrimSpace(wedding.PartnerTwo) != "" && wedding.Date != nil {
+		if storedVersion, err := a.repo.WeddingBannerVersion(wedding.ID); err == nil && storedVersion == version {
+			imageURL = host + "/og/" + url.PathEscape(wedding.ID) + ".png?v=" + version[:12]
+		}
+	}
+	couple := html.EscapeString(strings.TrimSpace(wedding.PartnerOne + " & " + wedding.PartnerTwo))
+	where := strings.TrimSpace(wedding.City)
+	if where == "" {
+		where = wedding.Venue
+	}
+	if where == "" {
+		where = "our celebration"
+	}
+	date := "our wedding day"
+	if wedding.Date != nil {
+		date = wedding.Date.Format("January 2, 2006")
+	}
+	desc := html.EscapeString("You're invited · " + date + " · " + where + ". Tap to view and RSVP.")
+	pageURL := html.EscapeString(host + "/i/" + code)
+	fmt.Fprintf(w, `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>%s are getting married</title><meta property="og:type" content="website"><meta property="og:title" content="%s are getting married"><meta property="og:description" content="%s"><meta property="og:image" content="%s"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:url" content="%s"><meta name="twitter:card" content="summary_large_image"><meta http-equiv="refresh" content="0;url=%s/pages/event.html?short=%s"></head><body><a href="%s/pages/event.html?short=%s">View your invitation</a><script>location.replace(%s)</script></body></html>`, couple, couple, desc, html.EscapeString(imageURL), pageURL, host, code, host, code, jsString(host+"/pages/event.html?short="+code))
+}
+
+func isPreviewBot(userAgent string) bool {
+	value := strings.ToLower(userAgent)
+	for _, marker := range []string{"bot", "crawler", "spider", "preview", "whatsapp", "facebookexternalhit", "facebot", "twitterbot", "telegrambot", "slackbot", "linkedinbot", "discordbot", "meta-externalagent"} {
+		if strings.Contains(value, marker) {
+			return true
+		}
+	}
+	return false
+}
+
+type shortLinkLimiter struct {
+	mu       sync.Mutex
+	hits     map[string][]time.Time
+	requests uint64
+}
+
+func newShortLinkLimiter() *shortLinkLimiter {
+	return &shortLinkLimiter{hits: make(map[string][]time.Time)}
+}
+
+func (a *API) limitShortCode(next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		code := r.PathValue("code")
+		if code == "" {
+			code = r.PathValue("token")
+		}
+		if validShortCode(code) && !a.previewLookups.Allow(clientIP(r)) {
+			writeError(w, http.StatusTooManyRequests, "please try again shortly")
+			return
+		}
+		next(w, r)
+	})
+}
+
+func (l *shortLinkLimiter) Allow(key string) bool {
+	now := time.Now()
+	cutoff := now.Add(-time.Minute)
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.requests++
+	if l.requests%128 == 0 {
+		for ip, old := range l.hits {
+			kept := old[:0]
+			for _, at := range old {
+				if at.After(cutoff) {
+					kept = append(kept, at)
+				}
+			}
+			if len(kept) == 0 {
+				delete(l.hits, ip)
+			} else {
+				l.hits[ip] = kept
+			}
+		}
+	}
+	if _, exists := l.hits[key]; !exists && len(l.hits) >= 4096 {
+		return false
+	}
+	hits := l.hits[key][:0]
+	for _, at := range l.hits[key] {
+		if at.After(cutoff) {
+			hits = append(hits, at)
+		}
+	}
+	if len(hits) >= 90 {
+		l.hits[key] = hits
+		return false
+	}
+	l.hits[key] = append(hits, now)
+	return true
+}
+
+func clientIP(r *http.Request) string {
+	if forwarded := strings.TrimSpace(r.Header.Get("X-Forwarded-For")); forwarded != "" {
+		parts := strings.Split(forwarded, ",")
+		if ip := strings.TrimSpace(parts[len(parts)-1]); net.ParseIP(ip) != nil {
+			return ip
+		}
+	}
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err == nil {
+		return host
+	}
+	return r.RemoteAddr
+}
+
+func bannerVersion(wedding models.Wedding) string {
+	date := ""
+	if wedding.Date != nil {
+		date = wedding.Date.Format(time.RFC3339)
+	}
+	card, _ := json.Marshal(wedding.CardConfig)
+	data, _ := json.Marshal([]string{wedding.PartnerOne, wedding.PartnerTwo, date, wedding.City, wedding.Venue, wedding.HeroImage, wedding.TemplateID, string(card)})
+	return models.HashToken(string(data))
+}
+
+func (a *API) weddingBanner(w http.ResponseWriter, r *http.Request) {
+	asset := r.PathValue("asset")
+	if !strings.HasSuffix(asset, ".png") {
+		http.NotFound(w, r)
+		return
+	}
+	weddingID := strings.TrimSuffix(asset, ".png")
+	wedding, weddingErr := a.repo.PublicWeddingPreview(weddingID)
+	version, image, err := a.repo.WeddingBanner(weddingID)
+	if weddingErr != nil || err != nil || len(image) == 0 || version != bannerVersion(wedding) {
+		a.defaultBanner(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "public, max-age=86400, stale-while-revalidate=3600")
+	w.Header().Set("ETag", `"`+version+`"`)
+	_, _ = w.Write(image)
+}
+
+func (a *API) defaultBanner(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "public, max-age=86400")
+	_, _ = w.Write(preview.DefaultBanner())
+}
+
+func (a *API) saveBanner(wedding models.Wedding) {
+	image, err := preview.Render(wedding)
+	if err != nil {
+		return
+	}
+	_ = a.repo.SaveWeddingBanner(wedding.ID, bannerVersion(wedding), image)
+}
+
+func jsString(s string) string { encoded, _ := json.Marshal(s); return string(encoded) }
 
 // weddingCreated wraps a newly created wedding together with its one-time admin
 // capability token. Only the token hash is stored; the raw token is returned here once.
@@ -289,6 +491,7 @@ func (a *API) updateWedding(w http.ResponseWriter, r *http.Request) {
 		writeRepositoryError(w, err)
 		return
 	}
+	a.saveBanner(updated)
 	writeJSON(w, http.StatusOK, updated)
 }
 
@@ -357,6 +560,11 @@ func (a *API) createInvitation(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "could not generate invitation")
 		return
 	}
+	code, codeHash, err := models.NewShortCode()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "could not generate invitation")
+		return
+	}
 	id, err := models.NewID()
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "could not generate invitation")
@@ -365,22 +573,23 @@ func (a *API) createInvitation(w http.ResponseWriter, r *http.Request) {
 	inv := models.Invitation{
 		ID: id, Type: invitationType, GuestName: input.GuestName, GuestEmail: strings.TrimSpace(input.GuestEmail),
 		GuestPhone: strings.TrimSpace(input.GuestPhone), CommitteeTitle: strings.TrimSpace(input.CommitteeTitle),
-		MaxPartySize: input.MaxPartySize, Status: models.InvitationPending, TokenHash: hash, ExpiresAt: input.ExpiresAt, CreatedAt: a.now(),
+		MaxPartySize: input.MaxPartySize, Status: models.InvitationPending, TokenHash: hash, ShortCodeHash: codeHash, ExpiresAt: input.ExpiresAt, CreatedAt: a.now(),
 	}
 	created, err := a.repo.AddInvitation(wedding.ID, inv)
 	if err != nil {
 		writeRepositoryError(w, err)
 		return
 	}
-	writeJSON(w, http.StatusCreated, invitationCreated{Invitation: created, Token: token})
+	writeJSON(w, http.StatusCreated, map[string]any{"invitation": created, "token": token, "short_code": code})
 }
 
 // sendInvitationRequest delivers an existing invitation to its recipient. The raw
 // token is supplied by the caller because only its hash is stored; it must match the
 // invitation's hash before any message is sent.
 type sendInvitationRequest struct {
-	Token    string   `json:"token"`
-	Channels []string `json:"channels"`
+	Token     string   `json:"token"`
+	ShortCode string   `json:"short_code"`
+	Channels  []string `json:"channels"`
 }
 
 type deliveryResult struct {
@@ -436,6 +645,11 @@ func (a *API) sendInvitation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	link := a.sender.Link(input.Token)
+	if validShortCode(input.ShortCode) && constantTimeMatch(invitation.ShortCodeHash, models.HashToken(input.ShortCode)) {
+		if base := strings.TrimRight(strings.TrimSpace(os.Getenv("WEDDINGHUB_PUBLIC_BASE_URL")), "/"); base != "" {
+			link = base + "/i/" + input.ShortCode
+		}
+	}
 	if link == "" {
 		writeError(w, http.StatusServiceUnavailable, "WEDDINGHUB_PUBLIC_BASE_URL is required to build invitation links")
 		return
@@ -459,8 +673,13 @@ func (a *API) sendInvitation(w http.ResponseWriter, r *http.Request) {
 		case strings.TrimSpace(result.To) == "":
 			result.Status, result.Error = "skipped", "no recipient on file"
 		default:
+			base := strings.TrimRight(strings.TrimSpace(os.Getenv("WEDDINGHUB_PUBLIC_BASE_URL")), "/")
+			bannerURL := ""
+			if base != "" {
+				bannerURL = base + "/og/" + url.PathEscape(wedding.ID) + ".png?v=" + bannerVersion(wedding)[:12]
+			}
 			sendErr := a.sender.Send(r.Context(), delivery.Invitation{
-				Channel: channel, To: result.To, Name: invitation.GuestName, Couple: weddingCouple(wedding), Link: link,
+				Channel: channel, To: result.To, Name: invitation.GuestName, Couple: weddingCouple(wedding), Link: link, BannerURL: bannerURL,
 			})
 			if sendErr != nil {
 				result.Status, result.Error = "failed", sendErr.Error()
@@ -520,6 +739,32 @@ func (a *API) getInvitation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, invitationView{Wedding: publishedWedding(wedding), Invitation: inv})
+}
+
+func (a *API) getShortInvitation(w http.ResponseWriter, r *http.Request) {
+	code := r.PathValue("code")
+	if !validShortCode(code) {
+		writeError(w, http.StatusNotFound, "invitation not found")
+		return
+	}
+	wedding, inv, err := a.repo.InvitationByShortCodeHash(models.HashToken(code))
+	if err != nil {
+		writeError(w, http.StatusNotFound, "invitation not found")
+		return
+	}
+	writeJSON(w, http.StatusOK, invitationView{Wedding: publishedWedding(wedding), Invitation: inv})
+}
+
+func validShortCode(code string) bool {
+	if len(code) != 12 {
+		return false
+	}
+	for _, c := range code {
+		if !(c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z') {
+			return false
+		}
+	}
+	return true
 }
 
 func (a *API) acceptInvitation(w http.ResponseWriter, r *http.Request) {
@@ -1323,6 +1568,9 @@ func (a *API) updateCardConfig(w http.ResponseWriter, r *http.Request) {
 		writeRepositoryError(w, err)
 		return
 	}
+	wedding.CardConfig = &updated
+	wedding.TemplateID = updated.TemplateID
+	a.saveBanner(wedding)
 	writeJSON(w, http.StatusOK, updated)
 }
 
@@ -1480,11 +1728,16 @@ func getTemplatesCatalog() []models.Template {
 }
 
 func (a *API) invitation(token string) (models.Wedding, models.Invitation, error) {
+	if validShortCode(token) {
+		return a.repo.InvitationByShortCodeHash(models.HashToken(token))
+	}
 	if !validToken(token) {
 		return models.Wedding{}, models.Invitation{}, repository.ErrNotFound
 	}
 	return a.repo.InvitationByHash(models.HashToken(token))
 }
+
+func invitationLookupHash(token string) string { return models.HashToken(token) }
 
 func validToken(token string) bool {
 	// Generated tokens encode exactly 32 random bytes using unpadded URL-safe base64.

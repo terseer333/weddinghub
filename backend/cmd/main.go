@@ -79,7 +79,7 @@ func main() {
 		log.Printf("Serving static frontend from %s", absPath)
 		fileServer := http.FileServer(http.Dir(staticDir))
 		rootHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, "/api/") || r.URL.Path == "/healthz" {
+			if strings.HasPrefix(r.URL.Path, "/api/") || r.URL.Path == "/healthz" || strings.HasPrefix(r.URL.Path, "/i/") || strings.HasPrefix(r.URL.Path, "/og/") || r.URL.Path == "/static/og/weddinghub-default.png" {
 				apiHandler.ServeHTTP(w, r)
 				return
 			}

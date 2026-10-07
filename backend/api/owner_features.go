@@ -2,6 +2,8 @@ package api
 
 import (
 	"net/http"
+	"net/url"
+	"os"
 	"strings"
 
 	"weddinghub/delivery"
@@ -48,6 +50,11 @@ func (a *API) createOwnerInvitation(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "could not generate invitation")
 		return
 	}
+	code, codeHash, err := models.NewShortCode()
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "could not generate invitation")
+		return
+	}
 	id := mustID(w)
 	if id == "" {
 		return
@@ -55,14 +62,14 @@ func (a *API) createOwnerInvitation(w http.ResponseWriter, r *http.Request) {
 	invitation := models.Invitation{
 		ID: id, Type: typ, GuestName: input.GuestName, GuestEmail: input.GuestEmail,
 		GuestPhone: input.GuestPhone, CommitteeTitle: input.CommitteeTitle, MaxPartySize: input.MaxPartySize,
-		Status: models.InvitationPending, TokenHash: hash, ExpiresAt: input.ExpiresAt, CreatedAt: a.now(),
+		Status: models.InvitationPending, TokenHash: hash, ShortCodeHash: codeHash, ExpiresAt: input.ExpiresAt, CreatedAt: a.now(),
 	}
 	created, err := a.repo.AddInvitation(wedding.ID, invitation)
 	if err != nil {
 		writeRepositoryError(w, err)
 		return
 	}
-	writeJSON(w, http.StatusCreated, invitationCreated{Invitation: created, Token: token})
+	writeJSON(w, http.StatusCreated, map[string]any{"invitation": created, "token": token, "short_code": code})
 }
 
 func (a *API) updateOwnerInvitation(w http.ResponseWriter, r *http.Request) {
@@ -146,13 +153,19 @@ func (a *API) refreshOwnerInvitationLink(w http.ResponseWriter, r *http.Request)
 			writeError(w, http.StatusInternalServerError, "could not create invitation link")
 			return
 		}
+		code, codeHash, err := models.NewShortCode()
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "could not create invitation link")
+			return
+		}
 		invitation.TokenHash = hash
+		invitation.ShortCodeHash = codeHash
 		updated, err := a.repo.UpdateInvitation(wedding.ID, invitation)
 		if err != nil {
 			writeRepositoryError(w, err)
 			return
 		}
-		writeJSON(w, http.StatusOK, invitationCreated{Invitation: updated, Token: token})
+		writeJSON(w, http.StatusOK, map[string]any{"invitation": updated, "token": token, "short_code": code})
 		return
 	}
 	writeError(w, http.StatusNotFound, "invitation not found")
@@ -198,6 +211,11 @@ func (a *API) sendOwnerInvitation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	link := a.sender.Link(input.Token)
+	if validShortCode(input.ShortCode) && constantTimeMatch(invitation.ShortCodeHash, models.HashToken(input.ShortCode)) {
+		if base := strings.TrimRight(strings.TrimSpace(os.Getenv("WEDDINGHUB_PUBLIC_BASE_URL")), "/"); base != "" {
+			link = base + "/i/" + input.ShortCode
+		}
+	}
 	if link == "" {
 		writeError(w, http.StatusServiceUnavailable, "WEDDINGHUB_PUBLIC_BASE_URL is required to build invitation links")
 		return
@@ -221,7 +239,12 @@ func (a *API) sendOwnerInvitation(w http.ResponseWriter, r *http.Request) {
 		case strings.TrimSpace(result.To) == "":
 			result.Status, result.Error = "skipped", "no recipient on file"
 		default:
-			message := delivery.Invitation{Channel: channel, To: result.To, Couple: weddingCouple(wedding), Name: invitation.GuestName, Link: link}
+			base := strings.TrimRight(strings.TrimSpace(os.Getenv("WEDDINGHUB_PUBLIC_BASE_URL")), "/")
+			bannerURL := ""
+			if base != "" {
+				bannerURL = base + "/og/" + url.PathEscape(wedding.ID) + ".png?v=" + bannerVersion(wedding)[:12]
+			}
+			message := delivery.Invitation{Channel: channel, To: result.To, Couple: weddingCouple(wedding), Name: invitation.GuestName, Link: link, BannerURL: bannerURL}
 			if err := a.sender.Send(r.Context(), message); err != nil {
 				result.Status, result.Error = "failed", "delivery failed"
 			} else {

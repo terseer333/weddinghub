@@ -80,7 +80,7 @@
   }
 
   async function cardStudio() {
-    root.innerHTML = `${intro("Invitations", "Card Studio", "Choose a design, adjust the fonts and colors, and preview your invitation as you edit.", '<a class="owner-button" href="preview-card.html">Guest preview</a>')} ${stateMarkup()}<div class="owner-grid card-studio-page" id="page-main" hidden><article class="owner-card studio-gallery-card"><div class="owner-card-head"><div><h2>1. Choose a design</h2><p>Start with a style you both like. You can change it any time.</p></div><label class="owner-field">Category<select id="template-filter" class="owner-control"><option value="">All categories</option></select></label></div><label class="owner-field studio-search-field">Search designs<input id="template-search" type="search" placeholder="Try botanical, classic, or gold"></label><div class="template-grid" id="template-grid"></div><p class="owner-empty" id="templates-empty" hidden>No templates match your search.</p></article><article class="owner-card studio-edit-card"><div class="owner-card-head"><div><h2>2. Make it yours</h2><p>Changes appear in the preview right away. Save when you’re happy.</p></div></div><div class="invitation-preview" id="card-mini-preview" aria-live="polite"><span class="owner-eyebrow">You are invited</span><h2 id="preview-couple"></h2><p id="preview-date"></p><p id="preview-venue"></p></div><form id="card-form" class="owner-form"><h3 class="studio-form-heading">Personalize the look</h3><label class="owner-field">Names font<select name="font-couple"></select></label><label class="owner-field">Heading font<select name="font-heading"></select></label><label class="owner-field">Details font<select name="font-body"></select></label><label class="owner-field">Background color<input name="color-background" type="color"></label><label class="owner-field">Text color<input name="color-text" type="color"></label><label class="owner-field">Accent color<input name="color-accent" type="color"></label><div class="owner-actions wide"><button class="owner-button primary" type="submit">Save invitation design</button></div></form></article></div>`;
+    root.innerHTML = `${intro("Invitations", "Card Studio", "Choose a design, adjust the fonts and colors, and preview your invitation as you edit.", '<a class="owner-button" href="preview-card.html">Guest preview</a>')} ${stateMarkup()}<div class="owner-grid card-studio-page" id="page-main" hidden><article class="owner-card studio-gallery-card"><div class="owner-card-head"><div><h2>1. Choose a design</h2><p>Start with a style you both like. You can change it any time.</p></div><label class="owner-field">Category<select id="template-filter" class="owner-control"><option value="">All categories</option></select></label></div><label class="owner-field studio-search-field">Search designs<input id="template-search" type="search" placeholder="Try botanical, classic, or gold"></label><div class="template-grid" id="template-grid"></div><p class="owner-empty" id="templates-empty" hidden>No templates match your search.</p></article><article class="owner-card studio-edit-card"><div class="owner-card-head"><div><h2>2. Make it yours</h2><p>Changes appear in the preview right away. Save when you’re happy.</p></div></div><div class="invitation-preview" id="card-mini-preview" aria-live="polite"><span class="owner-eyebrow">You are invited</span><h2 id="preview-couple"></h2><p id="preview-date"></p><p id="preview-venue"></p></div><form id="card-form" class="owner-form"><h3 class="studio-form-heading">Personalize the look</h3><label class="owner-field">Names font<select name="font-couple"></select></label><label class="owner-field">Heading font<select name="font-heading"></select></label><label class="owner-field">Details font<select name="font-body"></select></label><label class="owner-field">Background color<input name="color-background" type="color"></label><label class="owner-field">Text color<input name="color-text" type="color"></label><label class="owner-field">Accent color<input name="color-accent" type="color"></label><div class="owner-actions wide"><button class="owner-button primary" type="submit">Save invitation design</button></div></form></article><article class="owner-card"><div class="owner-card-head"><div><h2>Shared link preview</h2><p>This is how your link will look when shared.</p></div></div><img id="shared-link-preview" alt="WeddingHub link preview banner" style="display:block;width:100%;max-width:620px;border-radius:12px"></article></div>`;
     setState("loading");
     try {
       const [data, templatesResponse, fontsResponse] = await Promise.all([
@@ -95,6 +95,9 @@
       let config = data.card_config || (selected ? { template_id: selected.id, fonts: selected.fonts, colors: selected.colors, decorations: { ...(selected.decorations || {}), background: selected.background?.style || "solid" } } : { template_id: "", fonts: {}, colors: {}, decorations: {} });
       document.getElementById("page-main").hidden = false;
       setState("ready");
+      const banner = document.getElementById("shared-link-preview");
+      const bannerURL = () => `${owner.api.baseURL()}/og/${encodeURIComponent(data.id)}.png?v=${Date.now()}`;
+      banner.src = bannerURL();
       const form = document.getElementById("card-form");
       for (const category of [...new Set(templates.map(template => template.category).filter(Boolean))]) {
         const option = document.createElement("option"); option.value = category; option.textContent = category; document.getElementById("template-filter").append(option);
@@ -143,7 +146,7 @@
         if (!selected) return owner.toast("Choose a template first.", "error");
         const button = form.querySelector("button[type=submit]"); button.disabled = true;
         config.template_id = selected.id; data.template_id = selected.id; data.card_config = config;
-        try { data = await owner.saveWorkspace(data); owner.toast("Invitation design saved."); }
+        try { data = await owner.saveWorkspace(data); banner.src = bannerURL(); owner.toast("Invitation design saved."); }
         catch (error) { owner.toast(error.message || "Could not save the invitation design.", "error"); }
         finally { button.disabled = false; }
       });
@@ -188,7 +191,7 @@
   }
 
   async function guestsPage() {
-    root.innerHTML = `${intro("Guests", "Guests & RSVP", "Manage invitations, track responses, and share guest links.", '<button class="owner-button primary" id="add-guest" type="button">Add guest</button>')} ${stateMarkup()}<section id="page-main" hidden><div class="owner-stat-grid" id="guest-stats"></div><article class="owner-card"><div class="owner-card-head"><div><h2>Guest list</h2><p>Search by name or filter by RSVP status.</p></div><div class="owner-actions"><button class="owner-button" id="export-guests" type="button">Export CSV</button></div></div><div class="owner-rsvp"><div class="owner-donut" id="guest-donut"><div><strong id="guest-donut-total">0</strong><small>invited</small></div></div><div class="owner-rsvp-legend"><span>Attending <strong id="guest-attending">0</strong></span><span>Pending <strong id="guest-pending">0</strong></span><span>Declined <strong id="guest-declined">0</strong></span></div></div><div class="owner-tabs" id="guest-filters"><button type="button" data-status="all" aria-pressed="true">All</button><button type="button" data-status="attending" aria-pressed="false">Attending</button><button type="button" data-status="pending" aria-pressed="false">Pending</button><button type="button" data-status="declined" aria-pressed="false">Declined</button></div><div class="owner-list" id="guest-list"></div><div class="owner-empty" id="guest-empty" hidden><strong>No guests yet?</strong>Add your first guest to start collecting RSVPs.</div></article><dialog class="owner-dialog" id="guest-dialog"><form id="guest-form" method="dialog"><div class="owner-card-head"><div><span class="owner-eyebrow">Invitation</span><h2 id="guest-dialog-title">Add guest</h2></div><button class="owner-button" type="button" id="close-guest-dialog">Close</button></div><div class="owner-form"><label class="owner-field">Guest name<input name="guest_name" maxlength="160" required></label><label class="owner-field">Party size<input name="max_party_size" type="number" min="1" max="20" value="1" required></label><label class="owner-field">Email<input name="guest_email" type="email" maxlength="254"></label><label class="owner-field">Phone<input name="guest_phone" type="tel" maxlength="40"></label><div class="owner-actions wide"><button class="owner-button primary" type="submit">Save guest</button></div></div></form></dialog><section class="owner-card" id="guest-link-card" hidden><div class="owner-card-head"><div><h2>Guest invitation link</h2><p>This link is shown once when created. You can generate a replacement from the guest row later.</p></div></div><a id="guest-link" class="owner-control" target="_blank" rel="noopener"></a><div class="owner-actions"><button class="owner-button primary" id="copy-new-link" type="button">Copy link</button></div></section></section>`;
+    root.innerHTML = `${intro("Guests", "Guests & RSVP", "Manage invitations, track responses, and share guest links.", '<button class="owner-button primary" id="add-guest" type="button">Add guest</button>')} ${stateMarkup()}<section id="page-main" hidden><div class="owner-stat-grid" id="guest-stats"></div><article class="owner-card"><div class="owner-card-head"><div><h2>Guest list</h2><p>Search by name or filter by RSVP status.</p></div><div class="owner-actions"><button class="owner-button" id="export-guests" type="button">Export CSV</button></div></div><div class="owner-rsvp"><div class="owner-donut" id="guest-donut"><div><strong id="guest-donut-total">0</strong><small>invited</small></div></div><div class="owner-rsvp-legend"><span>Attending <strong id="guest-attending">0</strong></span><span>Pending <strong id="guest-pending">0</strong></span><span>Declined <strong id="guest-declined">0</strong></span></div></div><div class="owner-tabs" id="guest-filters"><button type="button" data-status="all" aria-pressed="true">All</button><button type="button" data-status="attending" aria-pressed="false">Attending</button><button type="button" data-status="pending" aria-pressed="false">Pending</button><button type="button" data-status="declined" aria-pressed="false">Declined</button></div><div class="owner-list" id="guest-list"></div><div class="owner-empty" id="guest-empty" hidden><strong>No guests yet?</strong>Add your first guest to start collecting RSVPs.</div></article><dialog class="owner-dialog" id="guest-dialog"><form id="guest-form" method="dialog"><div class="owner-card-head"><div><span class="owner-eyebrow">Invitation</span><h2 id="guest-dialog-title">Add guest</h2></div><button class="owner-button" type="button" id="close-guest-dialog">Close</button></div><div class="owner-form"><label class="owner-field">Guest name<input name="guest_name" maxlength="160" required></label><label class="owner-field">Party size<input name="max_party_size" type="number" min="1" max="20" value="1" required></label><label class="owner-field">Email<input name="guest_email" type="email" maxlength="254"></label><label class="owner-field">Phone<input name="guest_phone" type="tel" maxlength="40"></label><div class="owner-actions wide"><button class="owner-button primary" type="submit">Save guest</button></div></div></form></dialog><section class="owner-card" id="guest-link-card" hidden><div class="owner-card-head"><div><h2>Guest invitation link</h2><p>This link is shown once when created. You can generate a replacement from the guest row later.</p></div></div><a id="guest-link" class="owner-control" target="_blank" rel="noopener"></a><div class="owner-actions"><button class="owner-button primary" id="copy-new-link" type="button">Copy link</button><button class="owner-button" id="share-new-whatsapp" type="button">Share on WhatsApp</button><button class="owner-button" id="share-new-image" type="button" hidden>Share with image</button></div></section></section>`;
     setState("loading");
     let data;
     const tokens = new Map();
@@ -235,10 +238,11 @@
       none.hidden = rows.length > 0;
       document.getElementById("guest-list").hidden = visible.length === 0;
     }
-    function showGeneratedLink(token) {
+    function showGeneratedLink(code, invitation) {
       const panel = document.getElementById("guest-link-card");
       const anchor = document.getElementById("guest-link");
-      anchor.href = new URL(`event.html?token=${encodeURIComponent(token)}`, location.href).href;
+      const base = (window.WEDDINGHUB_API_URL || location.origin).replace(/\/$/, "");
+      anchor.href = `${base}/i/${encodeURIComponent(code)}`;
       anchor.textContent = anchor.href;
       panel.hidden = false;
       panel.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -246,12 +250,34 @@
         try { await navigator.clipboard.writeText(anchor.href); owner.toast("Invitation link copied."); }
         catch (_) { owner.toast("Copy the link shown above.", "error"); }
       };
+      const whatsapp = document.getElementById("share-new-whatsapp");
+      const imageShare = document.getElementById("share-new-image");
+      const wedding = data || {};
+      const couple = `${wedding.partner_one || ""} & ${wedding.partner_two || ""}`.trim();
+      const date = wedding.date ? new Date(wedding.date).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }) : "our wedding day";
+      const first = (invitation?.guest_name || "").trim().split(/\s+/)[0] || "";
+      const shareText = `Hi ${first} 💛 ${couple} would love to celebrate with you on ${date}. Tap to see your invitation and RSVP:\n${anchor.href}`;
+      whatsapp.onclick = () => {
+        location.href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+      };
+      imageShare.hidden = true;
+      if (navigator.share && navigator.canShare && window.File) {
+        fetch(`${base}/og/${encodeURIComponent(data.id)}.png?v=${Date.now()}`).then(response => {
+          if (!response.ok) throw new Error("Preview unavailable");
+          return response.blob();
+        }).then(blob => {
+          const file = new File([blob], "weddinghub-invitation.png", { type: "image/png" });
+          if (!navigator.canShare({ files: [file] })) return;
+          imageShare.hidden = false;
+          imageShare.onclick = () => navigator.share({ files: [file], title: `${couple} are getting married`, text: shareText }).catch(error => { if (error.name !== "AbortError") owner.toast("Could not share the banner image.", "error"); });
+        }).catch(() => {});
+      }
     }
     async function createFreshLink(id) {
       const link = await owner.api.refreshOwnerInvitationLink(id);
-      tokens.set(id, link.token);
-      showGeneratedLink(link.token);
-      return link.token;
+      tokens.set(id, link);
+      showGeneratedLink(link.short_code, guests().find(item => item.id === id));
+      return link;
     }
     try {
       data = await owner.loadWorkspace();
@@ -282,8 +308,8 @@
             owner.toast("Guest invitation updated.");
           } else {
             const created = await owner.api.createOwnerInvitation(invitation);
-            tokens.set(created.invitation.id, created.token);
-            showGeneratedLink(created.token);
+            tokens.set(created.invitation.id, created);
+            showGeneratedLink(created.short_code, { guest_name: created.invitation.guest_name });
             owner.toast("Guest added. Copy and share the invitation link.");
           }
           data = await owner.loadWorkspace(); render(); dialog.close();
@@ -307,16 +333,16 @@
             document.getElementById("guest-dialog-title").textContent = "Edit guest";
             dialog.showModal();
           } else if (copy) {
-            const token = await createFreshLink(copy.dataset.copyGuest);
-            try { await navigator.clipboard.writeText(new URL(`event.html?token=${encodeURIComponent(token)}`, location.href).href); owner.toast("A replacement guest link was copied."); }
+            const link = await createFreshLink(copy.dataset.copyGuest);
+            try { await navigator.clipboard.writeText(document.getElementById("guest-link").href); owner.toast("A replacement guest link was copied."); }
             catch (_) { owner.toast("A replacement link is displayed below the guest list."); }
           } else if (remind) {
             const id = remind.dataset.remindGuest;
-            let token = tokens.get(id);
-            if (!token) token = await createFreshLink(id);
+            let link = tokens.get(id);
+            if (!link) link = await createFreshLink(id);
             const invitation = guests().find(item => item.id === id);
             const channels = [invitation?.guest_email ? "email" : "", invitation?.guest_phone ? "whatsapp" : ""].filter(Boolean);
-            const sent = await owner.api.sendOwnerInvitation(id, token, channels);
+            const sent = await owner.api.sendOwnerInvitation(id, link.token, channels, link.short_code);
             const result = (sent.results || []).some(item => item.status === "sent");
             owner.toast(result ? "Reminder sent." : "No reminder channel is configured for this guest.", result ? "success" : "error");
           } else if (remove && window.confirm("Delete this invitation and its RSVP?")) {

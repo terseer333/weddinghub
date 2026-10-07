@@ -34,6 +34,13 @@ type Repository interface {
 	UpdateInvitation(weddingID string, invitation models.Invitation) (models.Invitation, error)
 	DeleteInvitation(weddingID, invitationID string) error
 	InvitationByHash(hash string) (models.Wedding, models.Invitation, error)
+	InvitationByShortCodeHash(hash string) (models.Wedding, models.Invitation, error)
+	PreviewByShortCodeHash(hash string) (models.Wedding, error)
+	PublicWeddingPreview(weddingID string) (models.Wedding, error)
+	RecordInvitationOpenByShortCodeHash(hash string, at time.Time) error
+	SaveWeddingBanner(weddingID, version string, image []byte) error
+	WeddingBanner(weddingID string) (version string, image []byte, err error)
+	WeddingBannerVersion(weddingID string) (string, error)
 	RespondToInvitation(hash string, status models.InvitationStatus, at time.Time) (models.Wedding, models.Invitation, error)
 	UpdateRSVP(hash string, rsvp models.RSVP) (models.Wedding, models.RSVP, error)
 	AddGuestMessage(hash string, message models.GuestMessage) (models.Wedding, models.GuestMessage, error)

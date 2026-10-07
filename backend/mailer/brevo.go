@@ -75,8 +75,10 @@ func New(apiKey, from, fromName, baseURL string) (*Brevo, error) {
 	if strings.TrimSpace(fromName) == "" {
 		fromName = "WeddingHub"
 	}
-	return &Brevo{apiKey: apiKey, from: parsedEmail.Address, fromName: fromName, baseURL: strings.TrimRight(base.String(), "/"),
-		client: &http.Client{Timeout: 10 * time.Second}, endpoint: brevoEndpoint}, nil
+	return &Brevo{
+		apiKey: apiKey, from: parsedEmail.Address, fromName: fromName, baseURL: strings.TrimRight(base.String(), "/"),
+		client: &http.Client{Timeout: 10 * time.Second}, endpoint: brevoEndpoint,
+	}, nil
 }
 
 func isLoopbackHost(host string) bool {

@@ -16,20 +16,24 @@ import (
 	"weddinghub/repository"
 )
 
-type capturedReset struct{ to, name, token string }
-type fakePasswordMailer struct {
-	resets   chan capturedReset
-	changed  chan string
-	resetErr error
-}
+type (
+	capturedReset      struct{ to, name, token string }
+	fakePasswordMailer struct {
+		resets   chan capturedReset
+		changed  chan string
+		resetErr error
+	}
+)
 
 func newFakePasswordMailer() *fakePasswordMailer {
 	return &fakePasswordMailer{resets: make(chan capturedReset, 10), changed: make(chan string, 10)}
 }
+
 func (f *fakePasswordMailer) SendPasswordReset(_ context.Context, to, name, token string) error {
 	f.resets <- capturedReset{to: to, name: name, token: token}
 	return f.resetErr
 }
+
 func (f *fakePasswordMailer) SendPasswordChanged(_ context.Context, to, _ string) error {
 	f.changed <- to
 	return nil

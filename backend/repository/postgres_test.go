@@ -145,12 +145,16 @@ func TestPostgresInvitationLifecycle(t *testing.T) {
 	if token == hash {
 		t.Fatal("raw token must differ from stored hash")
 	}
-	if _, err := repo.AddInvitation("w1", models.Invitation{ID: "i1", Type: models.InvitationGuest, GuestName: "Taylor",
-		GuestEmail: "taylor@example.com", MaxPartySize: 2, Status: models.InvitationPending, TokenHash: hash, CreatedAt: now}); err != nil {
+	if _, err := repo.AddInvitation("w1", models.Invitation{
+		ID: "i1", Type: models.InvitationGuest, GuestName: "Taylor",
+		GuestEmail: "taylor@example.com", MaxPartySize: 2, Status: models.InvitationPending, TokenHash: hash, CreatedAt: now,
+	}); err != nil {
 		t.Fatalf("AddInvitation: %v", err)
 	}
-	if _, err := repo.AddInvitation("w1", models.Invitation{ID: "i2", GuestName: "Sam", MaxPartySize: 1,
-		Status: models.InvitationPending, TokenHash: hash, CreatedAt: now}); !errors.Is(err, ErrConflict) {
+	if _, err := repo.AddInvitation("w1", models.Invitation{
+		ID: "i2", GuestName: "Sam", MaxPartySize: 1,
+		Status: models.InvitationPending, TokenHash: hash, CreatedAt: now,
+	}); !errors.Is(err, ErrConflict) {
 		t.Fatalf("duplicate token hash error = %v, want ErrConflict", err)
 	}
 	if _, err := repo.AddInvitation("missing", models.Invitation{ID: "i3", TokenHash: "other", CreatedAt: now}); !errors.Is(err, ErrNotFound) {
@@ -232,8 +236,10 @@ func TestPostgresExpiredInvitation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := repo.AddInvitation("w1", models.Invitation{ID: "i1", GuestName: "Late", MaxPartySize: 1,
-		Status: models.InvitationPending, TokenHash: hash, ExpiresAt: &expired, CreatedAt: now}); err != nil {
+	if _, err := repo.AddInvitation("w1", models.Invitation{
+		ID: "i1", GuestName: "Late", MaxPartySize: 1,
+		Status: models.InvitationPending, TokenHash: hash, ExpiresAt: &expired, CreatedAt: now,
+	}); err != nil {
 		t.Fatal(err)
 	}
 	if _, _, err := repo.InvitationByHash(hash); !errors.Is(err, ErrExpired) {
@@ -247,9 +253,11 @@ func TestPostgresExpiredInvitation(t *testing.T) {
 func TestPostgresCommitteeWorkspace(t *testing.T) {
 	repo := newTestPostgres(t)
 	now := time.Now().UTC().Truncate(time.Microsecond)
-	mustWedding(t, repo, models.Wedding{ID: "w1", Slug: "committee", Title: "Committee", Status: models.StatusPublished,
+	mustWedding(t, repo, models.Wedding{
+		ID: "w1", Slug: "committee", Title: "Committee", Status: models.StatusPublished,
 		AdminTokenHash: "h1", CommitteeRoles: []models.CommitteeRole{{ID: "r1", Name: "Finance", CreatedAt: now}},
-		CreatedAt: now, UpdatedAt: now})
+		CreatedAt: now, UpdatedAt: now,
+	})
 
 	if _, err := repo.AddCommitteeRole("w1", models.CommitteeRole{ID: "r2", Name: "Finance", CreatedAt: now}); !errors.Is(err, ErrConflict) {
 		t.Fatalf("duplicate role name error = %v, want ErrConflict", err)
@@ -270,8 +278,10 @@ func TestPostgresCommitteeWorkspace(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := repo.AddInvitation("w1", models.Invitation{ID: "i1", Type: models.InvitationCommittee, GuestName: "Ada",
-		CommitteeTitle: "Coordinator", MaxPartySize: 1, Status: models.InvitationPending, TokenHash: hash, CreatedAt: now}); err != nil {
+	if _, err := repo.AddInvitation("w1", models.Invitation{
+		ID: "i1", Type: models.InvitationCommittee, GuestName: "Ada",
+		CommitteeTitle: "Coordinator", MaxPartySize: 1, Status: models.InvitationPending, TokenHash: hash, CreatedAt: now,
+	}); err != nil {
 		t.Fatal(err)
 	}
 	wedding, _, err := repo.RespondToInvitation(hash, models.InvitationAccepted, now)
@@ -317,8 +327,10 @@ func TestPostgresCommitteeWorkspace(t *testing.T) {
 	}
 
 	// Planning tasks preserve creation metadata across updates.
-	task, err := repo.AddPlanningTask("w1", models.PlanningTask{ID: "t1", Title: "Book venue", Status: models.TaskTodo,
-		CreatedBy: "Ada", CreatedAt: now, UpdatedAt: now})
+	task, err := repo.AddPlanningTask("w1", models.PlanningTask{
+		ID: "t1", Title: "Book venue", Status: models.TaskTodo,
+		CreatedBy: "Ada", CreatedAt: now, UpdatedAt: now,
+	})
 	if err != nil {
 		t.Fatalf("AddPlanningTask: %v", err)
 	}
@@ -337,13 +349,17 @@ func TestPostgresCommitteeWorkspace(t *testing.T) {
 	}
 
 	// Announcements support create, update, and delete.
-	announcement, err := repo.AddAnnouncement("w1", models.Announcement{ID: "a1", Title: "Rehearsal", Body: "Friday",
-		Audience: models.AudienceCommittee, Status: models.StatusPublished, AuthorName: "Ada", CreatedAt: now})
+	announcement, err := repo.AddAnnouncement("w1", models.Announcement{
+		ID: "a1", Title: "Rehearsal", Body: "Friday",
+		Audience: models.AudienceCommittee, Status: models.StatusPublished, AuthorName: "Ada", CreatedAt: now,
+	})
 	if err != nil {
 		t.Fatalf("AddAnnouncement: %v", err)
 	}
-	if _, err := repo.UpdateAnnouncement("w1", models.Announcement{ID: announcement.ID, Title: "Rehearsal", Body: "Saturday",
-		Audience: models.AudienceCommittee, Status: models.StatusPublished, AuthorName: "Ada"}); err != nil {
+	if _, err := repo.UpdateAnnouncement("w1", models.Announcement{
+		ID: announcement.ID, Title: "Rehearsal", Body: "Saturday",
+		Audience: models.AudienceCommittee, Status: models.StatusPublished, AuthorName: "Ada",
+	}); err != nil {
 		t.Fatalf("UpdateAnnouncement: %v", err)
 	}
 	if err := repo.DeleteAnnouncement("w1", announcement.ID); err != nil {
@@ -482,8 +498,10 @@ func TestPostgresProfiles(t *testing.T) {
 	if _, err := repo.GetProfile("w1", models.ProfileKeyAdmin); !errors.Is(err, ErrNotFound) {
 		t.Fatalf("missing profile error = %v, want ErrNotFound", err)
 	}
-	if _, err := repo.UpsertProfile(models.Profile{WeddingID: "w1", ID: models.ProfileKeyAdmin, Role: models.RoleAdmin,
-		DisplayName: "Ada", Avatar: "data:image/png;base64,AAAA", UpdatedAt: now}); err != nil {
+	if _, err := repo.UpsertProfile(models.Profile{
+		WeddingID: "w1", ID: models.ProfileKeyAdmin, Role: models.RoleAdmin,
+		DisplayName: "Ada", Avatar: "data:image/png;base64,AAAA", UpdatedAt: now,
+	}); err != nil {
 		t.Fatalf("UpsertProfile: %v", err)
 	}
 	got, err := repo.GetProfile("w1", models.ProfileKeyAdmin)
@@ -496,8 +514,10 @@ func TestPostgresProfiles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := repo.AddInvitation("w1", models.Invitation{ID: "i1", Type: models.InvitationCommittee, GuestName: "Sam",
-		MaxPartySize: 1, Status: models.InvitationPending, TokenHash: hash, CreatedAt: now}); err != nil {
+	if _, err := repo.AddInvitation("w1", models.Invitation{
+		ID: "i1", Type: models.InvitationCommittee, GuestName: "Sam",
+		MaxPartySize: 1, Status: models.InvitationPending, TokenHash: hash, CreatedAt: now,
+	}); err != nil {
 		t.Fatal(err)
 	}
 	wedding, _, err := repo.RespondToInvitation(hash, models.InvitationAccepted, now)
@@ -505,8 +525,10 @@ func TestPostgresProfiles(t *testing.T) {
 		t.Fatalf("RespondToInvitation: %v", err)
 	}
 	memberID := wedding.CommitteeMembers[0].ID
-	if _, err := repo.UpsertProfile(models.Profile{WeddingID: "w1", ID: memberID, Role: models.RoleCommitteeMember,
-		DisplayName: "Sam", UpdatedAt: now}); err != nil {
+	if _, err := repo.UpsertProfile(models.Profile{
+		WeddingID: "w1", ID: memberID, Role: models.RoleCommitteeMember,
+		DisplayName: "Sam", UpdatedAt: now,
+	}); err != nil {
 		t.Fatalf("UpsertProfile(member): %v", err)
 	}
 

@@ -129,5 +129,6 @@ func (a *API) updateOwnerWorkspace(w http.ResponseWriter, r *http.Request) {
 		writeRepositoryError(w, err)
 		return
 	}
+	a.saveBanner(updated)
 	writeJSON(w, http.StatusOK, updated)
 }

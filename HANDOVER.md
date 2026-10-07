@@ -46,3 +46,12 @@ The API module is `backend/`. Set `WEDDINGHUB_DATABASE_URL` to a local PostgreSQ
 database before starting the app. The current dashboard endpoint returns `404` when a
 valid owner session has no linked wedding, and `401` for missing, expired, or suspended
 sessions.
+# Short links and link previews
+
+Guest invitations use 12-character base62 codes. PostgreSQL stores only the SHA-256 code hash in `invitations.short_code_hash`; migration `007_invitation_short_codes.sql` adds it. `GET /i/{code}` returns small Go-rendered Open Graph/Twitter HTML and directs browsers into the current invitation page with the short code. Preview lookups use a narrow PostgreSQL join, are rate-limited per client IP, and do not load guest details. No invitation-open timestamp or view counter exists, so crawler requests create no opens.
+
+Wedding banners are 1200×630 PNGs rendered in Go by `backend/preview` using the embedded DM Serif Display font and `golang.org/x/image`. The photo is softened under a cream overlay. Images are stored in PostgreSQL (`wedding_banners`) when owners save wedding details or card design; `/og/{wedding_id}.png` sends cache headers and falls back to the static `/static/og/weddinghub-default.png` when details or a stored render are unavailable. Link preview URLs include a wedding-details version hash.
+
+Guests & RSVP supports Copy link, WhatsApp sharing, and Web Share image sharing when supported. Card Studio displays the banner preview. Invitation SMTP email has a multipart HTML version with the banner and a “View your invitation” button; the existing plain text part remains available. A normal browser's first visit records `opened_at`; known link-preview bots do not. Migration `009_invitation_opened_at.sql` adds the timestamp.
+
+Render's static frontend and Go service are separate. `render.yaml` sets `WEDDINGHUB_PUBLIC_BASE_URL` to the Go service URL, so shared links use the service that handles `/i` and `/og`. To use another public domain for short links, route those paths to the Go service. `render.yaml` does not specify a compute plan: Render Free web services spin down after 15 idle minutes and take about a minute to wake; paid plans do not spin down. See [Render Free web services](https://render.com/docs/free).

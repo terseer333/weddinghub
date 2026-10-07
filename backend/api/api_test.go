@@ -20,7 +20,8 @@ import (
 func TestGuestDashboardFiltersContentAndDoesNotLeakHash(t *testing.T) {
 	repo := repository.NewMemoryRepository()
 	now := time.Now().UTC()
-	wedding := models.Wedding{ID: "w1", Slug: "alex-sam", Title: "Alex & Sam", Status: models.StatusPublished, CreatedAt: now, UpdatedAt: now,
+	wedding := models.Wedding{
+		ID: "w1", Slug: "alex-sam", Title: "Alex & Sam", Status: models.StatusPublished, CreatedAt: now, UpdatedAt: now,
 		Events: []models.Event{{ID: "published", Name: "Ceremony", Status: models.StatusPublished}, {ID: "draft", Name: "Secret", Status: models.StatusDraft}},
 	}
 	if _, err := repo.CreateWedding(wedding); err != nil {
@@ -516,11 +517,13 @@ func TestGuestDashboardExcludesCommitteeAnnouncements(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = hash
-	wedding := models.Wedding{ID: "w1", Slug: "public-only", Title: "Public Only", Status: models.StatusPublished,
+	wedding := models.Wedding{
+		ID: "w1", Slug: "public-only", Title: "Public Only", Status: models.StatusPublished,
 		Announcements: []models.Announcement{
 			{ID: "public-note", Title: "Welcome", Body: "Public", Status: models.StatusPublished, Audience: models.AudiencePublic},
 			{ID: "committee-note", Title: "Rehearsal", Body: "Committee only", Status: models.StatusPublished, Audience: models.AudienceCommittee},
-		}, CreatedAt: now, UpdatedAt: now}
+		}, CreatedAt: now, UpdatedAt: now,
+	}
 	if _, err := repo.CreateWedding(wedding); err != nil {
 		t.Fatal(err)
 	}

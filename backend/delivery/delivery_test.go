@@ -37,6 +37,15 @@ func TestNotifierChannelsLinkAndRouting(t *testing.T) {
 	}
 }
 
+func TestInvitationEmailIncludesPreviewAndButton(t *testing.T) {
+	message := string(buildInvitationEmail("from@example.com", "to@example.com", "You're invited", "Hello\nWedding date", "https://example.com/i/ABC123abc123", "https://example.com/og/w.png?v=abc"))
+	for _, part := range []string{`Content-Type: multipart/alternative`, `<img src="https://example.com/og/w.png?v=abc" alt="Wedding invitation banner"`, `View your invitation`, `https://example.com/i/ABC123abc123`} {
+		if !strings.Contains(message, part) {
+			t.Fatalf("email missing %q: %s", part, message)
+		}
+	}
+}
+
 func TestSMTPSenderRejectsHeaderInjectionAndRendersMessage(t *testing.T) {
 	var (
 		gotAddr string

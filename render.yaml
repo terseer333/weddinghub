@@ -6,6 +6,11 @@ services:
     startCommand: cd backend && ./app
     healthCheckPath: /healthz
     envVars:
+      - key: WEDDINGHUB_PUBLIC_BASE_URL
+        fromService:
+          type: web
+          name: weddinghub
+          envVarKey: RENDER_EXTERNAL_URL
       - key: WEDDINGHUB_ALLOWED_ORIGINS
         value: https://weddinghub.onrender.com,https://weddinghub-frontend.onrender.com
   - type: web

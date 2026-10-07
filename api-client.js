@@ -382,8 +382,8 @@
   async function refreshOwnerInvitationLink(id) {
     return request(`/api/owner/invitations/${encodeURIComponent(id)}/refresh-link`, { method: "POST", headers: sessionHeader() });
   }
-  async function sendOwnerInvitation(id, token, channels) {
-    return request(`/api/owner/invitations/${encodeURIComponent(id)}/send`, { method: "POST", headers: sessionHeader(), body: JSON.stringify({ token, channels }) });
+  async function sendOwnerInvitation(id, token, channels, shortCode) {
+    return request(`/api/owner/invitations/${encodeURIComponent(id)}/send`, { method: "POST", headers: sessionHeader(), body: JSON.stringify({ token, channels, short_code: shortCode }) });
   }
   async function createOwnerTask(task) {
     return request("/api/owner/tasks", { method: "POST", headers: sessionHeader(), body: JSON.stringify(task) });

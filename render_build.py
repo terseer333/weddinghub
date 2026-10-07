@@ -32,7 +32,7 @@ def copy_static_files() -> None:
     for path in ROOT.iterdir():
         if path.is_file() and path.suffix.lower() in STATIC_SUFFIXES:
             shutil.copy2(path, DIST / path.name)
-        elif path.is_dir() and path.name in {"assets", "pages", "reset-password", "templates"}:
+        elif path.is_dir() and path.name in {"assets", "pages", "reset-password", "static", "templates"}:
             for source in path.rglob("*"):
                 if source.is_file() and source.suffix.lower() in STATIC_SUFFIXES:
                     destination = DIST / source.relative_to(ROOT)

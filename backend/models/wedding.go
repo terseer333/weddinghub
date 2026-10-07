@@ -130,9 +130,11 @@ type Invitation struct {
 	MaxPartySize   int              `json:"max_party_size"`
 	Status         InvitationStatus `json:"status"`
 	TokenHash      string           `json:"-"`
+	ShortCodeHash  string           `json:"-"`
 	ExpiresAt      *time.Time       `json:"expires_at,omitempty"`
 	CreatedAt      time.Time        `json:"created_at"`
 	RespondedAt    *time.Time       `json:"responded_at,omitempty"`
+	OpenedAt       *time.Time       `json:"opened_at,omitempty"`
 }
 
 // CommitteeMember is created when a committee invitation is accepted. Membership is
@@ -364,6 +366,30 @@ func NewOpaqueToken() (token, hash string, err error) {
 	}
 	token = base64.RawURLEncoding.EncodeToString(buf)
 	return token, HashToken(token), nil
+}
+
+// NewShortCode makes a URL-safe base62 code and returns only its hash for storage.
+func NewShortCode() (string, string, error) {
+	const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	code := make([]byte, 12)
+	buf := make([]byte, 32)
+	for n := 0; n < len(code); {
+		if _, err := rand.Read(buf); err != nil {
+			return "", "", fmt.Errorf("generate short code: %w", err)
+		}
+		for _, b := range buf {
+			if b >= 248 {
+				continue
+			}
+			code[n] = alphabet[int(b)%len(alphabet)]
+			n++
+			if n == len(code) {
+				break
+			}
+		}
+	}
+	value := string(code)
+	return value, HashToken(value), nil
 }
 
 func HashToken(token string) string {
