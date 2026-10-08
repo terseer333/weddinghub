@@ -1,5 +1,5 @@
-async function copyInvitation(token){const url=new URL(`event.html?token=${token}`,location.href).href;const guest=AdminApp.data.guests.find(item=>item.token===token);if(guest&&guest.invitationStatus==='pending'){guest.invitationStatus='sent';WH.saveData(AdminApp.data);AdminApp.renderAll()}try{await navigator.clipboard.writeText(url);WH.toast('Invitation link copied and marked as sent')}catch(_){AdminModal.show(`<p class="eyebrow">Invitation link</p><h2>Copy this secure link</h2><label class="copy-field"><input value="${AdminModal.field(url)}" readonly></label>`)}}
-function invitationUrl(token) { return new URL(`event.html?token=${token}`, location.href).href; }
+async function copyInvitation(token){const url=new URL(`/event?token=${encodeURIComponent(token)}`,WeddingHubAPI.baseURL()).href;const guest=AdminApp.data.guests.find(item=>item.token===token);if(guest&&guest.invitationStatus==='pending'){guest.invitationStatus='sent';WH.saveData(AdminApp.data);AdminApp.renderAll()}try{await navigator.clipboard.writeText(url);WH.toast('Invitation link copied and marked as sent')}catch(_){AdminModal.show(`<p class="eyebrow">Invitation link</p><h2>Copy this secure link</h2><label class="copy-field"><input value="${AdminModal.field(url)}" readonly></label>`)}}
+function invitationUrl(token) { return new URL(`/event?token=${encodeURIComponent(token)}`, WeddingHubAPI.baseURL()).href; }
 
 function markInvitationSent(guest) {
   if (guest && guest.invitationStatus === 'pending') {

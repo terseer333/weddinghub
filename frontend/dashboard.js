@@ -178,7 +178,7 @@ function renderOverview() {
   if (data.messages[0]) activities.push({ icon: '✉', title: data.messages[0].name, detail: 'left a wedding wish' });
   $('#activityList').innerHTML = activities.length ? activities.map(item => `<p><i>${WH.escape(item.icon)}</i><span><strong>${WH.escape(item.title)}</strong> ${WH.escape(item.detail)}<small>Latest activity</small></span></p>`).join('') : '<p class="empty-inline">Guest activity will appear here.</p>';
   const preview = attending[0] || data.guests[0];
-  $$('a[href*="event.html?"]').forEach(anchor => anchor.href = preview ? `event.html?token=${preview.token}` : 'event.html?preview=admin');
+  $$('a[href*="event.html?"]').forEach(anchor => anchor.href = new URL(preview ? `/event?token=${encodeURIComponent(preview.token)}` : '/event?preview=admin', WeddingHubAPI.baseURL()).href);
 }
 WH.countdown(data.wedding.date, value => {
   $('#adminCountdown').innerHTML = value.passed ? '<strong>Today we celebrate love</strong>' : [['Days',value.days],['Hours',value.hours],['Minutes',value.minutes],['Seconds',value.seconds]].map(([label,number]) => `<div><strong>${String(number).padStart(2,'0')}</strong><span>${label}</span></div>`).join('');

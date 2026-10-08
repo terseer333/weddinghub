@@ -2,20 +2,11 @@ services:
   - type: web
     name: weddinghub
     runtime: go
-    buildCommand: cd backend && go build -tags netgo -ldflags "-s -w" -o app ./cmd
+    buildCommand: python3 scripts/build_frontend.py && cd backend && go build -tags netgo -ldflags "-s -w" -o app ./cmd
     startCommand: cd backend && ./app
     healthCheckPath: /healthz
     envVars:
+      - key: WEDDINGHUB_STATIC_DIR
+        value: ../dist
       - key: WEDDINGHUB_ALLOWED_ORIGINS
-        value: https://weddinghub.onrender.com,https://weddinghub-frontend.onrender.com
-  - type: web
-    name: weddinghub-frontend
-    runtime: static
-    buildCommand: python3 render_build.py
-    staticPublishPath: dist
-    envVars:
-      - key: WEDDINGHUB_API_URL
-        fromService:
-          type: web
-          name: weddinghub
-          envVarKey: RENDER_EXTERNAL_URL
+        value: https://weddinghub.onrender.com

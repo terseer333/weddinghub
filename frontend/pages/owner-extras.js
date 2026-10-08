@@ -107,7 +107,7 @@
           token = link.token;
           inviteTokens.set(id, token);
         }
-        const url = new URL(`event.html?token=${encodeURIComponent(token)}`, location.href).href;
+        const url = new URL(`/event?token=${encodeURIComponent(token)}`, WeddingHubAPI.baseURL()).href;
         const linkNode = [...box.querySelectorAll("[data-committee-invite-link]")].find(node => node.dataset.committeeInviteLink === id);
         if (linkNode) { linkNode.href = url; linkNode.textContent = url; linkNode.target = "_blank"; linkNode.rel = "noopener"; linkNode.hidden = false; }
         try { await navigator.clipboard.writeText(url); owner.toast("Committee invitation link copied."); }

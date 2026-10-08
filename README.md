@@ -20,9 +20,16 @@ configured with the same names (`WEDDINGHUB_DATABASE_URL`, and `PORT` is used au
 
 The API pings the database and applies its embedded schema migrations at startup. It exits with a fatal error when `WEDDINGHUB_DATABASE_URL` is missing or the database is unreachable; there is no in-memory fallback.
 
-Serve the frontend from a loopback origin in another terminal:
+The Go server also serves the frontend. At startup it registers a Go handler for every HTML page
+in the configured frontend directory, using root extensionless URLs (for example, `/login` and
+`/dashboard`). Requests to legacy `.html` or `/pages/...` URLs redirect to the clean URL; `/` and
+directory index pages have clean routes too.
+When started from `backend/`, it detects the repository's frontend files automatically, so open
+`http://localhost:8080` to use the pages and API on one origin. To work on the frontend through a
+separate static development server instead, use:
 
 ```sh
+cd frontend
 python3 -m http.server 5500
 ```
 
@@ -30,11 +37,11 @@ Then open `http://localhost:5500`. The Admin Dashboard shows **API connected** w
 
 ### Render deployment
 
-The Render Blueprint deploys the frontend as a separate Static Site (`weddinghub-frontend`) and keeps the Go API in the `weddinghub` web service. Render serves the landing page from its CDN without waiting for the API service to start. The static build injects the API service URL into the frontend, and the API's exact CORS allowlist includes both Render service origins. If Render assigns a different frontend URL or you attach a custom domain, update `WEDDINGHUB_ALLOWED_ORIGINS` on the API service to include that exact origin.
+The Render Blueprint builds the frontend into `dist` and serves it from the Go `weddinghub` web service. Page requests such as `/`, `/login`, `/dashboard`, `/reset-password`, and `/api/...` therefore share one origin; the browser uses that origin for API calls, so no frontend API URL or cross-origin allowlist is needed. If you attach a custom domain, point it at this web service.
 
 Recommended product journey:
 
-1. Open `pages/dashboard.html` to use the Wedding Admin workspace.
+1. Open `frontend/pages/dashboard.html` to use the Wedding Admin workspace.
 2. Edit **Wedding information** (for example, change the venue) and save.
 3. Create a published **Announcement** or add a guest.
 4. Select another design from the generated 108-template library.
@@ -44,11 +51,11 @@ Recommended product journey:
 
 On a browser that has never completed the guided tour, the admin dashboard opens with a step-by-step walkthrough of every feature: each step highlights a sidebar section, switches to it, and explains what it does. It can be skipped at any point and replayed from **Settings → Getting started**.
 
-`api-client.js` maps the browser view model to the Go API, which is the only source of truth. The browser keeps just the current working copy used to render a page; it is refreshed from the API and is never used as an offline data store.
+`frontend/api-client.js` maps the browser view model to the Go API, which is the only source of truth. The browser keeps just the current working copy used to render a page; it is refreshed from the API and is never used as an offline data store.
 
-### Hosted frontend
+### Separate static frontend hosting
 
-A static host must be pointed at a deployed API before it can load a wedding. Open **Dashboard → Settings → API connection** and enter the deployed HTTPS API URL, or define `window.WEDDINGHUB_API_URL` before loading `api-client.js`. A static host with no reachable API shows the blocking API-unavailable error. Do not point an HTTPS website at an HTTP API; browsers block that as mixed content.
+A separately hosted frontend can still be pointed at a deployed API. Open **Dashboard → Settings → API connection** and enter the deployed HTTPS API URL, or define `window.WEDDINGHUB_API_URL` before loading `frontend/api-client.js`. A static host with no reachable API shows the blocking API-unavailable error. Do not point an HTTPS website at an HTTP API; browsers block that as mixed content.
 
 ## Backend API
 

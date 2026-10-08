@@ -2,10 +2,10 @@
 
 ## Owner dashboard
 
-The refreshed owner dashboard is served at `/pages/dashboard.html`. Its plain HTML,
-CSS, and JavaScript live in `pages/dashboard.html`, `pages/dashboard.css`, and
-`pages/dashboard.js`. The previous owner dashboard is preserved at
-`/pages/dashboard.old.html` and continues using the original root scripts.
+The refreshed owner dashboard is served at `/dashboard`. Its plain HTML,
+CSS, and JavaScript live in `frontend/pages/dashboard.html`,
+`frontend/pages/dashboard.css`, and `frontend/pages/dashboard.js`. The previous owner dashboard is preserved at
+`/dashboard.old` and continues using the original root scripts.
 
 `GET /api/dashboard` requires `Authorization: Bearer <session_token>`. It selects the
 first wedding linked to the authenticated user through `wedding_admins`; it does not
@@ -15,10 +15,10 @@ the existing auth and repository methods.
 ### Sidebar navigation check
 
 The current sidebar routes dashboard sections to the matching anchors on
-`/pages/dashboard.html`; the invitation preview opens `/pages/event.html?preview=admin`
+`/dashboard`; the invitation preview opens `/event?preview=admin`
 and its return button goes back to the dashboard. Existing `rsvps.html` and
 `create-event.html` aliases redirect to the new dashboard. Dashboard requests retain
-the browser session token and redirect to `login.html` after a `401`.
+the browser session token and redirect to `/login` after a `401`.
 
 Standalone owner pages for messages, events, committee, photos/story, announcements,
 Card Studio, and Help do not exist yet. Their sidebar entries currently point to the

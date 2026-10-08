@@ -8,13 +8,13 @@ import (
 	"testing"
 )
 
-// pages/dashboard.html and pages/event.html load templates/templates-data.js before
+// frontend/pages/dashboard.html and frontend/pages/event.html load frontend/templates/templates-data.js before
 // template-engine.js, which seeds window.WEDDINGHUB_BUILTIN_TEMPLATES. That built-in list
 // is what the studio renders from before /api/templates answers, and the only catalog when
-// the API is unreachable. If it drifts from templates/templates.json, offline users see
+// the API is unreachable. If it drifts from frontend/templates/templates.json, offline users see
 // retired designs in the picker and never see newly added ones.
 func TestBuiltinCatalogMatchesTemplateJSON(t *testing.T) {
-	raw, err := os.ReadFile("../../templates/templates-data.js")
+	raw, err := os.ReadFile("../../frontend/templates/templates-data.js")
 	if err != nil {
 		t.Skipf("built-in catalog not available: %v", err)
 	}
@@ -31,7 +31,7 @@ func TestBuiltinCatalogMatchesTemplateJSON(t *testing.T) {
 		t.Fatalf("templates-data.js payload is not valid JSON: %v", err)
 	}
 
-	fileRaw, err := os.ReadFile("../../templates/templates.json")
+	fileRaw, err := os.ReadFile("../../frontend/templates/templates.json")
 	if err != nil {
 		t.Skipf("catalog not available: %v", err)
 	}
@@ -52,7 +52,7 @@ func TestBuiltinCatalogMatchesTemplateJSON(t *testing.T) {
 			if id == "" {
 				id = "<missing>"
 			}
-			t.Errorf("entry %d differs (%s); regenerate with templates/sync-builtin-catalog.py", i, id)
+			t.Errorf("entry %d differs (%s); regenerate with frontend/templates/sync-builtin-catalog.py", i, id)
 			diverged++
 		}
 	}

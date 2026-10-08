@@ -122,8 +122,8 @@ Delivery configuration (every variable is optional; a channel without complete c
 
 | Variable | Purpose |
 |---|---|
-| `WEDDINGHUB_PUBLIC_BASE_URL` | Public origin used to build `.../pages/event.html?token=...` links |
-| `WEDDINGHUB_INVITATION_PATH` | Invitation path, default `/pages/event.html` |
+| `WEDDINGHUB_PUBLIC_BASE_URL` | Public origin used to build `.../event?token=...` links |
+| `WEDDINGHUB_INVITATION_PATH` | Invitation path, default `/event` |
 | `WEDDINGHUB_SMTP_HOST` | Enables the email channel; requires a from address or username |
 | `WEDDINGHUB_SMTP_PORT` | SMTP port, default `587` |
 | `WEDDINGHUB_SMTP_USERNAME` / `WEDDINGHUB_SMTP_PASSWORD` | SMTP credentials (PLAIN auth when a username is set) |

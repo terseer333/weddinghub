@@ -163,14 +163,14 @@
       select.innerHTML = '<option value="">Choose a guest</option>' + invitations.map(invitation => `<option value="${escape(invitation.id)}">${escape(invitation.guest_name)}</option>`).join("");
       document.getElementById("page-main").hidden = false;
       setState("ready");
-      document.getElementById("guest-preview").src = "event.html?preview=admin";
+      document.getElementById("guest-preview").src = "/event?preview=admin";
       document.querySelectorAll("[data-preview-size]").forEach(button => button.addEventListener("click", () => {
         const frame = document.querySelector(".preview-frame"); frame.classList.toggle("mobile", button.dataset.previewSize === "mobile");
       }));
       async function guestURL() {
         if (!select.value) throw new Error("Choose a guest first.");
         const link = await owner.api.refreshOwnerInvitationLink(select.value);
-        const url = new URL(`event.html?token=${encodeURIComponent(link.token)}`, location.href).href;
+        const url = new URL(`/event?token=${encodeURIComponent(link.token)}`, WeddingHubAPI.baseURL()).href;
         return url;
       }
       document.getElementById("copy-invitation").addEventListener("click", async () => {
@@ -238,7 +238,7 @@
     function showGeneratedLink(token) {
       const panel = document.getElementById("guest-link-card");
       const anchor = document.getElementById("guest-link");
-      anchor.href = new URL(`event.html?token=${encodeURIComponent(token)}`, location.href).href;
+      anchor.href = new URL(`/event?token=${encodeURIComponent(token)}`, WeddingHubAPI.baseURL()).href;
       anchor.textContent = anchor.href;
       panel.hidden = false;
       panel.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -308,7 +308,7 @@
             dialog.showModal();
           } else if (copy) {
             const token = await createFreshLink(copy.dataset.copyGuest);
-            try { await navigator.clipboard.writeText(new URL(`event.html?token=${encodeURIComponent(token)}`, location.href).href); owner.toast("A replacement guest link was copied."); }
+            try { await navigator.clipboard.writeText(new URL(`/event?token=${encodeURIComponent(token)}`, WeddingHubAPI.baseURL()).href); owner.toast("A replacement guest link was copied."); }
             catch (_) { owner.toast("A replacement link is displayed below the guest list."); }
           } else if (remind) {
             const id = remind.dataset.remindGuest;

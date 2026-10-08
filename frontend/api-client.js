@@ -559,7 +559,7 @@
     return request(`/api/weddings/${encodeURIComponent(id)}/committee/members/${encodeURIComponent(memberID)}`, { method: "DELETE", headers: authHeader() });
   }
 
-  window.WeddingHubAPI = { requireAPI, showFatalError, bootstrap, saveWedding, ownerWorkspace, saveOwnerWorkspace,
+  window.WeddingHubAPI = { baseURL, requireAPI, showFatalError, bootstrap, saveWedding, ownerWorkspace, saveOwnerWorkspace,
     createOwnerInvitation, updateOwnerInvitation, deleteOwnerInvitation, refreshOwnerInvitationLink, sendOwnerInvitation,
     createOwnerTask, updateOwnerTask, deleteOwnerTask, setOwnerMessageRead, deleteOwnerMessage,
     createOwnerCommitteeRole, deleteOwnerCommitteeRole, updateOwnerCommitteeMember, deleteOwnerCommitteeMember,

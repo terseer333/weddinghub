@@ -1,4 +1,4 @@
-"""Build the browser frontend for Render's CDN-backed static site."""
+"""Build the frontend static tree consumed by the Go server."""
 
 import json
 import os
@@ -7,7 +7,8 @@ import shutil
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
+FRONTEND = ROOT / "frontend"
 DIST = ROOT / "dist"
 STATIC_SUFFIXES = {
     ".css",
@@ -29,13 +30,13 @@ def copy_static_files() -> None:
         shutil.rmtree(DIST)
     DIST.mkdir()
 
-    for path in ROOT.iterdir():
+    for path in FRONTEND.iterdir():
         if path.is_file() and path.suffix.lower() in STATIC_SUFFIXES:
             shutil.copy2(path, DIST / path.name)
-        elif path.is_dir() and path.name in {"assets", "pages", "reset-password", "templates"}:
+        elif path.is_dir():
             for source in path.rglob("*"):
                 if source.is_file() and source.suffix.lower() in STATIC_SUFFIXES:
-                    destination = DIST / source.relative_to(ROOT)
+                    destination = DIST / source.relative_to(FRONTEND)
                     destination.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(source, destination)
 
@@ -43,7 +44,9 @@ def copy_static_files() -> None:
 def configure_api_url() -> None:
     api_url = os.environ.get("WEDDINGHUB_API_URL", "").strip()
     if not api_url:
-        raise SystemExit("WEDDINGHUB_API_URL must reference the WeddingHub API service")
+        # A same-origin Go deployment needs no injected URL: api-client.js uses
+        # location.origin when the page is served over HTTP(S).
+        return
 
     (DIST / "api-config.js").write_text(
         "window.WEDDINGHUB_API_URL = " + json.dumps(api_url) + ";\n",

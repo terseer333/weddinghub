@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	defaultInvitationPath = "/pages/event.html"
+	defaultInvitationPath = "/event"
 	defaultSMTPPort       = "587"
 	defaultWhatsAppAPI    = "v21.0"
 	defaultWhatsAppBase   = "https://graph.facebook.com"

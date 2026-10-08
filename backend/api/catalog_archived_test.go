@@ -8,12 +8,12 @@ import (
 	"weddinghub/models"
 )
 
-// The catalog reaches the client from templates/templates.json. Archived entries have to
+// The catalog reaches the client from frontend/templates/templates.json. Archived entries have to
 // survive that JSON round-trip: the client hides them from the picker but still needs them
 // to resolve the design of weddings that already reference one. If the Archived field is
 // ever dropped from models.Template, every retired template silently returns to the gallery.
 func TestArchivedTemplatesSurviveCatalogRoundTrip(t *testing.T) {
-	const path = "../../templates/templates.json"
+	const path = "../../frontend/templates/templates.json"
 
 	raw, err := os.ReadFile(path)
 	if err != nil {

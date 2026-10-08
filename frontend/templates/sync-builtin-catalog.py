@@ -7,7 +7,7 @@ studio renders from before /api/templates answers, and the only list when the AP
 is unreachable. It has to carry the same entries and archived flags as the JSON.
 backend/api/catalog_builtin_test.go fails if the two ever diverge.
 
-Run from anywhere: python3 templates/sync-builtin-catalog.py
+Run from anywhere: python3 frontend/templates/sync-builtin-catalog.py
 """
 import json
 from pathlib import Path

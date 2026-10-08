@@ -6,6 +6,7 @@ backend/weddinghub-server
 check.png
 Screenshot from *.png
 upload/
+dist/
 
 # Local agent scratch space
 .qwen/tmp/

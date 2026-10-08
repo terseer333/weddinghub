@@ -23,7 +23,7 @@ func TestNotifierChannelsLinkAndRouting(t *testing.T) {
 	if len(channels) != 2 || channels[0] != ChannelEmail || channels[1] != ChannelWhatsApp {
 		t.Fatalf("channels = %#v", channels)
 	}
-	if link := notifier.Link("abc def"); link != "https://wedding.example/pages/event.html?token=abc+def" {
+	if link := notifier.Link("abc def"); link != "https://wedding.example/event?token=abc+def" {
 		t.Fatalf("link = %q", link)
 	}
 	if link := (&Notifier{}).Link("abc"); link != "" {
@@ -50,7 +50,7 @@ func TestSMTPSenderRejectsHeaderInjectionAndRendersMessage(t *testing.T) {
 		return nil
 	}
 
-	invitation := Invitation{Channel: ChannelEmail, To: "guest@example.com", Name: "Taylor", Couple: "Alex & Sam", Link: "https://wedding.example/pages/event.html?token=t"}
+	invitation := Invitation{Channel: ChannelEmail, To: "guest@example.com", Name: "Taylor", Couple: "Alex & Sam", Link: "https://wedding.example/event?token=t"}
 	if err := sender.Send(context.Background(), invitation); err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func TestWhatsAppSenderPostsToCloudAPI(t *testing.T) {
 	defer server.Close()
 
 	sender := NewWhatsAppSender(WhatsAppConfig{Token: "secret", PhoneNumberID: "999", BaseURL: server.URL})
-	invitation := Invitation{Channel: ChannelWhatsApp, To: "+1 (555) 123-4567", Name: "Taylor", Couple: "Alex & Sam", Link: "https://wedding.example/pages/event.html?token=t"}
+	invitation := Invitation{Channel: ChannelWhatsApp, To: "+1 (555) 123-4567", Name: "Taylor", Couple: "Alex & Sam", Link: "https://wedding.example/event?token=t"}
 	if err := sender.Send(context.Background(), invitation); err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +138,7 @@ func TestFromEnvActivatesOnlyConfiguredChannels(t *testing.T) {
 	if len(channels) != 1 || channels[0] != ChannelEmail {
 		t.Fatalf("channels = %#v", channels)
 	}
-	if link := notifier.Link("tok"); link != "https://wedding.example/pages/event.html?token=tok" {
+	if link := notifier.Link("tok"); link != "https://wedding.example/event?token=tok" {
 		t.Fatalf("link = %q", link)
 	}
 

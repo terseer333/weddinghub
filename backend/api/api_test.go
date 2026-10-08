@@ -774,7 +774,7 @@ func TestSendInvitationDeliversAndValidatesToken(t *testing.T) {
 	if response := call(`{"token":"`+invitation.Token+`","channels":["email"]}`, true); response.Code != http.StatusServiceUnavailable {
 		t.Fatalf("missing base url status = %d: %s", response.Code, response.Body)
 	}
-	sender.link = "https://wedding.example/pages/event.html?token="
+	sender.link = "https://wedding.example/event?token="
 
 	response := call(`{"token":"`+invitation.Token+`","channels":["email","whatsapp"]}`, true)
 	if response.Code != http.StatusOK {
