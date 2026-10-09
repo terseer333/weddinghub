@@ -218,7 +218,7 @@
       city: w.city || data.wedding.city, state: w.state || data.wedding.state,
       country: w.country || data.wedding.country, message: w.message || data.wedding.message,
       verse: w.verse || data.wedding.verse, dressCode: w.dress_code || data.wedding.dressCode,
-      heroImage: w.hero_image || data.wedding.heroImage, templateId: w.template_id || data.wedding.templateId,
+      heroImage: Object.hasOwn(w, "hero_image") ? (w.hero_image || "") : data.wedding.heroImage, templateId: w.template_id || data.wedding.templateId,
       cardConfig: w.card_config || data.wedding.cardConfig };
     if (w.committee_roles) {
       data.committeeRoles = w.committee_roles.map(r => ({ id: r.id, name: r.name, description: r.description || "" }));

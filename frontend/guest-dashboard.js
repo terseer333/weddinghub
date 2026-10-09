@@ -95,10 +95,13 @@ function revealOnScroll() {
 
 function renderGuestDashboard() {
   const galleryPhotos = WH.published(data.photos).filter(photo => !/^(bride|groom) portrait$/i.test(photo.caption || ''));
+  // Prefer the couple's chosen hero image, with their current published uploads as a
+  // live fallback when no hero image is set.
+  const heroImage = wedding.heroImage || galleryPhotos[0]?.url || "";
   const visibility = { story: WH.published(data.stories).length > 0, gallery: galleryPhotos.length > 0, events: WH.published(data.events).length > 0, announcements: WH.publicAnnouncements(data.announcements).length > 0 };
   Object.entries(visibility).forEach(([id, visible]) => { const section=document.getElementById(id); if(section)section.hidden=!visible; const link=document.querySelector(`.guest-links a[href="#${id}"]`); if(link)link.hidden=!visible; });
-  document.getElementById("guestHero").style.backgroundImage = `url('${wedding.heroImage}')`;
-  document.getElementById("detailImage").style.backgroundImage = `url('${galleryPhotos[2]?.url || galleryPhotos[0]?.url || wedding.heroImage}')`;
+  document.getElementById("guestHero").style.backgroundImage = heroImage ? `url('${heroImage}')` : "";
+  document.getElementById("detailImage").style.backgroundImage = `url('${galleryPhotos[2]?.url || galleryPhotos[0]?.url || heroImage}')`;
   document.getElementById("welcomeName").textContent = `Welcome, ${guest.name.split(" ")[0]}`;
   document.getElementById("heroBride").textContent = wedding.brideName;
   document.getElementById("heroGroom").textContent = wedding.groomName;

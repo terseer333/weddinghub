@@ -15,7 +15,7 @@
 .couple-section{padding:95px 7vw;background:#faf8f3}
 .couple-grid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:34px;max-width:880px;margin:60px auto 0}
 .couple-card{text-align:center}
-.couple-portrait{display:grid;width:min(100%,250px);aspect-ratio:1;margin:0 auto 22px;overflow:hidden;place-items:center;border:1px solid #ded5c6;border-radius:50%;background:#efe9dd}
+.couple-portrait{display:grid;width:min(100%,250px);aspect-ratio:4/5;margin:0 auto 22px;overflow:hidden;place-items:center;border:1px solid #ded5c6;border-radius:48% 48% 18px 18px;background:#efe9dd}
 .couple-portrait img{width:100%;height:100%;object-fit:cover}
 .couple-monogram{color:#c0a077;font-family:var(--script);font-size:var(--display-sm);line-height:1}
 .couple-role{color:#9b7862;font-size:var(--text-2xs);letter-spacing:.25em;text-transform:uppercase}
@@ -35,9 +35,10 @@
 [data-reveal=in]{opacity:1;transform:none}
 @media(max-width:700px){
 .couple-section,.countdown-section{padding:75px 19px}
-.couple-grid{grid-template-columns:1fr;gap:26px;margin-top:42px}
+.couple-grid{grid-template-columns:1fr 1fr;gap:12px;max-width:600px;margin-top:42px}
+.couple-portrait{width:min(100%,210px)}
 .couple-card h3{font-size:var(--text-5xl)}
-.couple-amp{font-size:var(--text-6xl)}
+.couple-amp{grid-column:1/-1;grid-row:2;justify-self:center;font-size:var(--text-6xl);line-height:.5}
 .countdown-grid{grid-template-columns:repeat(2,1fr);gap:26px 0;margin-top:36px}
 .countdown-grid div:nth-child(odd){border-left:0}
 .countdown-today{font-size:var(--text-6xl)}
